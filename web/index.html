@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="tfsitescapeweb">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/png" href="favicon.png"/>
+
+  <title>Sitescape</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js');
+      });
+    }
+  </script>
+
+<script type="text/javascript" src="jszip-utils.js"></script>
+<script type="text/javascript" src="jszip.js"></script>
+<script type="text/javascript" src="FileSaver.js"></script>
+  
+  <script>
+    function generateZIP(links) {
+      if (links.length == 0) {
+        return;
+      }
+
+      var zip = new JSZip();
+      var count = 0;
+
+      var cutbefore = links[0].substring(links[0].indexOf("tfcloud%2F") + 10);
+      var sitename = cutbefore.substring(0, cutbefore.indexOf("%2F")).replaceAll("%20", " ");
+
+      var zipFilename = "PHOTOPACK-" + sitename + ".zip";
+
+      links.forEach(function (url, i) {
+        var filename = links[i];
+        console.log(links[i]);
+        filename = links[i].substring(links[i].indexOf("tfcloud%2F") + 10, links[i].indexOf("?alt")).replaceAll("%20", " ").replaceAll("%2F", "/");
+
+        // loading a file and add it in a zip file
+        JSZipUtils.getBinaryContent(url, function (err, data) {
+          if (err) {
+            throw err; // or handle the error
+          }
+          zip.file(filename, data, { binary: true });
+          count++;
+          if (count == links.length) {
+            zip.generateAsync({ type: 'blob' }).then(function (content) {
+              saveAs(content, zipFilename);
+            });
+          }
+        });
+      });
+    }
+  </script>
+
+  <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+      https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-database.js"></script>
+  
+
+  <script>
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyAGBXJxEJ0JU4RE-F1IKjTMmVzh7gpHFLM",
+      authDomain: "tfsitescape.firebaseapp.com",
+      databaseURL: "https://tfsitescape.firebaseio.com",
+      projectId: "tfsitescape",
+      storageBucket: "tfsitescape.appspot.com",
+      messagingSenderId: "760937399414",
+      appId: "1:760937399414:web:ca525921238f5ef1988b57",
+      measurementId: "G-63YKBQSW5G"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
+  <!-- END OF FIREBASE INIT CODE -->
+
+  <script src="main.dart.js" type="application/javascript"></script>
+</body>
+</html>
