@@ -17,10 +17,11 @@ import 'package:tfsitescapeweb/services/util.dart';
    loginCallback -> void: Performed after authentication attempt 
 */
 class SubPage extends StatefulWidget {
-  SubPage({this.auth, this.site});
+  SubPage({this.auth, this.site, this.readOnly});
 
   final Auth auth;
   final Site site;
+  final bool readOnly;
 
   @override
   State<StatefulWidget> createState() => new SubPageState(this.site);
@@ -31,14 +32,12 @@ class SubPageState extends State<SubPage> {
   final Site site;
   SubPageState(this.site);
 
-  String _sub;
   TextEditingController subController;
 
   @override
   void initState() {
     super.initState();
     subController = new TextEditingController();
-    _sub = "";
   }
 
   // Build the widget.
@@ -46,7 +45,7 @@ class SubPageState extends State<SubPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
@@ -56,25 +55,27 @@ class SubPageState extends State<SubPage> {
           Center(
             child: Container(
               width: 600,
-              height: 800,
+              height: 900,
               padding: EdgeInsets.all(10),
               color: Colors.black.withOpacity(0.25),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   showLogOut(context),
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: 15,
-                      right: 15,
-                      top: 15,
-                    ),
-                    margin: EdgeInsets.only(top: 30),
-                    child: showSubInput(),
-                  ),
-                  showAdd(),
+                  !widget.readOnly
+                      ? Container(
+                          padding: EdgeInsets.only(
+                            left: 15,
+                            right: 15,
+                            top: 15,
+                          ),
+                          margin: EdgeInsets.only(top: 30),
+                          child: showSubInput(),
+                        )
+                      : Container(),
+                  !widget.readOnly ? showAdd() : Container(),
                   showSubsites(),
-                  showContinue(context),
+                  !widget.readOnly ? showContinue(context) : Container(),
                   showCancel(context),
                 ],
               ),
@@ -196,7 +197,7 @@ class SubPageState extends State<SubPage> {
 
           if (notDuplicate && subController.text.isNotEmpty) {
             setState(() {
-              site.subsites.add(Subsite(subController.text, {}, []));
+              site.subsites.add(Subsite(subController.text, {}));
               site.subsites.sort((a, b) => a.name.compareTo(b.name));
             });
           }
@@ -243,7 +244,7 @@ class SubPageState extends State<SubPage> {
                     width: 36,
                     child: IconButton(
                       icon: Icon(
-                        Icons.edit,
+                        !widget.readOnly ? Icons.edit : Icons.photo_library,
                         size: 16,
                       ),
                       onPressed: () {
@@ -253,6 +254,7 @@ class SubPageState extends State<SubPage> {
                             builder: (BuildContext context) => SecPage(
                               auth: userAuth,
                               sub: sub,
+                              readOnly: widget.readOnly,
                             ),
                           ),
                         ).then(
@@ -261,22 +263,24 @@ class SubPageState extends State<SubPage> {
                       },
                     ),
                   ),
-                  SizedBox(
-                    height: 36,
-                    width: 36,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.delete_outline,
-                        size: 16,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          site.subsites.remove(sub);
-                        });
-                      },
-                    ),
-                  )
+                  !widget.readOnly
+                      ? SizedBox(
+                          height: 36,
+                          width: 36,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              size: 16,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                site.subsites.remove(sub);
+                              });
+                            },
+                          ),
+                        )
+                      : Container(),
                 ],
               ),
             ],
@@ -304,7 +308,7 @@ class SubPageState extends State<SubPage> {
           ),
           color: Colors.green[400].withOpacity(0.9),
           child: new Text(
-            "Finalise and publish",
+            "Apply changes and return",
             style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,
@@ -340,7 +344,7 @@ class SubPageState extends State<SubPage> {
           ),
           color: Colors.indigoAccent[400].withOpacity(0.9),
           child: new Text(
-            "Back to site details",
+            !widget.readOnly ? "Back to site details" : "Back to main menu",
             style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,

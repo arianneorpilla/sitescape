@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:tfsitescapeweb/main.dart';
+import 'package:tfsitescapeweb/pages/photos.dart';
 
 import 'package:tfsitescapeweb/pages/root.dart';
 import 'package:tfsitescapeweb/services/auth.dart';
@@ -16,10 +17,11 @@ import 'package:tfsitescapeweb/services/classes.dart';
    loginCallback -> void: Performed after authentication attempt 
 */
 class TaskPage extends StatefulWidget {
-  TaskPage({this.auth, this.sec});
+  TaskPage({this.auth, this.sec, this.readOnly});
 
   final Auth auth;
   final Sector sec;
+  final bool readOnly;
 
   @override
   State<StatefulWidget> createState() => new TaskPageState(this.sec);
@@ -30,8 +32,6 @@ class TaskPageState extends State<TaskPage> {
   final Sector sec;
   TaskPageState(this.sec);
 
-  String _name;
-  String _description;
   TextEditingController nameController;
   TextEditingController descriptionController;
 
@@ -44,9 +44,6 @@ class TaskPageState extends State<TaskPage> {
     descriptionController = new TextEditingController();
 
     descriptionFocus = new FocusNode();
-
-    _name = "";
-    _description = "";
   }
 
   // Build the widget.
@@ -54,7 +51,7 @@ class TaskPageState extends State<TaskPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
@@ -64,31 +61,35 @@ class TaskPageState extends State<TaskPage> {
           Center(
             child: Container(
               width: 600,
-              height: 800,
+              height: 900,
               padding: EdgeInsets.all(10),
               color: Colors.black.withOpacity(0.25),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   showLogOut(context),
-                  Container(
-                    padding: EdgeInsets.only(
-                      top: 15,
-                      left: 15,
-                      right: 15,
-                    ),
-                    margin: EdgeInsets.only(top: 30),
-                    child: showNameInput(),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(
-                      top: 15,
-                      left: 15,
-                      right: 15,
-                    ),
-                    child: showDescriptionInput(),
-                  ),
-                  showAdd(),
+                  !widget.readOnly
+                      ? Container(
+                          padding: EdgeInsets.only(
+                            top: 15,
+                            left: 15,
+                            right: 15,
+                          ),
+                          margin: EdgeInsets.only(top: 30),
+                          child: showNameInput(),
+                        )
+                      : Container(),
+                  !widget.readOnly
+                      ? Container(
+                          padding: EdgeInsets.only(
+                            top: 15,
+                            left: 15,
+                            right: 15,
+                          ),
+                          child: showDescriptionInput(),
+                        )
+                      : Container(),
+                  !widget.readOnly ? showAdd() : Container(),
                   showTasks(),
                   showCancel(context),
                 ],
@@ -226,22 +227,50 @@ class TaskPageState extends State<TaskPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   // Stretch the cards in horizontal axis
                   children: <Widget>[
-                    SizedBox(
-                      height: 36,
-                      width: 36,
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.delete_outline,
-                          size: 16,
-                          color: Colors.red,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            sec.tasks.remove(task);
-                          });
-                        },
-                      ),
-                    )
+                    widget.readOnly
+                        ? SizedBox(
+                            height: 36,
+                            width: 36,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.photo_library,
+                                size: 16,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        PhotosPage(
+                                      auth: userAuth,
+                                      task: task,
+                                    ),
+                                  ),
+                                ).then(
+                                  (onValue) => setState(() {}),
+                                );
+                              },
+                            ),
+                          )
+                        : Container(),
+                    !widget.readOnly
+                        ? SizedBox(
+                            height: 36,
+                            width: 36,
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.delete_outline,
+                                size: 16,
+                                color: Colors.red,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  sec.tasks.remove(task);
+                                });
+                              },
+                            ),
+                          )
+                        : Container()
                   ],
                 ),
               ),
@@ -310,7 +339,7 @@ class TaskPageState extends State<TaskPage> {
           ),
           color: Colors.indigoAccent[400].withOpacity(0.9),
           child: new Text(
-            "Back to sector details",
+            !widget.readOnly ? "Back to sector details" : "Back to sector",
             style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,

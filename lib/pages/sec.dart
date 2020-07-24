@@ -16,10 +16,11 @@ import 'package:tfsitescapeweb/services/classes.dart';
    loginCallback -> void: Performed after authentication attempt 
 */
 class SecPage extends StatefulWidget {
-  SecPage({this.auth, this.sub});
+  SecPage({this.auth, this.sub, this.readOnly});
 
   final Auth auth;
   final Subsite sub;
+  final bool readOnly;
 
   @override
   State<StatefulWidget> createState() => new SecPageState(this.sub);
@@ -30,14 +31,12 @@ class SecPageState extends State<SecPage> {
   final Subsite sub;
   SecPageState(this.sub);
 
-  String _sec;
   TextEditingController secController;
 
   @override
   void initState() {
     super.initState();
     secController = new TextEditingController();
-    _sec = "";
   }
 
   // Build the widget.
@@ -45,7 +44,7 @@ class SecPageState extends State<SecPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
@@ -55,23 +54,25 @@ class SecPageState extends State<SecPage> {
           Center(
             child: Container(
               width: 600,
-              height: 800,
+              height: 900,
               padding: EdgeInsets.all(10),
               color: Colors.black.withOpacity(0.25),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   showLogOut(context),
-                  Container(
-                    padding: EdgeInsets.only(
-                      left: 15,
-                      right: 15,
-                      top: 15,
-                    ),
-                    margin: EdgeInsets.only(top: 30),
-                    child: showSubInput(),
-                  ),
-                  showAdd(),
+                  !widget.readOnly
+                      ? Container(
+                          padding: EdgeInsets.only(
+                            left: 15,
+                            right: 15,
+                            top: 15,
+                          ),
+                          margin: EdgeInsets.only(top: 30),
+                          child: showSubInput(),
+                        )
+                      : Container(),
+                  !widget.readOnly ? showAdd() : Container(),
                   showSectors(),
                   showCancel(context),
                 ],
@@ -194,7 +195,7 @@ class SecPageState extends State<SecPage> {
 
           if (notDuplicate && secController.text.isNotEmpty) {
             setState(() {
-              sub.sectors.add(Sector(secController.text, {}, []));
+              sub.sectors.add(Sector(secController.text, {}, false, false));
               sub.sectors.sort((a, b) => a.name.compareTo(b.name));
             });
           }
@@ -241,7 +242,7 @@ class SecPageState extends State<SecPage> {
                     width: 36,
                     child: IconButton(
                       icon: Icon(
-                        Icons.edit,
+                        !widget.readOnly ? Icons.edit : Icons.photo_library,
                         size: 16,
                       ),
                       onPressed: () {
@@ -251,6 +252,7 @@ class SecPageState extends State<SecPage> {
                             builder: (BuildContext context) => TaskPage(
                               auth: userAuth,
                               sec: sec,
+                              readOnly: widget.readOnly,
                             ),
                           ),
                         ).then(
@@ -259,22 +261,24 @@ class SecPageState extends State<SecPage> {
                       },
                     ),
                   ),
-                  SizedBox(
-                    height: 36,
-                    width: 36,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.delete_outline,
-                        size: 16,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          sub.sectors.remove(sec);
-                        });
-                      },
-                    ),
-                  )
+                  !widget.readOnly
+                      ? SizedBox(
+                          height: 36,
+                          width: 36,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.delete_outline,
+                              size: 16,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                sub.sectors.remove(sec);
+                              });
+                            },
+                          ),
+                        )
+                      : Container()
                 ],
               ),
             ],
@@ -302,7 +306,7 @@ class SecPageState extends State<SecPage> {
           ),
           color: Colors.indigoAccent[400].withOpacity(0.9),
           child: new Text(
-            "Back to subsite details",
+            !widget.readOnly ? "Back to subsite details" : "Back to subsite",
             style: new TextStyle(
                 fontSize: 20.0,
                 color: Colors.white,

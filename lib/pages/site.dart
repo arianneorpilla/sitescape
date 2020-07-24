@@ -50,8 +50,9 @@ class SitePageState extends State<SitePage> {
     nameController.text = site.name;
     addressController.text = site.address;
     buildController.text = site.build;
-    latController.text = site.latitude.toString();
-    longController.text = site.longitude.toString();
+    latController.text = site.latitude == null ? "" : site.latitude.toString();
+    longController.text =
+        site.longitude == null ? "" : site.longitude.toString();
     networkController.text = site.network;
   }
 
@@ -60,7 +61,7 @@ class SitePageState extends State<SitePage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
@@ -70,7 +71,7 @@ class SitePageState extends State<SitePage> {
           Center(
             child: Container(
               width: 600,
-              height: 800,
+              height: 900,
               padding: EdgeInsets.all(10),
               color: Colors.black.withOpacity(0.25),
               child: Column(
@@ -764,22 +765,24 @@ class SitePageState extends State<SitePage> {
           ),
           onPressed: () {
             if (_formKey.currentState.validate()) {
+              Site clone = Site(
+                codeController.text,
+                nameController.text,
+                addressController.text,
+                buildController.text,
+                networkController.text,
+                double.parse(latController.text),
+                double.parse(longController.text),
+                site.maps,
+              );
+
+              clone.populate();
+
               Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => SubPage(
-                          auth: userAuth,
-                          site: Site(
-                            codeController.text,
-                            nameController.text,
-                            addressController.text,
-                            buildController.text,
-                            networkController.text,
-                            double.parse(latController.text),
-                            double.parse(longController.text),
-                            site.maps,
-                            site.subsites,
-                          )))).then(
+                          auth: userAuth, site: clone, readOnly: false))).then(
                 (onValue) => setState(() {}),
               );
             }

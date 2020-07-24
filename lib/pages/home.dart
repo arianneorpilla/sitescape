@@ -9,6 +9,7 @@ import 'package:firebase/firebase.dart' as fb;
 import 'package:tfsitescapeweb/main.dart';
 import 'package:tfsitescapeweb/pages/site.dart';
 import 'package:tfsitescapeweb/pages/root.dart';
+import 'package:tfsitescapeweb/pages/sub.dart';
 import 'package:tfsitescapeweb/services/auth.dart';
 import 'package:tfsitescapeweb/services/classes.dart';
 import 'package:tfsitescapeweb/services/util.dart';
@@ -46,7 +47,7 @@ class HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
@@ -56,17 +57,14 @@ class HomePageState extends State<HomePage> {
           Center(
             child: Container(
               width: 600,
-              height: 800,
+              height: 900,
               padding: EdgeInsets.all(10),
               color: Colors.black.withOpacity(0.25),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   showLogOut(context),
-                  Container(
-                    padding: EdgeInsets.all(15),
-                    child: showAddSite(context),
-                  ),
+                  isAdmin ? showAddSite() : Container(),
                   showSites(),
                 ],
               ),
@@ -79,24 +77,31 @@ class HomePageState extends State<HomePage> {
   }
 
   Future<List<Uri>> getDownloadInfo(Site site) async {
-    List<Uri> links = [];
+    List<Uri> urls;
+    List<Future<Uri>> futures = [];
 
     for (Subsite sub in site.subsites) {
       for (Sector sec in sub.sectors) {
-        fb.StorageReference storageRef = fb
-            .app()
-            .storage()
+        fb.StorageReference storageRef = widget.auth
+            .getStorage()
             .refFromURL("gs://tfsitescape.appspot.com")
             .child("tfcloud")
             .child(site.name)
             .child(sub.name)
             .child(sec.name);
         fb.ListResult result = await storageRef.listAll();
-        result.items.forEach((a) async => links.add(await a.getDownloadURL()));
+
+        // print(result.items);
+        for (fb.StorageReference i in result.items) {
+          Future<Uri> future = i.getDownloadURL();
+          futures.add(future);
+        }
+
+        urls = await Future.wait(futures);
       }
     }
 
-    return links;
+    return urls;
   }
 
   Widget showLogOut(BuildContext context) {
@@ -148,26 +153,27 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget showSites() {
-    return Container(
-      height: 538,
-      padding: EdgeInsets.all(15),
-      child: Scrollbar(
-        child: ListView.builder(
-          shrinkWrap: true,
-          primary: true,
-          itemCount: sites.length,
-          itemBuilder: (BuildContext context, int index) {
-            // Return a card only if the search term is found in name/code.
-            return showSiteCard(context, sites[index], index);
-          },
+    return Flexible(
+      child: Container(
+        padding: EdgeInsets.all(15),
+        child: Scrollbar(
+          child: ListView.builder(
+            shrinkWrap: true,
+            primary: true,
+            itemCount: sites.length,
+            itemBuilder: (BuildContext context, int index) {
+              // Return a card only if the search term is found in name/code.
+              return showSiteCard(context, sites[index], index);
+            },
+          ),
         ),
       ),
     );
   }
 
-  Widget showAddSite(BuildContext context) {
+  Widget showAddSite() {
     return new Container(
-      padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
+      padding: EdgeInsets.fromLTRB(15.0, 65.0, 15.0, 15.0),
       child: SizedBox(
         height: 60.0,
         width: 600,
@@ -206,69 +212,38 @@ class HomePageState extends State<HomePage> {
           child: new Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              new Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                // Stretch the cards in horizontal axis
-                children: <Widget>[
-                  new Text(
-                    site.name.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+              Flexible(
+                child: new Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // Stretch the cards in horizontal axis
+                  children: <Widget>[
+                    new Text(
+                      site.name.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  new Text(
-                    site.code.toUpperCase(),
-                    style: new TextStyle(
-                      color: Colors.black54,
+                    new Text(
+                      site.code.toUpperCase(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: new TextStyle(
+                        color: Colors.black54,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               new Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 // Stretch the cards in horizontal axis
                 children: <Widget>[
-                  SizedBox(
-                    height: 36,
-                    width: 36,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.edit,
-                        size: 16,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) => SitePage(
-                                        auth: userAuth,
-                                        site: site,
-                                        create: false)))
-                            .then((onValue) => setState(() {}));
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 36,
-                    width: 36,
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.content_copy,
-                        size: 16,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (BuildContext context) => SitePage(
-                                        auth: userAuth,
-                                        site: site,
-                                        create: true)))
-                            .then((onValue) => setState(() {}));
-                      },
-                    ),
-                  ),
+                  showViewButton(site),
+                  isAdmin ? showEditButton(site) : Container(),
+                  isAdmin ? showCopyButton(site) : Container(),
                   showDownloadButton(site, index)
                 ],
               ),
@@ -276,6 +251,69 @@ class HomePageState extends State<HomePage> {
           ),
           padding: const EdgeInsets.all(15.0),
         ),
+      ),
+    );
+  }
+
+  Widget showViewButton(Site site) {
+    return SizedBox(
+      height: 36,
+      width: 36,
+      child: IconButton(
+        icon: Icon(
+          Icons.photo_library,
+          size: 16,
+        ),
+        onPressed: () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          SubPage(auth: userAuth, site: site, readOnly: true)))
+              .then((onValue) => setState(() {}));
+        },
+      ),
+    );
+  }
+
+  Widget showEditButton(Site site) {
+    return SizedBox(
+      height: 36,
+      width: 36,
+      child: IconButton(
+        icon: Icon(
+          Icons.edit,
+          size: 16,
+        ),
+        onPressed: () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          SitePage(auth: userAuth, site: site, create: false)))
+              .then((onValue) => setState(() {}));
+        },
+      ),
+    );
+  }
+
+  Widget showCopyButton(Site site) {
+    return SizedBox(
+      height: 36,
+      width: 36,
+      child: IconButton(
+        icon: Icon(
+          Icons.content_copy,
+          size: 16,
+        ),
+        onPressed: () {
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          SitePage(auth: userAuth, site: site, create: true)))
+              .then((onValue) => setState(() {}));
+        },
       ),
     );
   }
@@ -328,6 +366,8 @@ class HomePageState extends State<HomePage> {
               await js.context.callMethod("generateZIP", [
                 js.JsArray.from(urls),
               ]);
+
+              await Future.delayed(Duration(seconds: 10));
 
               setState(() {
                 _downloading = false;

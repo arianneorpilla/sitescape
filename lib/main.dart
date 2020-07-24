@@ -9,6 +9,10 @@ import 'services/classes.dart';
 Auth userAuth = new Auth();
 List<Site> sites = [];
 
+bool isAdmin = false;
+
+String cloudDir = "tfcloud/";
+
 void main() {
   runApp(MyApp());
 }
@@ -22,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'Sitescape',
       theme: new ThemeData(
           // fontFamily: "Montserrat",
-          primaryColor: Colors.indigo[900],
+          primaryColor: Color.fromRGBO(58, 65, 120, 1.0),
           visualDensity: VisualDensity.adaptivePlatformDensity),
       home: RootPage(auth: userAuth),
     );

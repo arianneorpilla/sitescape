@@ -2,7 +2,15 @@ import 'dart:convert';
 import 'dart:core';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:path/path.dart' as ph;
+import 'package:tfsitescapeweb/main.dart';
+import 'package:firebase/firebase.dart' as fb;
+import 'package:tfsitescapeweb/services/cloud.dart';
+import 'package:tfsitescapeweb/services/util.dart';
+import 'package:http/http.dart' as http;
 
 /* Represents a cell-site with a unique code. Top-level nested 
    structure loaded from the cloud or as a JSON file. 
@@ -29,7 +37,7 @@ class Site {
   final double latitude;
   final double longitude;
   final Map<dynamic, dynamic> maps;
-  final List<Subsite> subsites;
+  List<Subsite> subsites;
 
   Site(
     this.code,
@@ -40,7 +48,6 @@ class Site {
     this.latitude,
     this.longitude,
     this.maps,
-    this.subsites,
   );
 
   /* Used after decode to get a Site from JSON key-value String pairs.
@@ -48,17 +55,15 @@ class Site {
      key -> String: A primary key from a JSON map, this is the code
      value -> Map<dynamic, dynamic>: A JSON map containing site data
   */
-  factory Site.fromJson(String key, Map<dynamic, dynamic> value) {
+  /* Used after decode to get a Site from JSON key-value String pairs.
+  
+     key -> String: A primary key from a JSON map, this is the code
+     value -> Map<dynamic, dynamic>: A JSON map containing site data
+  */
+  factory Site.fromMap(String key, Map<dynamic, dynamic> value) {
     // Convert GPS values to double, as JSON has no concept of int/double
     double latitude = value["latitude"].toDouble();
     double longitude = value["longitude"].toDouble();
-
-    // Call the Subsite factory on the 'subsites' parameter
-    List<Subsite> subs = [];
-    Map<dynamic, dynamic> maps = value["subsites"];
-    maps.forEach((k, v) => subs.add(Subsite.fromMap(k, v)));
-    // Sort the subsites by alphabetical order
-    subs.sort((a, b) => a.name.compareTo(b.name));
 
     return Site(
       key,
@@ -69,8 +74,24 @@ class Site {
       latitude,
       longitude,
       value["subsites"],
-      subs,
     );
+  }
+
+  /*
+    Used after factory constructor to populate subsites. Necessary to set
+    up a reference to site. 
+  */
+  void populate() {
+    // Initialise subsites and make them from the maps.
+    subsites = [];
+    maps.forEach((k, v) => subsites.add(Subsite.fromMap(k, v)));
+
+    subsites.forEach((sub) {
+      sub.site = this;
+      sub.populate();
+    });
+    // Sort the subsites by alphabetical order
+    subsites.sort((a, b) => a.name.compareTo(b.name));
   }
 
   factory Site.add() {
@@ -83,7 +104,6 @@ class Site {
       null,
       null,
       {},
-      [],
     );
   }
 
@@ -157,7 +177,7 @@ List<Site> jsonToSites(String text) {
 
   Map sitesJson = json.decode(text);
 
-  sitesJson.forEach((key, value) => sites.add(Site.fromJson(key, value)));
+  sitesJson.forEach((key, value) => sites.add(Site.fromMap(key, value)));
 
   sites.sort((a, b) => a.name.compareTo(b.name));
 
@@ -173,7 +193,7 @@ List<Site> snapshotToSites(Map<dynamic, dynamic> snapshot) {
   List<Site> sites = [];
 
   snapshot.forEach((key, values) {
-    Site site = Site.fromJson(key, values);
+    Site site = Site.fromMap(key, values);
     sites.add(site);
   });
 
@@ -194,12 +214,12 @@ List<Site> snapshotToSites(Map<dynamic, dynamic> snapshot) {
 class Subsite {
   final String name;
   final Map<dynamic, dynamic> maps;
-  final List<Sector> sectors;
+  List<Sector> sectors;
+  Site site;
 
   Subsite(
     this.name,
     this.maps,
-    this.sectors,
   );
 
   /* Used after decode to get a Subsite from a JSON string. 
@@ -209,13 +229,19 @@ class Subsite {
      value -> Map<dynamic, dynamic>: A JSON map containing subsite data
   */
   factory Subsite.fromMap(String key, Map<dynamic, dynamic> value) {
-    List<Sector> secs = [];
-    Map<dynamic, dynamic> maps = value["sectors"];
-    maps.forEach((k, v) => secs.add(Sector.fromMap(k, v)));
+    return Subsite(key, value["sectors"]);
+  }
 
-    secs.sort((a, b) => a.name.compareTo(b.name));
+  void populate() {
+    sectors = [];
+    maps.forEach((k, v) => sectors.add(Sector.fromMap(k, v)));
 
-    return Subsite(key, value["sectors"], secs);
+    sectors.forEach((sec) {
+      sec.subsite = this;
+      sec.populate();
+    });
+
+    sectors.sort((a, b) => a.name.compareTo(b.name));
   }
 }
 
@@ -232,12 +258,20 @@ class Subsite {
 class Sector {
   final String name;
   final Map<dynamic, dynamic> maps;
-  final List<Task> tasks;
+  List<Task> tasks;
+  Subsite subsite;
+  bool downloading;
+  bool uploading;
+
+  bool inTransaction() {
+    return (downloading || uploading);
+  }
 
   Sector(
     this.name,
     this.maps,
-    this.tasks,
+    this.downloading,
+    this.uploading,
   );
 
   /* Used after decode to get a Sector from a JSON string. 
@@ -247,13 +281,31 @@ class Sector {
      value -> Map<dynamic, dynamic>: A JSON map containing sector data
   */
   factory Sector.fromMap(String key, Map<dynamic, dynamic> value) {
-    List<Task> tasks = [];
-    Map<dynamic, dynamic> maps = value["tasks"];
+    return Sector(
+      key,
+      value["tasks"],
+      false,
+      false,
+    );
+  }
+
+  populate() {
+    tasks = [];
     maps.forEach((k, v) => tasks.add(Task.fromMap(k, v)));
 
-    tasks.sort((a, b) => a.name.compareTo(b.name));
+    tasks.forEach((task) => task.sector = this);
 
-    return Sector(key, value["tasks"], tasks);
+    // Sort the subsites by alphabetical order
+    tasks.sort((a, b) => a.name.compareTo(b.name));
+  }
+
+  String getCloudPath() {
+    return ph.join(
+      cloudDir,
+      subsite.site.name,
+      subsite.name,
+      this.name,
+    );
   }
 }
 
@@ -269,6 +321,8 @@ class Task {
   final String name;
   final String note;
   final int required;
+  Sector sector;
+  NetworkImage thumbnail;
 
   Task(
     this.name,
@@ -283,5 +337,319 @@ class Task {
      value -> Map<dynamic, dynamic>: A JSON map containing task data */
   factory Task.fromMap(String key, Map<dynamic, dynamic> value) {
     return Task(key, value["note"], value["required"]);
+  }
+
+  String getCloudPath() {
+    return sector.getCloudPath();
+  }
+
+  Future<List<Future<NetworkTaskImage>>> getCloudPhotos({Task task}) async {
+    List<String> filenames = await getPhotosInCloudFolder(getCloudPath());
+    List<Future<NetworkTaskImage>> futures = [];
+
+    for (String basename in filenames) {
+      List<String> parts = ph.basenameWithoutExtension(basename).split("-");
+      if (task == null || task.name == parts[1]) {
+        futures.add(getCloudPhoto(basename));
+      }
+    }
+
+    return futures;
+  }
+
+  Future<NetworkTaskImage> getCloudPhoto(String basename) async {
+    String fullPath = ph.join(getCloudPath(), basename);
+    String thumbPath =
+        ph.join(getCloudPath(), "thumbs", "thumb@256_" + basename);
+
+    print(fullPath);
+    print(thumbPath);
+
+    final fb.StorageReference fullRef = userAuth
+        .getStorage()
+        .refFromURL("gs://tfsitescape.appspot.com")
+        .child(fullPath);
+    final fb.StorageReference thumbRef = userAuth
+        .getStorage()
+        .refFromURL("gs://tfsitescape.appspot.com")
+        .child(thumbPath);
+
+    final fb.DatabaseReference dbRef = userAuth
+        .getDatabase()
+        .refFromURL("gs://tfsitescape.firebaseio.com")
+        .child("photos")
+        .child(this.sector.subsite.site.name)
+        .child(this.sector.subsite.name)
+        .child(this.sector.name)
+        .child(ph.basenameWithoutExtension(basename));
+
+    List<dynamic> futures = await Future.wait([
+      dbRef.once('value'),
+      fullRef.getDownloadURL(),
+      thumbRef.getDownloadURL()
+    ]);
+
+    fb.QueryEvent once = futures[0];
+    Uri fullURL = futures[1];
+    Uri thumbURL = futures[2];
+
+    String key = once.snapshot.key;
+    Map<dynamic, dynamic> data = once.snapshot.val();
+
+    NetworkTaskImage cloudTaskImage = NetworkTaskImage.filename(
+        this, basename, key, data, fullURL.toString(), thumbURL.toString());
+
+    return cloudTaskImage;
+  }
+
+  Future<dynamic> acceptCloudPhoto(
+      NetworkTaskImage netTask, String message) async {
+    netTask.message = message;
+    netTask.rejected = false;
+    netTask.approved = true;
+
+    return userAuth
+        .getDatabase()
+        .refFromURL("gs://tfsitescape.firebaseio.com")
+        .child("photos")
+        .child(this.sector.subsite.site.name)
+        .child(this.sector.subsite.name)
+        .child(this.sector.name)
+        .child(
+          ph.basenameWithoutExtension(
+            ph.basenameWithoutExtension(netTask.fileName),
+          ),
+        )
+        .update(
+      {
+        "rejected": false,
+        "message": message,
+        "approved": true,
+      },
+    );
+  }
+
+  Future<dynamic> rejectCloudPhoto(
+      NetworkTaskImage netTask, String message) async {
+    netTask.message = message;
+    netTask.rejected = true;
+    netTask.approved = false;
+
+    final firestoreInstance = Firestore.instance;
+
+    final tokens = await firestoreInstance
+        .collection('users')
+        .document(netTask.uid)
+        .collection('tokens')
+        .getDocuments();
+
+    tokens.documents.forEach((result) {
+      String token = result.documentID;
+      sendNote(netTask, token);
+    });
+
+    return userAuth
+        .getDatabase()
+        .refFromURL("gs://tfsitescape.firebaseio.com")
+        .child("photos")
+        .child(this.sector.subsite.site.name)
+        .child(this.sector.subsite.name)
+        .child(this.sector.name)
+        .child(
+          ph.basenameWithoutExtension(
+            ph.basenameWithoutExtension(netTask.fileName),
+          ),
+        )
+        .update(
+      {
+        "rejected": true,
+        "message": message,
+        "approved": false,
+      },
+    );
+  }
+
+  Future<void> sendNote(NetworkTaskImage netTask, String token) async {
+    String content = "A photo has been rejected. Review it under " +
+        netTask.siteName +
+        ", " +
+        netTask.subName +
+        ", " +
+        netTask.secName +
+        ".";
+    String header = netTask.taskName + ": Photo Rejected";
+
+    await http.post(
+      'https://fcm.googleapis.com/fcm/send',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'Authorization':
+            'key=AAAAsStnRHY:APA91bHJPex4cOuzXD2N2-uGjZ9LE4GFEQmnw0RugQt8pI6G-_XRqxoEnENWOA9yBaYlG0QK4NnUAgCBaQp3GN0B1UQz2-CyrCIPQv4ayLPXYx9ABdQjSV3KgfEm6Y8Hy9OTrO6KO89W',
+      },
+      body: jsonEncode(
+        <String, dynamic>{
+          'notification': <String, dynamic>{'body': content, 'title': header},
+          'priority': 'high',
+          'data': <String, dynamic>{
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'id': '1',
+            'status': 'done'
+          },
+          'to': token,
+        },
+      ),
+    );
+
+    return;
+  }
+}
+
+abstract class TaskImage {
+  String siteName;
+  String siteCode;
+  String subName;
+  String secName;
+  String taskName;
+  ImageProvider image;
+  int count;
+  String hash;
+  bool isCloud;
+
+  TaskImage(
+    this.siteName,
+    this.siteCode,
+    this.subName,
+    this.secName,
+    this.taskName,
+    this.image,
+    this.count,
+    this.hash,
+    this.isCloud,
+  );
+}
+
+class NetworkTaskImage implements TaskImage {
+  String siteName;
+  String siteCode;
+  String subName;
+  String secName;
+  String taskName;
+  ImageProvider image;
+  ImageProvider fullImage;
+  int count;
+  String hash;
+  bool isCloud;
+  String fullURL;
+  String thumbURL;
+  String fileName;
+  bool rejected;
+  bool approved;
+  String message;
+  String uid;
+
+  NetworkTaskImage(
+    this.siteName,
+    this.siteCode,
+    this.subName,
+    this.secName,
+    this.taskName,
+    this.image,
+    this.fullImage,
+    this.count,
+    this.hash,
+    this.isCloud,
+    this.fullURL,
+    this.thumbURL,
+    this.fileName,
+    this.rejected,
+    this.approved,
+    this.message,
+    this.uid,
+  );
+
+  /* From a UserSelection object providing names/codes, a file to work with
+     and a cryptographic hash, create a TaskImage.
+
+     NOTE: May need refactoring and unification under UserSelection as
+     having these separate may be redundant. Point is, the constructor
+     is from two things which are separately obtained upon new file, but
+     the two are very exclusively used and removed from one another.
+
+     It may be unnecessary (though hash may need to be removed as an
+     argument).
+
+     This is just used for filename generation, after all.
+
+     selection -> UserSelection: Holds names/codes for file details
+     image -> File: Appropriate to hold file
+     hash -> String: Cryptographic hash for filename creation
+  */
+  factory NetworkTaskImage.filename(
+    Task task,
+    String basename,
+    String fileName,
+    Map<dynamic, dynamic> data,
+    String finalURL,
+    String thumbURL,
+  ) {
+    List<String> parts = basename.split("-");
+
+    if (parts.length != 4) {
+      return null;
+    }
+
+    String siteName = task.sector.subsite.site.name;
+    String siteCode = task.sector.subsite.site.code;
+    String subName = task.sector.subsite.name;
+    String secName = task.sector.name;
+    String taskName = task.name;
+    int count = int.tryParse(parts[2]);
+    String hash = parts[3];
+
+    return NetworkTaskImage(
+      siteName,
+      siteCode,
+      subName,
+      secName,
+      taskName,
+      NetworkImage(thumbURL),
+      NetworkImage(finalURL),
+      count,
+      hash,
+      true,
+      finalURL,
+      thumbURL,
+      fileName,
+      data['rejected'] as bool,
+      data['approved'] as bool,
+      data['message'] as String,
+      data['uid'] as String,
+    );
+  }
+
+  String getBasename(bool isCloud) {
+    return this.siteCode +
+        "-" +
+        this.taskName +
+        "-" +
+        this.count.toString().padLeft(3, "0") +
+        "-" +
+        this.hash;
+  }
+
+  String getFilePath() {
+    return ph.join(cloudDir, siteName, subName, secName, getBasename(isCloud));
+  }
+
+  String getCloudPath() {
+    return fullURL;
+  }
+
+  String getCloudThumbPath() {
+    return thumbURL;
+  }
+
+  NetworkImage getFullImage() {
+    return fullImage;
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase/firebase.dart' as fb;
+import 'package:firebase_core/firebase_core.dart';
 
 enum AuthStatus {
   NOT_DETERMINED,
@@ -26,12 +28,23 @@ abstract class BaseAuth {
 
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final fb.App _firebaseStorage = fb.app();
 
   Future<FirebaseUser> signIn(String email, String password) async {
     AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: password);
+    await _firebaseStorage.auth().signInWithEmailAndPassword(email, password);
+
     FirebaseUser user = result.user;
     return user;
+  }
+
+  fb.Storage getStorage() {
+    return _firebaseStorage.storage();
+  }
+
+  fb.Database getDatabase() {
+    return _firebaseStorage.database();
   }
 
   Future<String> signUp(String email, String password) async {

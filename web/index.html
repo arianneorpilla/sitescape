@@ -43,14 +43,13 @@
       var count = 0;
 
       var cutbefore = links[0].substring(links[0].indexOf("tfcloud%2F") + 10);
-      var sitename = cutbefore.substring(0, cutbefore.indexOf("%2F")).replaceAll("%20", " ");
+      var sitename = cutbefore.substring(0, cutbefore.indexOf("%2F")).replace(/%20/g, " ")
 
       var zipFilename = "PHOTOPACK-" + sitename + ".zip";
 
       links.forEach(function (url, i) {
         var filename = links[i];
-        console.log(links[i]);
-        filename = links[i].substring(links[i].indexOf("tfcloud%2F") + 10, links[i].indexOf("?alt")).replaceAll("%20", " ").replaceAll("%2F", "/");
+        filename = links[i].substring(links[i].indexOf("tfcloud%2F") + 10, links[i].indexOf("?alt")).replace(/%20/g, " ").replace(/%2F/g, "/");
 
         // loading a file and add it in a zip file
         JSZipUtils.getBinaryContent(url, function (err, data) {
@@ -100,6 +99,6 @@
   </script>
   <!-- END OF FIREBASE INIT CODE -->
 
-  <script src="main.dart.js" type="application/javascript"></script>
+  <script src="main.dart.js?version=4" type="application/javascript"></script>
 </body>
 </html>

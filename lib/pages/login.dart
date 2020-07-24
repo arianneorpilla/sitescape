@@ -71,6 +71,11 @@ class LoginPageState extends State<LoginPage> {
     return false;
   }
 
+  bool lazyAuth(String userId) {
+    return (userId == "EeIVhpj0tPgjZTpJh3TULdqKrcG3" ||
+        userId == "dHJnsajX75PnZ0oShFg3B2CaZMq1");
+  }
+
   /* Perform login or signup */
   void validateAndSubmit() async {
     // Remove any informatives as "Password is required" could show below.
@@ -119,8 +124,15 @@ class LoginPageState extends State<LoginPage> {
             _isLoginForm &&
             user.isEmailVerified) {
           sites = await fetchSites();
+          isAdmin = lazyAuth(userId);
           widget.loginCallback();
         }
+        // else if (!lazyAuth(userId)) {
+        //   setState(() {
+        //     _errorMessage = "   Elevated permissions are required to use " +
+        //         "the Sitescape web console.";
+        //   });
+        // }
       } on PlatformException catch (e) {
         print('Error: $e');
 
@@ -191,7 +203,7 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
@@ -242,7 +254,7 @@ class LoginPageState extends State<LoginPage> {
                       showPasswordInput(),
                       showConfirmPassword(),
                       showErrorMessage(_errorColor),
-                      showForgotPassword(),
+                      // showForgotPassword(),
                     ]),
               ),
               showPrimaryButton(),
@@ -263,23 +275,23 @@ class LoginPageState extends State<LoginPage> {
       child: new Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          new Text(
-            "P O W E R E D  B Y",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w300,
-            ),
-            textAlign: TextAlign.justify,
-          ),
-          new Text(
-            "T O W E R F O R C E",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
+          // new Text(
+          //   "P O W E R E D  B Y",
+          //   style: TextStyle(
+          //     color: Colors.white,
+          //     fontSize: 12,
+          //     fontWeight: FontWeight.w300,
+          //   ),
+          //   textAlign: TextAlign.justify,
+          // ),
+          // new Text(
+          //   "T O W E R F O R C E",
+          //   style: TextStyle(
+          //     color: Colors.white,
+          //     fontSize: 20,
+          //     fontWeight: FontWeight.w300,
+          //   ),
+          // ),
           new Text(""),
           // new Text(
           //   versionAndBuild,
@@ -303,18 +315,21 @@ class LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               new Text(
-                "SITESCAPE",
+                "sitescape",
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w300,
+                  fontFamily: "Quicksand",
                 ),
               ),
               new Text(
                 "W E B  C O N S O L E",
                 style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 3,
-                    fontWeight: FontWeight.w300),
+                  color: Colors.white,
+                  fontSize: 3,
+                  fontWeight: FontWeight.w300,
+                  fontFamily: "Quicksand",
+                ),
                 textAlign: TextAlign.justify,
               ),
             ],
