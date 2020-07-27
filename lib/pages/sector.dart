@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -161,7 +162,12 @@ class _SectorPageState extends State<SectorPage> {
                 onPressed: () async {
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      content: Text("This feature is under construction."),
+                      content: Text(
+                        "This feature is under construction.",
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                        ),
+                      ),
                       duration: Duration(milliseconds: 500),
                     ),
                   );
@@ -236,7 +242,7 @@ class _SectorPageState extends State<SectorPage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: ScreenUtil().setSp(48),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -253,7 +259,7 @@ class _SectorPageState extends State<SectorPage> {
     return Flexible(
       child: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.fromLTRB(12, 12, 12, 96),
+          padding: EdgeInsets.fromLTRB(12, 12, 12, 256.h),
           alignment: Alignment.topCenter,
           child: MediaQuery.removePadding(
             context: context,
@@ -304,7 +310,7 @@ class _SectorPageState extends State<SectorPage> {
                               maxLines: 1,
                               softWrap: false,
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: ScreenUtil().setSp(42),
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -315,8 +321,8 @@ class _SectorPageState extends State<SectorPage> {
                               maxLines: 3,
                               style: new TextStyle(
                                 color: Colors.black54,
+                                fontSize: ScreenUtil().setSp(36),
                               ),
-                              textAlign: TextAlign.justify,
                             ),
                           ],
                         ),
@@ -377,7 +383,7 @@ class _SectorPageState extends State<SectorPage> {
       style: new TextStyle(
         fontStyle: FontStyle.italic,
         color: Colors.grey,
-        fontSize: 12,
+        fontSize: ScreenUtil().setSp(36),
       ),
     );
   }
@@ -400,7 +406,7 @@ class _SectorPageState extends State<SectorPage> {
             style: new TextStyle(
               color: color,
               fontStyle: FontStyle.italic,
-              fontSize: 12,
+              fontSize: ScreenUtil().setSp(36),
             ),
           ),
         ],
@@ -553,7 +559,7 @@ class _SectorPageState extends State<SectorPage> {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.red,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(42),
         ),
       ),
       onPressed: () async {
@@ -575,7 +581,7 @@ class _SectorPageState extends State<SectorPage> {
         'CANCEL',
         style: TextStyle(
           color: Colors.black,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(42),
         ),
       ),
       onPressed: () {
@@ -591,7 +597,7 @@ class _SectorPageState extends State<SectorPage> {
             'Are you sure?',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(48),
             ),
           ),
           content: SingleChildScrollView(
@@ -601,7 +607,10 @@ class _SectorPageState extends State<SectorPage> {
                   'submitted.\n\nYour progression may not reflect what '
                       'others see on the cloud.',
               textAlign: TextAlign.justify,
-              style: TextStyle(fontWeight: FontWeight.w400),
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: ScreenUtil().setSp(42),
+              ),
             ),
           ),
           actions: [logout, cancel],

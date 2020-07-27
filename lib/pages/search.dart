@@ -3,13 +3,14 @@ import "dart:ui";
 import "package:flushbar/flushbar.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 import "package:lazy_load_scrollview/lazy_load_scrollview.dart";
 
 import "package:tfsitescape/main.dart";
 import "package:tfsitescape/pages/site.dart";
 import 'package:tfsitescape/services/modal.dart';
-import "package:tfsitescape/services/classes.dart";
+import 'package:tfsitescape/services/classes.dart';
 import "package:tfsitescape/services/util.dart";
 
 class SearchPage extends StatefulWidget {
@@ -26,7 +27,7 @@ class SearchPageState extends State<SearchPage> {
   // 10 initially, and paginated per scroll
   static const int PAGE_SIZE = 10;
 
-  // Paginated list of sites for performance reasons
+  // Paginated list of Sites for performance reasons
   List<Site> _paged;
   // Whether or not to show the loading circle
   bool _isLoading;
@@ -61,7 +62,7 @@ class SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
-    // Show first 10 sites alphabetically
+    // Show first 10 Sites alphabetically
     _search = "";
     _currentIndex = PAGE_SIZE;
     _paged = filterSitesByNameOrCode(_search, PAGE_SIZE);
@@ -115,6 +116,7 @@ class SearchPageState extends State<SearchPage> {
             ),
           ),
           LazyLoadScrollView(
+            scrollOffset: (512.h).round(),
             onEndOfPage: () => loadMore(),
             child: ListView(
               shrinkWrap: true,
@@ -143,7 +145,12 @@ class SearchPageState extends State<SearchPage> {
                 onPressed: () async {
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      content: Text("This feature is under construction."),
+                      content: Text(
+                        "This feature is under construction.",
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                        ),
+                      ),
                       duration: Duration(milliseconds: 500),
                     ),
                   );
@@ -195,12 +202,13 @@ class SearchPageState extends State<SearchPage> {
             contentPadding: EdgeInsets.all(12.0),
             prefixIcon: Icon(
               Icons.search,
+              size: ScreenUtil().setSp(48),
               color: Colors.grey,
             ),
             hintText: "Search for site",
             hintStyle: TextStyle(
               color: Colors.grey,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(48),
               fontWeight: FontWeight.w300,
             ),
           ),
@@ -237,9 +245,9 @@ class SearchPageState extends State<SearchPage> {
     );
   }
 
-  /* List of sites that can be scrolled through infinitely with pagination */
+  /* List of Sites that can be scrolled through infinitely with pagination */
   Widget showSites() {
-    if (sites.isEmpty) {
+    if (gSites.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -298,10 +306,13 @@ class SearchPageState extends State<SearchPage> {
   Widget showLoading() {
     return Container(
       padding: EdgeInsets.all(15.0),
-      height: 69,
+      height: 512.h,
       alignment: Alignment.center,
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation(Colors.white),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation(Colors.white),
+        ),
       ),
     );
   }
@@ -326,7 +337,7 @@ class SearchPageState extends State<SearchPage> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: ScreenUtil().setSp(42),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -335,6 +346,7 @@ class SearchPageState extends State<SearchPage> {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: new TextStyle(
+                        fontSize: ScreenUtil().setSp(36),
                         color: Colors.black54,
                       ),
                     ),
@@ -348,12 +360,13 @@ class SearchPageState extends State<SearchPage> {
                   ImageIcon(
                     site.getIconFromNetwork(),
                     color: Colors.black54,
-                    size: 28,
+                    size: ScreenUtil().setSp(72),
                   ),
                   Text(" "),
                   Icon(
                     Icons.chevron_right,
                     color: Colors.black54,
+                    size: ScreenUtil().setSp(42),
                   )
                 ],
               ),

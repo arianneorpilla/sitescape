@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/services/auth.dart';
@@ -97,6 +98,7 @@ class LoginPageState extends State<LoginPage> {
             );
           } else {
             userId = user.uid;
+            await refreshSites();
           }
           print('Signed in: $userId');
         } else {
@@ -117,7 +119,6 @@ class LoginPageState extends State<LoginPage> {
             userId != null &&
             _isLoginForm &&
             user.isEmailVerified) {
-          await refreshSites();
           widget.loginCallback();
         }
       } on PlatformException catch (e) {
@@ -144,6 +145,7 @@ class LoginPageState extends State<LoginPage> {
       }
     }
     /* Remove loading circle at the end of Auth attempt. */
+    await Future.delayed(Duration(seconds: 1));
     setState(() {
       _isLoading = false;
     });
@@ -201,7 +203,7 @@ class LoginPageState extends State<LoginPage> {
                 fit: BoxFit.fill,
                 colorFilter: new ColorFilter.mode(
                     Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                image: bgImage,
+                image: AssetImage('images/login.jpg'),
               ),
             ),
           ),
@@ -275,10 +277,10 @@ class LoginPageState extends State<LoginPage> {
           // ),
           // new Text(""),
           new Text(
-            versionAndBuild,
+            gVersion,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 9,
+              fontSize: ScreenUtil().setSp(28),
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.justify,
@@ -375,14 +377,17 @@ class LoginPageState extends State<LoginPage> {
           hintText: 'E-mail',
           hintStyle: TextStyle(
             color: Colors.grey[400],
-            fontSize: 16,
+            fontSize: ScreenUtil().setSp(42),
           ),
           errorStyle: TextStyle(
             color: Colors.red,
-            fontSize: 14,
+            fontSize: ScreenUtil().setSp(36),
           ),
         ),
-        style: TextStyle(color: Colors.white, fontSize: 16),
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: ScreenUtil().setSp(42),
+        ),
         // Must be valid entry
         validator: (value) => value.isEmpty ? 'E-mail required.' : null,
         // Used to pass focus from user -> pass
@@ -457,16 +462,16 @@ class LoginPageState extends State<LoginPage> {
             hintText: 'Password',
             hintStyle: TextStyle(
               color: Colors.grey[400],
-              fontSize: 16,
+              fontSize: ScreenUtil().setSp(42),
             ),
             errorStyle: TextStyle(
               color: Colors.red,
-              fontSize: 14,
+              fontSize: ScreenUtil().setSp(36),
             ),
           ),
           style: TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: ScreenUtil().setSp(42),
           ),
           // Must be valid entry
           validator: (value) => value.isEmpty || (value.length < 5)
@@ -547,14 +552,17 @@ class LoginPageState extends State<LoginPage> {
                   hintText: 'Confirm Password',
                   hintStyle: TextStyle(
                     color: Colors.grey[400],
-                    fontSize: 16,
+                    fontSize: ScreenUtil().setSp(42),
                   ),
                   errorStyle: TextStyle(
                     color: Colors.red,
-                    fontSize: 14,
+                    fontSize: ScreenUtil().setSp(36),
                   ),
                 ),
-                style: TextStyle(color: Colors.white, fontSize: 16),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil().setSp(42),
+                ),
                 // Must be valid entry
                 validator: (value) => (value.isEmpty || (value.length < 5)) ||
                         (value != passwordController.text)
@@ -574,9 +582,14 @@ class LoginPageState extends State<LoginPage> {
   /* Progress circle which shows on primary button on press during Auth. */
   Widget showCircularProgress() {
     if (_isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation(Colors.white),
+      return Container(
+        margin: EdgeInsets.all(12.0),
+        child: Center(
+          child: FittedBox(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Colors.white),
+            ),
+          ),
         ),
       );
     }
@@ -623,7 +636,7 @@ class LoginPageState extends State<LoginPage> {
             "Forgot your password?",
             style: TextStyle(
               color: Colors.indigoAccent[100],
-              fontSize: 16,
+              fontSize: ScreenUtil().setSp(42),
               fontWeight: FontWeight.w600,
               fontStyle: FontStyle.italic,
             ),
@@ -640,7 +653,7 @@ class LoginPageState extends State<LoginPage> {
     return new Container(
       padding: EdgeInsets.fromLTRB(0.0, 40.0, 0.0, 0.0),
       child: SizedBox(
-        height: 60.0,
+        height: ScreenUtil().setSp(48) * 3,
         child: new RaisedButton(
           elevation: 20,
           shape: new RoundedRectangleBorder(
@@ -653,7 +666,7 @@ class LoginPageState extends State<LoginPage> {
               ? new Text(
                   _isLoginForm ? 'Login' : 'Create account',
                   style: new TextStyle(
-                      fontSize: 20.0,
+                      fontSize: ScreenUtil().setSp(48),
                       color: Colors.white,
                       fontWeight: FontWeight.bold),
                 )
@@ -669,7 +682,7 @@ class LoginPageState extends State<LoginPage> {
     return new Container(
       padding: EdgeInsets.fromLTRB(0.0, 10, 0.0, 0.0),
       child: SizedBox(
-        height: 40.0,
+        height: ScreenUtil().setSp(48) * 2.5,
         child: new RaisedButton(
           elevation: 20,
           shape: new RoundedRectangleBorder(
@@ -681,7 +694,7 @@ class LoginPageState extends State<LoginPage> {
           child: new Text(
             _isLoginForm ? 'I don\'t have an account' : 'Return to login',
             style: new TextStyle(
-                fontSize: 16.0,
+                fontSize: ScreenUtil().setSp(42),
                 color: Colors.white,
                 fontWeight: FontWeight.w500),
           ),

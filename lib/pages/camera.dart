@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:get/get.dart';
 import 'package:adv_camera/adv_camera.dart';
-
 import 'package:tfsitescape/main.dart';
+
 import 'package:tfsitescape/services/classes.dart';
 import 'package:tfsitescape/services/util.dart';
 
@@ -55,22 +56,46 @@ class CameraScreenState extends State<CameraScreen> {
   /* Take a picture and return the file to save */
   void _processPicture(String path) async {
     if (this.mounted) {
-      setState(() {
-        print(path);
-      });
+      // This is necessary for the settings to apply on slow cameras.
+      print(path);
 
-      File tempFile = await bakeTimestamp(File(path), bearings: _isBearingsOn);
+      ImageProperties properties =
+          await FlutterNativeImage.getImageProperties(path);
+
+      File processed;
+
+      int scaleWidth = (properties.width * 1080 / properties.height).round();
+      int scaleHeight = (properties.height * 1920 / properties.width).round();
+
+      if (properties.width > 1920) {
+        processed = await FlutterNativeImage.compressImage(
+          path,
+          targetHeight: scaleHeight,
+          targetWidth: 1920,
+        );
+      } else if (properties.height > 1080) {
+        processed = await FlutterNativeImage.compressImage(
+          path,
+          targetWidth: scaleWidth,
+          targetHeight: 1080,
+        );
+      } else {
+        processed = File(path);
+      }
+
+      File workingFile =
+          await bakeTimestamp(File(processed.path), bearings: _isBearingsOn);
 
       FileTaskImage taskImage = FileTaskImage.create(
         widget.task,
-        tempFile,
+        workingFile,
       );
       String fileName = taskImage.getFilePath();
 
       File file = new File(fileName);
       file.createSync(recursive: true);
-      await tempFile.copy(fileName);
-      tempFile.deleteSync();
+      await workingFile.copy(fileName);
+      workingFile.deleteSync();
 
       Get.back();
     }
@@ -82,7 +107,7 @@ class CameraScreenState extends State<CameraScreen> {
 
     _cameraController.setFlashType(FlashType.off);
     _cameraController.setSessionPreset(CameraSessionPreset.photo);
-    _cameraController.setSavePath(tempDir.path);
+    _cameraController.setSavePath(gTempDir.path);
     _cameraController.setPictureSize(1920, 1080);
   }
 
@@ -127,6 +152,9 @@ class CameraScreenState extends State<CameraScreen> {
         onCameraCreated: _onCameraCreated,
         onImageCaptured: (String path) => _processPicture(path),
         cameraPreviewRatio: CameraPreviewRatio.r16_9,
+        cameraSessionPreset: CameraSessionPreset.high,
+        bestPictureSize: false,
+        flashType: FlashType.off,
       ),
     );
   }

@@ -1,11 +1,12 @@
 import 'package:expandable/expandable.dart';
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 import "package:photo_view/photo_view.dart";
 import "package:photo_view/photo_view_gallery.dart";
 
-import "package:tfsitescape/services/classes.dart";
+import 'package:tfsitescape/services/classes.dart';
 
 /* The Preview Page is for photo inspection and interaction; the user can
    zoom, pinch and scroll through a task"s gallery
@@ -197,7 +198,7 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
             Text(
               header,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: ScreenUtil().setSp(42),
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
@@ -211,7 +212,7 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
             textAlign: TextAlign.justify,
             maxLines: 3,
             style: TextStyle(
-                fontSize: 16,
+                fontSize: ScreenUtil().setSp(36),
                 color: Colors.white54,
                 fontStyle: netTask.message == null || netTask.message == ""
                     ? FontStyle.italic
@@ -224,7 +225,7 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
               : "\"" + netTask.message + "\"",
           textAlign: TextAlign.justify,
           style: TextStyle(
-              fontSize: 16,
+              fontSize: ScreenUtil().setSp(36),
               color: Colors.white54,
               fontStyle: netTask.message == null || netTask.message == ""
                   ? FontStyle.italic

@@ -5,15 +5,17 @@ import 'package:expandable/expandable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart' as ph;
 
 import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/pages/camera.dart';
 import 'package:tfsitescape/pages/preview.dart';
 import 'package:tfsitescape/pages/preview_cloud.dart';
 import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/classes.dart';
 import 'package:tfsitescape/services/tabs.dart';
+import 'package:tfsitescape/services/classes.dart';
 import 'package:tfsitescape/services/util.dart';
 
 /* Page for Task Selection, shows tasks in list order with option to take
@@ -135,7 +137,12 @@ class _TaskPageState extends State<TaskPage> {
                 onPressed: () async {
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      content: Text("This feature is under construction."),
+                      content: Text(
+                        "This feature is under construction.",
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                        ),
+                      ),
                       duration: Duration(milliseconds: 500),
                     ),
                   );
@@ -175,9 +182,23 @@ class _TaskPageState extends State<TaskPage> {
     Widget buildTabs(int index) {
       switch (index) {
         case 0:
-          return Tab(text: "Local");
+          return Tab(
+            child: Text(
+              "Local",
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(34),
+              ),
+            ),
+          );
         case 1:
-          return Tab(text: "Cloud");
+          return Tab(
+            child: Text(
+              "Cloud",
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(34),
+              ),
+            ),
+          );
       }
       return null;
     }
@@ -260,7 +281,7 @@ class _TaskPageState extends State<TaskPage> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
+                    fontSize: ScreenUtil().setSp(48),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -294,7 +315,7 @@ class _TaskPageState extends State<TaskPage> {
               Text(
                 " Description",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: ScreenUtil().setSp(42),
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
@@ -305,7 +326,7 @@ class _TaskPageState extends State<TaskPage> {
               textAlign: TextAlign.justify,
               maxLines: 3,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: ScreenUtil().setSp(40),
                 color: Colors.black54,
               ),
               softWrap: true,
@@ -314,7 +335,7 @@ class _TaskPageState extends State<TaskPage> {
             task.note == "" ? "N/A" : task.note,
             textAlign: TextAlign.justify,
             style: TextStyle(
-              fontSize: 16,
+              fontSize: ScreenUtil().setSp(40),
               color: Colors.black54,
             ),
             softWrap: true,
@@ -352,15 +373,20 @@ class _TaskPageState extends State<TaskPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.cloud_queue, color: Colors.white70, size: 36),
+                    Icon(
+                      Icons.cloud_queue,
+                      color: Colors.white70,
+                      size: ScreenUtil().setSp(96),
+                    ),
                     SizedBox(height: 10),
                     Text(
                       "No photos in cloud",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 24),
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                        fontSize: ScreenUtil().setSp(60),
+                      ),
                     ),
                     SizedBox(height: 96),
                   ],
@@ -380,15 +406,20 @@ class _TaskPageState extends State<TaskPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(Icons.cloud_queue, color: Colors.white70, size: 36),
+                Icon(
+                  Icons.cloud_queue,
+                  color: Colors.white70,
+                  size: ScreenUtil().setSp(96),
+                ),
                 SizedBox(height: 10),
                 Text(
                   "No photos in cloud",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      color: Colors.white70,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 24),
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w500,
+                    fontSize: ScreenUtil().setSp(60),
+                  ),
                 ),
                 SizedBox(height: 96),
               ],
@@ -409,7 +440,7 @@ class _TaskPageState extends State<TaskPage> {
         context: context,
         removeTop: true,
         child: GridView.builder(
-          padding: EdgeInsets.only(bottom: 96),
+          padding: EdgeInsets.only(bottom: 256.h),
           controller: _scrollController,
           itemCount: _cloudPhotos.length,
           gridDelegate:
@@ -502,22 +533,27 @@ class _TaskPageState extends State<TaskPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(emptyIcon, color: Colors.white70, size: 36),
+                    Icon(
+                      emptyIcon,
+                      color: Colors.white70,
+                      size: ScreenUtil().setSp(96),
+                    ),
                     SizedBox(height: 10),
                     Text(
                       emptyText,
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Colors.white70,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 24),
+                        color: Colors.white70,
+                        fontWeight: FontWeight.w500,
+                        fontSize: ScreenUtil().setSp(60),
+                      ),
                     ),
                     SizedBox(height: 96),
                   ],
                 ),
               )
             : GridView.builder(
-                padding: EdgeInsets.only(bottom: 96),
+                padding: EdgeInsets.only(bottom: 256.h),
                 controller: _scrollController,
                 itemCount: allPhotos.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -701,7 +737,7 @@ class _TaskPageState extends State<TaskPage> {
               Text(
                 " MARK TASK AS NOT REQUIRED",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: ScreenUtil().setSp(42),
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
@@ -726,7 +762,7 @@ class _TaskPageState extends State<TaskPage> {
               Text(
                 " MARK TASK AS REQUIRED",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: ScreenUtil().setSp(42),
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
@@ -755,7 +791,7 @@ class _TaskPageState extends State<TaskPage> {
           onPressed: () async {
             int oldCount = task.getTaskImageCount();
 
-            Get.to(CameraScreen(camera: cam, task: task)).then((onValue) => {
+            Get.to(CameraScreen(camera: gCam, task: task)).then((onValue) => {
                   setState(() {
                     int newCount = task.getTaskImageCount();
 
@@ -817,19 +853,23 @@ class _TaskPageState extends State<TaskPage> {
       if (properties.width > 1920) {
         processed = await FlutterNativeImage.compressImage(
           file.path,
-          quality: 80,
           targetHeight: scaleHeight,
           targetWidth: 1920,
         );
       } else if (properties.height > 1080) {
         processed = await FlutterNativeImage.compressImage(
           file.path,
-          quality: 80,
           targetWidth: scaleWidth,
           targetHeight: 1080,
         );
       } else {
-        processed = file;
+        // Copy the file to the temporary directory.
+
+        // We previously passed the file directly and this resulted to
+        // the file being deleted if it was smaller and did not need
+        // compression. This prevents that.
+        processed =
+            file.copySync(ph.join(gTempDir.path, ph.basename(file.path)));
       }
 
       File workingFile = await bakeTimestamp(processed);
@@ -840,7 +880,7 @@ class _TaskPageState extends State<TaskPage> {
       File newFile = File(fileName);
       newFile.createSync(recursive: true);
       workingFile.copySync(newFile.path);
-      processed.deleteSync();
+      processed.deleteSync(recursive: false);
 
       setState(() {});
     }

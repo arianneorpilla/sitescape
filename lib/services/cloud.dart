@@ -9,7 +9,7 @@ import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/services/classes.dart';
 
 Future<List<dynamic>> getPhotosInCloudFolder(String path) async {
-  // print(cloudDir + path);
+  // print(gCloudPath + path);
   final StorageReference storageRef =
       FirebaseStorage.instance.ref().child(path);
   Map<dynamic, dynamic> listed = (await storageRef.listAll());
@@ -23,10 +23,10 @@ Future syncPhoto(FileTaskImage taskImage) async {
   // print(file.path);
 
   FlutterImageCompress.validator.ignoreCheckExtName = true;
-  File workingFile = File(ph.join(tempDir.path,
+  File workingFile = File(ph.join(gTempDir.path,
       ph.basename(file.path) + "_compressed" + ph.extension(file.path)));
   workingFile.createSync(recursive: true);
-  // File thumbFile = File(ph.join(tempDir.path,
+  // File thumbFile = File(ph.join(gTempDir.path,
   //     ph.basename(file.path) + "_thumbnail" + ph.extension(file.path)));
 
   workingFile.createSync(recursive: true);
@@ -34,7 +34,7 @@ Future syncPhoto(FileTaskImage taskImage) async {
 
   workingFile = await FlutterImageCompress.compressAndGetFile(
     file.path,
-    ph.join(tempDir.path,
+    ph.join(gTempDir.path,
         ph.basenameWithoutExtension(file.path) + "_compressed.jpg"),
     minWidth: 1920,
     minHeight: 1080,
@@ -47,7 +47,7 @@ Future syncPhoto(FileTaskImage taskImage) async {
   try {
     await storageReference.getDownloadURL();
   } catch (e) {
-    FirebaseUser user = await userAuth.getCurrentUser();
+    FirebaseUser user = await gUserAuth.getCurrentUser();
 
     StorageMetadata metadata = StorageMetadata(customMetadata: {
       'uid': user.uid,
@@ -62,7 +62,7 @@ Future syncPhoto(FileTaskImage taskImage) async {
   workingFile.deleteSync();
 
   String newPath = ph.join(
-    extDir.path,
+    gExtDir.path,
     taskImage.siteName,
     taskImage.subName,
     taskImage.secName,

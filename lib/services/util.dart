@@ -119,9 +119,9 @@ Future<bool> isLocationAvailable() async {
    {offlineCallback -> void}: Calls when internet is unavailable
 */
 Future refreshSites({offlineCallback}) async {
-  sites = [];
+  gSites = [];
 
-  String siteCacheDir = extDir.path + "/.sites";
+  String siteCacheDir = gExtDir.path + "/.sites";
   File(siteCacheDir).createSync();
   File siteCache = File(siteCacheDir);
 
@@ -137,13 +137,14 @@ Future refreshSites({offlineCallback}) async {
 
   firestoreInstance.collection("sites").snapshots().listen((result) {
     if (result.documents.isNotEmpty) {
+      gSites = [];
       result.documents.forEach((entry) {
         Site site = Site.fromMap(entry.documentID, entry.data);
         site.populate();
-        sites.add(site);
+        gSites.add(site);
         sitesChild.addAll({entry.documentID: entry.data});
       });
-      sites.sort((a, b) => a.name.compareTo(b.name));
+      gSites.sort((a, b) => a.name.compareTo(b.name));
 
       String cacheContents = json.encode(sitesChild);
       print(cacheContents);
@@ -155,13 +156,13 @@ Future refreshSites({offlineCallback}) async {
 }
 
 Future<Site> getLastSiteAccessed() async {
-  String lastSiteCacheDir = extDir.path + "/.lastaccessed";
+  String lastSiteCacheDir = gExtDir.path + "/.lastaccessed";
   File lastSiteCache = File(lastSiteCacheDir);
 
   if (lastSiteCache.existsSync()) {
-    for (int i = 0; i < sites.length; i++) {
-      if (lastSiteCache.readAsStringSync() == sites[i].code) {
-        return sites[i];
+    for (int i = 0; i < gSites.length; i++) {
+      if (lastSiteCache.readAsStringSync() == gSites[i].code) {
+        return gSites[i];
       }
     }
   }
@@ -169,7 +170,7 @@ Future<Site> getLastSiteAccessed() async {
 }
 
 void setLastSiteAccessed(Site site) {
-  String lastSiteCacheDir = extDir.path + "/.lastaccessed";
+  String lastSiteCacheDir = gExtDir.path + "/.lastaccessed";
   File lastSiteCache = File(lastSiteCacheDir);
 
   lastSiteCache.createSync();
@@ -177,7 +178,7 @@ void setLastSiteAccessed(Site site) {
 }
 
 void freeUpSpace() {
-  List<FileSystemEntity> files = extDir.listSync(recursive: true);
+  List<FileSystemEntity> files = gExtDir.listSync(recursive: true);
 
   for (FileSystemEntity i in files) {
     if (ph.extension(i.path) == ".jpg" &&
@@ -196,19 +197,19 @@ void freeUpSpace() {
 /* If the cache exists, load it. Used on startup so that site data is
    available on startup. */
 Future loadLocalSites() async {
-  sites = [];
+  gSites = [];
 
-  String siteCacheDir = extDir.path + "/.sites";
+  String siteCacheDir = gExtDir.path + "/.sites";
   bool siteCacheExists = await File(siteCacheDir).exists();
 
   if (siteCacheExists) {
     print("Site cache exists: " + siteCacheDir);
     String contents = await File(siteCacheDir).readAsString();
-    sites = jsonToSites(contents);
-    sites.sort((a, b) => a.name.compareTo(b.name));
+    gSites = jsonToSites(contents);
+    gSites.sort((a, b) => a.name.compareTo(b.name));
   } else {
     print("Site cache not found.");
-    sites = [];
+    gSites = [];
   }
 }
 
@@ -226,51 +227,52 @@ String getTimeFlavour() {
 
 /* Returns weather from OpenWeather API. */
 Future<Weather> getWeather() async {
-  if (userLat == null || userLong == null) {
+  if (gUserLatitude == null || gUserLongitude == null) {
     // Get current user's GPS coordinates.
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    userLat = position.latitude;
-    userLong = position.longitude;
+    gUserLatitude = position.latitude;
+    gUserLongitude = position.longitude;
   }
 
   WeatherStation weatherStation =
       new WeatherStation("d61e123d47c998fb20c54a8cc5bc300b");
 
-  Weather weather = await weatherStation.currentWeather(userLat, userLong);
+  Weather weather =
+      await weatherStation.currentWeather(gUserLatitude, gUserLongitude);
   return weather;
 }
 
-/* Iterate on all sites and return the ones with closest distance.
+/* Iterate on all Sites and return the ones with closest distance.
    Returns [List<Site>, List<double>], closest site and distance. */
 Future<List<dynamic>> getThreeClosestSites() async {
-  if (userLat == null || userLong == null) {
+  if (gUserLatitude == null || gUserLongitude == null) {
     // Get current user's GPS coordinates.
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    userLat = position.latitude;
-    userLong = position.longitude;
+    gUserLatitude = position.latitude;
+    gUserLongitude = position.longitude;
   }
 
-  // List of closest sites and distances to return
+  // List of closest Sites and distances to return
   List<Site> closestSites = [];
   List<double> closestDistances = [];
   // Necessary as we'll be manipulating and removing from this list
-  List<Site> allSites = []..addAll(sites);
+  List<Site> allSites = []..addAll(gSites);
   List<double> allDistances = [];
 
   // Get all distances from every site
   for (Site i in allSites) {
     allDistances.add(
-      await Geolocator()
-          .distanceBetween(i.latitude, i.longitude, userLat, userLong),
+      await Geolocator().distanceBetween(
+          i.latitude, i.longitude, gUserLatitude, gUserLongitude),
     );
   }
 
-  // Perform three times as we are getting three of the closest sites
+  // Perform three times as we are getting three of the closest Sites
   for (int i = 0; i < 3; i++) {
     double minimum = -1;
-    // Get the minimum distance among all sites
+    // Get the minimum distance among all Sites
     for (var i = 0; i < allDistances.length; i++) {
       if (minimum == -1 || minimum > allDistances[i]) {
         minimum = allDistances[i];
@@ -280,11 +282,11 @@ Future<List<dynamic>> getThreeClosestSites() async {
     // Get the site index of the minimum
     int indexMin = allDistances.indexOf(minimum);
 
-    // Add these sites/distances of the min's index to the appropriate lists
+    // Add these Sites/distances of the min's index to the appropriate lists
     closestSites.add(allSites[indexMin]);
     closestDistances.add(allDistances[indexMin]);
 
-    // Remove these sites from the list to check in the next iteration
+    // Remove these Sites from the list to check in the next iteration
     allSites.removeAt(indexMin);
     allDistances.removeAt(indexMin);
   }
@@ -308,22 +310,22 @@ String getDistanceText(double distance) {
   }
 }
 
-/* Uses Fuzzy string searching to filter sites in search properly. Limit
+/* Uses Fuzzy string searching to filter Sites in search properly. Limit
    is used to limit the search results for performance.
    
    searchTerm -> String: String to use for a filter
-   limit -> int: The max number of sites to return */
+   limit -> int: The max number of Sites to return */
 List<Site> filterSitesByNameOrCode(String searchTerm, int limit) {
-  // If the search term is blank, return the sites in alphabetical order
+  // If the search term is blank, return the Sites in alphabetical order
   // as already sorted
   if (searchTerm == "") {
     // return [];
     // Safety for when limit exceeds the site length
-    if (limit > sites.length) {
-      limit = sites.length;
+    if (limit > gSites.length) {
+      limit = gSites.length;
     }
 
-    return sites.sublist(0, limit);
+    return gSites.sublist(0, limit);
   }
 
   // Useful so we can iterate on these and get their site indexes
@@ -332,11 +334,11 @@ List<Site> filterSitesByNameOrCode(String searchTerm, int limit) {
   // To fairly discern between codes and names in the search
   List<String> namesAndCodes = [];
 
-  for (int i = 0; i < sites.length; i++) {
-    names.add(sites[i].name);
-    codes.add(sites[i].code);
-    namesAndCodes.add(sites[i].name);
-    namesAndCodes.add(sites[i].code);
+  for (int i = 0; i < gSites.length; i++) {
+    names.add(gSites[i].name);
+    codes.add(gSites[i].code);
+    namesAndCodes.add(gSites[i].name);
+    namesAndCodes.add(gSites[i].code);
   }
 
   // Perform a Fuzzy string search with the term on all names/codes
@@ -365,8 +367,8 @@ List<Site> filterSitesByNameOrCode(String searchTerm, int limit) {
     }
 
     // If an index match is found, add it
-    if (addIndex != -1 && !bestResults.contains(sites[addIndex])) {
-      bestResults.add(sites[addIndex]);
+    if (addIndex != -1 && !bestResults.contains(gSites[addIndex])) {
+      bestResults.add(gSites[addIndex]);
     }
   }
 
@@ -396,7 +398,7 @@ Future<File> bakeTimestamp(File file, {bool bearings = false}) async {
       EditorText(
         offset: Offset(x, y),
         text: text,
-        fontSizePx: 48,
+        fontSizePx: 36,
         textColor: color,
       ),
     );

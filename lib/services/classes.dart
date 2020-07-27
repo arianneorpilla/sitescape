@@ -18,7 +18,7 @@ import 'package:tfsitescape/services/util.dart';
 /* Represents a cell-site with a unique code. Top-level nested 
    structure loaded from the cloud or as a JSON file. 
    
-   Subsite mappings are stored separately to the list of Subsites
+   Subsite mappings are stored separately to the list of SubSites
    to allow exporting to JSON.
    
    code -> String: A site code, typically a 5 letter ID (primary key)
@@ -138,7 +138,7 @@ class Site {
   //             print("fuck");
   //             try {
   //               String notRequiredCloudPath = ph.join(
-  //                     extDir.path,
+  //                     gExtDir.path,
   //                     task.sector.subsite.site.name,
   //                     task.sector.subsite.name,
   //                     task.sector.name,
@@ -214,7 +214,7 @@ class Site {
   Directory getDirectory() {
     return Directory(
       ph.join(
-        extDir.path,
+        gExtDir.path,
         this.name,
       ),
     );
@@ -235,20 +235,20 @@ enum SyncStatus {
    text -> String: Text containing JSON site data
 */
 List<Site> jsonToSites(String text) {
-  List<Site> sites = [];
+  List<Site> Sites = [];
 
-  Map sitesJson = json.decode(text);
+  Map SitesJson = json.decode(text);
 
-  sitesJson.forEach((key, value) {
+  SitesJson.forEach((key, value) {
     Site site = Site.fromMap(key, value);
     site.populate();
 
-    sites.add(site);
+    Sites.add(site);
   });
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  Sites.sort((a, b) => a.name.compareTo(b.name));
 
-  return sites;
+  return Sites;
 }
 
 /* From the cloud, convert the database mappings to an appropriate
@@ -257,16 +257,16 @@ List<Site> jsonToSites(String text) {
    snapshot -> Map<dynamic, dynamic>: JSON map pulled from database 
 */
 List<Site> snapshotToSites(Map<dynamic, dynamic> snapshot) {
-  List<Site> sites = [];
+  List<Site> Sites = [];
 
   snapshot.forEach((key, values) {
     Site site = Site.fromMap(key, values);
-    sites.add(site);
+    Sites.add(site);
   });
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  Sites.sort((a, b) => a.name.compareTo(b.name));
 
-  return sites;
+  return Sites;
 }
 
 /* Represents a Subsite within a Site with a unique name.
@@ -319,7 +319,7 @@ class Subsite {
   Directory getDirectory() {
     return Directory(
       ph.join(
-        extDir.path,
+        gExtDir.path,
         site.name,
         this.name,
       ),
@@ -374,7 +374,7 @@ class Sector {
     );
   }
 
-  populate() {
+  void populate() {
     tasks = [];
     maps.forEach((k, v) => tasks.add(Task.fromMap(k, v)));
 
@@ -392,7 +392,7 @@ class Sector {
   Directory getDirectory() {
     return Directory(
       ph.join(
-        extDir.path,
+        gExtDir.path,
         subsite.site.name,
         subsite.name,
         this.name,
@@ -402,7 +402,7 @@ class Sector {
 
   String getCloudPath() {
     return ph.join(
-      cloudDir,
+      gCloudPath,
       subsite.site.name,
       subsite.name,
       this.name,
@@ -1039,11 +1039,11 @@ class FileTaskImage implements TaskImage {
   }
 
   String getCloudPath() {
-    return ph.join(cloudDir, siteName, subName, secName, getBasename(true));
+    return ph.join(gCloudPath, siteName, subName, secName, getBasename(true));
   }
 
   String getCloudThumbPath() {
-    return ph.join(cloudThumbDir, siteName, subName, secName, "thumbs",
+    return ph.join(gCloudPath, siteName, subName, secName, "thumbs",
         "thumb@256_" + getBasename(true));
   }
 
@@ -1068,7 +1068,7 @@ class FileTaskImage implements TaskImage {
 
   String getFilePath() {
     return ph.join(
-        extDir.path, siteName, subName, secName, getBasename(isCloud));
+        gExtDir.path, siteName, subName, secName, getBasename(isCloud));
   }
 }
 
@@ -1178,7 +1178,8 @@ class NetworkTaskImage implements TaskImage {
   }
 
   String getFilePath() {
-    return ph.join(cloudDir, siteName, subName, secName, getBasename(isCloud));
+    return ph.join(
+        gCloudPath, siteName, subName, secName, getBasename(isCloud));
   }
 
   String getCloudPath() {

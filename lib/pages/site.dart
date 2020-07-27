@@ -3,21 +3,21 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mapbox_navigation/flutter_mapbox_navigation.dart'
     as fmn;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:ntp/ntp.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/pages/sector.dart';
 import 'package:tfsitescape/services/cloud.dart';
 import 'package:path/path.dart' as ph;
 import 'package:http/http.dart' as http;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/classes.dart';
@@ -50,103 +50,7 @@ class _SitePageState extends State<SitePage> {
 
   bool _downloading = false;
   bool _uploading = false;
-
-  Future<bool> _onWillPop() async {
-    if (_downloading || _uploading) {
-      Widget logout = FlatButton(
-        child: Text(
-          "CANCEL OPERATION",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.red,
-            fontSize: 16,
-          ),
-        ),
-        onPressed: () {
-          _downloading = false;
-          _uploading = false;
-          for (Subsite sub in widget.site.subsites) {
-            for (Sector sec in sub.sectors) {
-              sec.downloading = false;
-              sec.uploading = false;
-            }
-          }
-          Get.back();
-          Get.back();
-        },
-      );
-
-      Widget cancel = FlatButton(
-        child: Text(
-          "RESUME",
-          style: TextStyle(
-            color: Colors.blue,
-            fontSize: 16,
-          ),
-        ),
-        onPressed: () {
-          // Pop the sign-out dialog.
-          Get.back();
-        },
-      );
-
-      return (await showDialog(
-            context: context,
-            builder: (context) => new AlertDialog(
-              title: Text(
-                "Operation In Progress",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-              ),
-              content: SingleChildScrollView(
-                child: Text(
-                  "Exiting past this site screen will abruptly terminate the " +
-                      "ongoing download or upload.\n\nPartial progress will " +
-                      "be retained and you may restart the task wherever you " +
-                      "left off later.",
-                  textAlign: TextAlign.justify,
-                  style: TextStyle(fontWeight: FontWeight.w400),
-                ),
-              ),
-              actions: [logout, cancel],
-            ),
-          )) ??
-          false;
-    } else {
-      Get.back();
-      return false;
-    }
-  }
-
-  /* Upon clicking the icon button to navigate, this uses Mapbox Navigation
-     to start turn-by-turn navigation, might need to check if this is a 
-     realistic feature to have given the cost of Mapbox. */
-  Future startSiteNavigation() async {
-    fmn.MapboxNavigation _directions;
-
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    double myLat = position.latitude;
-    double myLong = position.longitude;
-
-    _directions = fmn.MapboxNavigation(onRouteProgress: (arrived) async {
-      if (arrived) await _directions.finishNavigation();
-    });
-
-    final userLocation =
-        fmn.Location(name: "My location", latitude: myLat, longitude: myLong);
-
-    final selectedLocation = fmn.Location(
-        name: widget.site.name,
-        latitude: widget.site.latitude,
-        longitude: widget.site.longitude);
-
-    _directions.startNavigation(
-        origin: userLocation,
-        destination: selectedLocation,
-        mode: fmn.NavigationMode.drivingWithTraffic,
-        simulateRoute: false,
-        units: fmn.VoiceUnits.metric);
-  }
+  bool _navigating = false;
 
   @override
   void initState() {
@@ -154,8 +58,6 @@ class _SitePageState extends State<SitePage> {
     _recentlyDone = false;
 
     setLastSiteAccessed(widget.site);
-
-    // site.updateTaskInfo().then((onValue) {});
   }
 
   @override
@@ -212,7 +114,12 @@ class _SitePageState extends State<SitePage> {
                   onPressed: () async {
                     _scaffoldKey.currentState.showSnackBar(
                       SnackBar(
-                        content: Text("This feature is under construction."),
+                        content: Text(
+                          "This feature is under construction.",
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
+                        ),
                         duration: Duration(milliseconds: 500),
                       ),
                     );
@@ -235,6 +142,119 @@ class _SitePageState extends State<SitePage> {
         ),
       ),
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    if (_downloading || _uploading) {
+      Widget logout = FlatButton(
+        child: Text(
+          "CANCEL OPERATION",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.red,
+            fontSize: ScreenUtil().setSp(42),
+          ),
+        ),
+        onPressed: () {
+          _downloading = false;
+          _uploading = false;
+          for (Subsite sub in widget.site.subsites) {
+            for (Sector sec in sub.sectors) {
+              sec.downloading = false;
+              sec.uploading = false;
+            }
+          }
+          Get.back();
+          Get.back();
+        },
+      );
+
+      Widget cancel = FlatButton(
+        child: Text(
+          "RESUME",
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: ScreenUtil().setSp(42),
+          ),
+        ),
+        onPressed: () {
+          // Pop the sign-out dialog.
+          Get.back();
+        },
+      );
+
+      return (await showDialog(
+            context: context,
+            builder: (context) => new AlertDialog(
+              title: Text(
+                "Operation In Progress",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: ScreenUtil().setSp(48),
+                ),
+              ),
+              content: SingleChildScrollView(
+                child: Text(
+                  "Exiting past this site screen will abruptly terminate the " +
+                      "ongoing download or upload.\n\nPartial progress will " +
+                      "be retained and you may restart the task wherever you " +
+                      "left off later.",
+                  textAlign: TextAlign.justify,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: ScreenUtil().setSp(42),
+                  ),
+                ),
+              ),
+              actions: [logout, cancel],
+            ),
+          )) ??
+          false;
+    } else {
+      Get.back();
+      return false;
+    }
+  }
+
+  /* Upon clicking the icon button to navigate, this uses Mapbox Navigation
+     to start turn-by-turn navigation, might need to check if this is a 
+     realistic feature to have given the cost of Mapbox. */
+  Future startSiteNavigation() async {
+    setState(() {
+      _navigating = true;
+    });
+
+    fmn.MapboxNavigation _directions;
+
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    double myLat = position.latitude;
+    double myLong = position.longitude;
+
+    _directions = fmn.MapboxNavigation(onRouteProgress: (arrived) async {
+      if (arrived) await _directions.finishNavigation();
+    });
+
+    final userLocation =
+        fmn.Location(name: "My location", latitude: myLat, longitude: myLong);
+
+    final selectedLocation = fmn.Location(
+        name: widget.site.name,
+        latitude: widget.site.latitude,
+        longitude: widget.site.longitude);
+
+    _directions.startNavigation(
+        origin: userLocation,
+        destination: selectedLocation,
+        mode: fmn.NavigationMode.drivingWithTraffic,
+        simulateRoute: false,
+        units: fmn.VoiceUnits.metric);
+
+    Future.delayed(Duration(seconds: 10)).then((onValue) {
+      setState(() {
+        _navigating = false;
+      });
+    });
   }
 
   Widget showFloatingActionButton() {
@@ -351,13 +371,14 @@ class _SitePageState extends State<SitePage> {
             widget.site.name.toUpperCase(),
             style: TextStyle(
               color: Colors.black,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(48),
               fontWeight: FontWeight.w600,
             ),
           ),
           Text(
             widget.site.code.toUpperCase(),
             style: TextStyle(
+              fontSize: ScreenUtil().setSp(36),
               color: Colors.black54,
               fontWeight: FontWeight.w400,
             ),
@@ -377,6 +398,7 @@ class _SitePageState extends State<SitePage> {
                         Text(
                           " " + widget.site.network + " • " + widget.site.build,
                           style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
                             color: Colors.black54,
                             fontWeight: FontWeight.w400,
                           ),
@@ -388,6 +410,7 @@ class _SitePageState extends State<SitePage> {
                       maxLines: 5,
                       overflow: TextOverflow.fade,
                       style: TextStyle(
+                        fontSize: ScreenUtil().setSp(36),
                         color: Colors.black54,
                         fontWeight: FontWeight.w400,
                       ),
@@ -398,34 +421,9 @@ class _SitePageState extends State<SitePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Container(
-                    width: 48,
-                    child: Center(
-                      child: IconButton(
-                        icon: Icon(Icons.directions),
-                        iconSize: 36,
-                        color: Colors.blue,
-                        onPressed: () async {
-                          startSiteNavigation();
-                        },
-                      ),
-                    ),
-                  ),
-                  // If site is downloading
+                  showDirectionsButton(),
                   showDownloadButton(),
-                  Container(
-                    width: 48,
-                    child: Center(
-                      child: IconButton(
-                        icon: Icon(Icons.note_add),
-                        iconSize: 36,
-                        color: Colors.red[400],
-                        onPressed: () async {
-                          showReportDialog(context);
-                        },
-                      ),
-                    ),
-                  ),
+                  showReportButton(),
                 ],
               )
             ],
@@ -433,6 +431,38 @@ class _SitePageState extends State<SitePage> {
         ],
       ),
     );
+  }
+
+  Widget showDirectionsButton() {
+    if (_navigating) {
+      return Container(
+        height: 48,
+        width: 48,
+        child: Center(
+          child: SizedBox(
+            height: 30,
+            width: 30,
+            child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Colors.blue),
+                strokeWidth: 6.0),
+          ),
+        ),
+      );
+    } else {
+      return Container(
+        width: 48,
+        child: Center(
+          child: IconButton(
+            icon: Icon(Icons.directions),
+            iconSize: 36,
+            color: Colors.blue,
+            onPressed: () async {
+              startSiteNavigation();
+            },
+          ),
+        ),
+      );
+    }
   }
 
   Widget showDownloadButton() {
@@ -478,10 +508,26 @@ class _SitePageState extends State<SitePage> {
       );
   }
 
+  Widget showReportButton() {
+    return Container(
+      width: 48,
+      child: Center(
+        child: IconButton(
+          icon: Icon(Icons.note_add),
+          iconSize: 36,
+          color: Colors.red[400],
+          onPressed: () async {
+            showReportDialog(context);
+          },
+        ),
+      ),
+    );
+  }
+
   /* On top center clipping through the notification shade */
   Widget showMapCard() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.25,
+      height: ScreenUtil().setHeight(2280) * 0.25,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -508,43 +554,49 @@ class _SitePageState extends State<SitePage> {
   Widget showTabs() {
     Widget buildPages(int index) {
       if (index < widget.site.subsites.length) {
-        return InkWell(
-          child: (index == widget.site.subsites.length - 1)
-              ? showSectorList(widget.site, widget.site.subsites[index])
-              : MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: ListView(
-                    children: [
-                      showSectorList(widget.site, widget.site.subsites[index]),
-                      SizedBox(height: 96),
-                    ],
-                  ),
-                ),
+        return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ListView(
+            children: [
+              showSectorList(widget.site, widget.site.subsites[index]),
+              SizedBox(height: 256.h),
+            ],
+          ),
         );
       } else {
-        return InkWell(
-          child: (index == widget.site.subsites.length - 1)
-              ? showNoteList(widget.site)
-              : MediaQuery.removePadding(
-                  context: context,
-                  removeTop: true,
-                  child: ListView(
-                    children: [
-                      showNoteList(widget.site),
-                      SizedBox(height: 96),
-                    ],
-                  ),
-                ),
+        return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: ListView(
+            children: [
+              showNoteList(widget.site),
+              SizedBox(height: 256.h),
+            ],
+          ),
         );
       }
     }
 
     Widget buildTabs(int index) {
       if (index < widget.site.subsites.length) {
-        return Tab(text: widget.site.subsites[index].name);
+        return Tab(
+          child: Text(
+            widget.site.subsites[index].name,
+            style: TextStyle(
+              fontSize: ScreenUtil().setSp(34),
+            ),
+          ),
+        );
       } else {
-        return Tab(text: "Issues");
+        return Tab(
+          child: Text(
+            "Issues",
+            style: TextStyle(
+              fontSize: ScreenUtil().setSp(34),
+            ),
+          ),
+        );
       }
     }
 
@@ -756,15 +808,20 @@ class _SitePageState extends State<SitePage> {
                         children: [
                           SizedBox(
                               height: MediaQuery.of(context).size.height / 6),
-                          Icon(Icons.note_add, color: Colors.white70, size: 36),
+                          Icon(
+                            Icons.note_add,
+                            color: Colors.white70,
+                            size: ScreenUtil().setSp(96),
+                          ),
                           SizedBox(height: 10),
                           Text(
                             "No reported issues fetched",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                                color: Colors.white70,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 24),
+                              color: Colors.white70,
+                              fontWeight: FontWeight.w500,
+                              fontSize: ScreenUtil().setSp(60),
+                            ),
                           ),
                           SizedBox(height: 96),
                         ],
@@ -1017,12 +1074,12 @@ class SectorCardState extends State<SectorCard> {
         }
       },
       child: Stack(
+        alignment: AlignmentDirectional.bottomStart,
         children: [
           Card(
             color: (sector.inTransaction()) ? Colors.grey[200] : Colors.white,
             elevation: 1,
             child: Container(
-              height: 54,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1031,7 +1088,7 @@ class SectorCardState extends State<SectorCard> {
                       sector.name,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          fontSize: 18,
+                          fontSize: ScreenUtil().setSp(42),
                           fontWeight: FontWeight.w600,
                           color: Colors.black),
                     ),
@@ -1042,7 +1099,11 @@ class SectorCardState extends State<SectorCard> {
                       sector.getUnsynced() ? showUnsyncedCount() : Container(),
                       sector.inTransaction()
                           ? showLoading(sector.downloading)
-                          : Icon(Icons.chevron_right, color: Colors.black54)
+                          : Icon(
+                              Icons.chevron_right,
+                              color: Colors.black54,
+                              size: ScreenUtil().setSp(42),
+                            )
                     ],
                   ),
                 ],
@@ -1051,7 +1112,7 @@ class SectorCardState extends State<SectorCard> {
             ),
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(6, 54, 6, 0),
+            padding: EdgeInsets.fromLTRB(6, 0, 6, 3),
             child: LinearPercentIndicator(
               animateFromLastPercent: true,
               animation: true,
@@ -1097,11 +1158,14 @@ class SectorCardState extends State<SectorCard> {
           Icon(
             unsyncIcon,
             color: unsyncColor,
-            size: 16,
+            size: ScreenUtil().setSp(42),
           ),
           Text(
             " Not required ",
-            style: TextStyle(fontSize: 16, color: unsyncColor),
+            style: TextStyle(
+              fontSize: ScreenUtil().setSp(42),
+              color: unsyncColor,
+            ),
           ),
         ],
       );
@@ -1111,11 +1175,14 @@ class SectorCardState extends State<SectorCard> {
           Icon(
             unsyncIcon,
             color: unsyncColor,
-            size: 16,
+            size: ScreenUtil().setSp(42),
           ),
           Text(
             " " + unsynced.toString() + suffix,
-            style: TextStyle(fontSize: 16, color: unsyncColor),
+            style: TextStyle(
+              fontSize: ScreenUtil().setSp(42),
+              color: unsyncColor,
+            ),
           ),
         ],
       );

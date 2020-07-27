@@ -1,10 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:tfsitescape/main.dart';
 import 'package:weather/weather_library.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:tfsitescape/pages/calculator.dart';
 import 'package:tfsitescape/pages/scanner.dart';
@@ -42,7 +41,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    showWhatsNewModal(context);
+    Future.delayed(Duration(seconds: 1))
+        .then((onValue) => {showWhatsNewModal()});
   }
 
   @override
@@ -88,7 +88,12 @@ class _HomePageState extends State<HomePage> {
                 onPressed: () async {
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      content: Text("This feature is under construction."),
+                      content: Text(
+                        "This feature is under construction.",
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                        ),
+                      ),
                       duration: Duration(milliseconds: 500),
                     ),
                   );
@@ -160,7 +165,7 @@ class _HomePageState extends State<HomePage> {
             getTimeFlavour(),
             style: TextStyle(
               color: Colors.white,
-              fontSize: 48,
+              fontSize: ScreenUtil().setSp(48),
               fontWeight: FontWeight.w200,
             ),
           ),
@@ -224,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                     textAlign: TextAlign.right,
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 48,
+                        fontSize: ScreenUtil().setSp(128),
                         fontWeight: FontWeight.w200),
                   ),
                 ],
@@ -266,7 +271,7 @@ class _HomePageState extends State<HomePage> {
           textAlign: TextAlign.right,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: ScreenUtil().setSp(36),
             fontWeight: FontWeight.w300,
           ),
         ),
@@ -275,7 +280,7 @@ class _HomePageState extends State<HomePage> {
           textAlign: TextAlign.right,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 14,
+            fontSize: ScreenUtil().setSp(36),
             fontWeight: FontWeight.w200,
           ),
         ),
@@ -304,12 +309,13 @@ class _HomePageState extends State<HomePage> {
               contentPadding: EdgeInsets.all(12.0),
               prefixIcon: Icon(
                 Icons.search,
+                size: ScreenUtil().setSp(48),
                 color: Colors.grey,
               ),
               hintText: 'Search for site',
               hintStyle: TextStyle(
                   color: Colors.grey,
-                  fontSize: 20,
+                  fontSize: ScreenUtil().setSp(48),
                   fontWeight: FontWeight.w300),
             ),
             style: TextStyle(color: Colors.black, fontSize: 20),
@@ -347,7 +353,7 @@ class _HomePageState extends State<HomePage> {
               name,
               textAlign: TextAlign.center,
               style: TextStyle(
-                  fontSize: 16,
+                  fontSize: ScreenUtil().setSp(42),
                   fontWeight: FontWeight.w200,
                   color: Colors.white),
             )
@@ -362,7 +368,12 @@ class _HomePageState extends State<HomePage> {
           case 2:
             _scaffoldKey.currentState.showSnackBar(
               SnackBar(
-                content: Text("This feature is under construction."),
+                content: Text(
+                  "This feature is under construction.",
+                  style: TextStyle(
+                    fontSize: ScreenUtil().setSp(36),
+                  ),
+                ),
                 duration: Duration(milliseconds: 500),
               ),
             );
@@ -431,7 +442,9 @@ class _HomePageState extends State<HomePage> {
                           "Your last accessed site",
                           textAlign: TextAlign.start,
                           style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w600),
+                            fontWeight: FontWeight.w600,
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
                         ),
                         SizedBox(height: 8),
                         Text(
@@ -440,7 +453,7 @@ class _HomePageState extends State<HomePage> {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: TextStyle(
-                              fontSize: 18,
+                              fontSize: ScreenUtil().setSp(48),
                               fontWeight: FontWeight.w600,
                               color: Colors.black54),
                         ),
@@ -450,6 +463,7 @@ class _HomePageState extends State<HomePage> {
                           maxLines: 1,
                           textAlign: TextAlign.start,
                           style: TextStyle(
+                              fontSize: ScreenUtil().setSp(36),
                               fontWeight: FontWeight.w400,
                               color: Colors.black54),
                         )
@@ -477,7 +491,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /* One of three nearest sites, polled with getThreeClosestSites()
+  /* One of three nearest Sites, polled with getThreeClosestSites()
 
      site -> Site: Site with info to show
      distance -> String: Distance in km or m with getDistanceText()
@@ -486,7 +500,7 @@ class _HomePageState extends State<HomePage> {
     return InkWell(
       child: Card(
         child: Container(
-          height: 36,
+          height: 96.h,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -498,7 +512,7 @@ class _HomePageState extends State<HomePage> {
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: TextStyle(
-                      fontSize: 16,
+                      fontSize: ScreenUtil().setSp(42),
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[100]),
                 ),
@@ -510,7 +524,7 @@ class _HomePageState extends State<HomePage> {
                     textAlign: TextAlign.start,
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 12,
+                      fontSize: ScreenUtil().setSp(36),
                     ),
                   ),
                   Icon(Icons.location_on, color: Colors.white)
@@ -530,7 +544,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /* Checks if it is appropriate to check the location, does not show the
-     nearest three sites if not */
+     nearest three Sites if not */
   Widget showNearestSitesOnLocation() {
     return FutureBuilder(
       future: isLocationAvailable(),
@@ -544,8 +558,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /* Shows nearest three sites by calling getThreeClosestThreeSites() to
-     get closest sites from all site data */
+  /* Shows nearest three Sites by calling getThreeClosestThreeSites() to
+     get closest Sites from all site data */
   Widget showNearestThreeSites() {
     return FutureBuilder(
       future: getThreeClosestSites(),
@@ -566,7 +580,7 @@ class _HomePageState extends State<HomePage> {
           );
         }
 
-        // Show the closest sites and their distances in order.
+        // Show the closest Sites and their distances in order.
         return Column(
           children: [
             showNearest(closestSites[0], closestText[0]),
@@ -578,16 +592,16 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void showWhatsNewModal(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String getVersion = prefs.getString('version') ?? null;
+  void showWhatsNewModal() {
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // String getVersion = prefs.getString('version') ?? null;
 
     Widget dismiss = FlatButton(
       child: Text(
         "DISMISS",
         style: TextStyle(
           color: Colors.blue,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(42),
         ),
       ),
       onPressed: () {
@@ -596,33 +610,42 @@ class _HomePageState extends State<HomePage> {
       },
     );
 
-    if (getVersion == null || getVersion != version) {
-      prefs.setString('version', version);
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              "What's New In " + version,
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Welcome to the Technical Test",
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: ScreenUtil().setSp(48),
             ),
-            content: SingleChildScrollView(
-              child: Text(
-                "- Photo approval system.\n" +
-                    "- Rejections will result in push notification.\n" +
-                    "- Selective web app features based on role.\n" +
-                    "- Added Mark All Done feature for sectors.\n" +
-                    "- Fixed several issues with progression.\n" +
-                    "- Faster loading of cloud images.\n" +
-                    "- General performance improvements.",
-                textAlign: TextAlign.left,
-                style: TextStyle(fontWeight: FontWeight.w400),
+          ),
+          content: SingleChildScrollView(
+            child: Text(
+              "Thank you for participating in the Sitescape Technical Test. This message will appear with each startup." +
+                  " Your objective as a pre-production tester is as follows:\n\n"
+                      "- As a basic tutorial, attempt to access the Technical Test 00 site, where every tester is instructed to dump any number of photos.\n" +
+                  "- Make sure to sync your items to the cloud.\n" +
+                  "- Find a Technical Test site that is empty (not 00) and perform the tasks in it as your individual folder.\n" +
+                  "- Complete every sector until progression is complete.\n" +
+                  "- No additional instructions are available to you as a tester as the tests are intended to gauge the effectiveness of the application and user interface design.\n\n" +
+                  "The following are what we expect to gain from this Technical Test:\n\n" +
+                  "- Knowledge of bugs present in the application.\n" +
+                  "- User's tendencies and any aversions towards the user interface.\n" +
+                  "- Stability of the client software in different devices.\n" +
+                  "- Reliability of cloud upload and presence of any undesired or undefined behaviour.\n" +
+                  "- Server load, cost and bandwidth from each cloud task performed with increased traffic.\n",
+              textAlign: TextAlign.justify,
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: ScreenUtil().setSp(42),
               ),
             ),
-            actions: [dismiss],
-          );
-        },
-      );
-    }
+          ),
+          actions: [dismiss],
+        );
+      },
+    );
   }
 }

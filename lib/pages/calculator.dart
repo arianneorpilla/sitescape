@@ -2,6 +2,7 @@ import "dart:ui";
 
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 
 import 'package:tfsitescape/services/modal.dart';
@@ -44,7 +45,7 @@ class CalculatorPageState extends State<CalculatorPage> {
   @override
   void initState() {
     super.initState();
-    // Show first 10 sites alphabetically
+    // Show first 10 Sites alphabetically
     chrAGCValue = "";
     chrRSLValueLER = "";
 
@@ -148,7 +149,7 @@ class CalculatorPageState extends State<CalculatorPage> {
                   child: Text(
                     "Ceragon / Harris / RTN",
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: ScreenUtil().setSp(96),
                       color: Colors.white,
                       fontWeight: FontWeight.w100,
                     ),
@@ -224,7 +225,7 @@ class CalculatorPageState extends State<CalculatorPage> {
                   child: Text(
                     "Ericsson",
                     style: TextStyle(
-                      fontSize: 36,
+                      fontSize: ScreenUtil().setSp(96),
                       color: Colors.white,
                       fontWeight: FontWeight.w100,
                     ),
@@ -316,7 +317,12 @@ class CalculatorPageState extends State<CalculatorPage> {
                 onPressed: () async {
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      content: Text("This feature is under construction."),
+                      content: Text(
+                        "This feature is under construction.",
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                        ),
+                      ),
                       duration: Duration(milliseconds: 500),
                     ),
                   );
@@ -349,7 +355,7 @@ class CalculatorPageState extends State<CalculatorPage> {
           title,
           textAlign: TextAlign.end,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: ScreenUtil().setSp(36),
             fontWeight: FontWeight.w600,
             color: Colors.grey[300].withOpacity(0.7),
           ),
@@ -369,18 +375,18 @@ class CalculatorPageState extends State<CalculatorPage> {
             suffixText: units,
             suffixStyle: TextStyle(
                 color: Colors.grey[300].withOpacity(0.5),
-                fontSize: 12,
+                fontSize: ScreenUtil().setSp(36),
                 fontWeight: FontWeight.w600),
             hintText: "Input a proper value",
             hintStyle: TextStyle(
               color: Colors.grey[300].withOpacity(0.5),
-              fontSize: 16,
+              fontSize: ScreenUtil().setSp(42),
               fontWeight: FontWeight.w300,
             ),
           ),
           style: TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: ScreenUtil().setSp(42),
           ),
           // Must be valid entry
         ),
@@ -428,21 +434,25 @@ class CalculatorPageState extends State<CalculatorPage> {
             prefixIcon: Icon(
               icon,
               color: Colors.grey,
+              size: ScreenUtil().setSp(48),
             ),
             suffixText: suffix,
             suffixStyle: TextStyle(
                 color: Colors.grey[800],
-                fontSize: 20,
+                fontSize: ScreenUtil().setSp(48),
                 fontWeight: FontWeight.w600,
                 fontStyle: FontStyle.italic),
             hintText: caption,
             hintStyle: TextStyle(
               color: Colors.grey,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(48),
               fontWeight: FontWeight.w300,
             ),
           ),
-          style: TextStyle(color: Colors.black, fontSize: 20),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: ScreenUtil().setSp(48),
+          ),
           // Must be valid entry
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /* A class providing paged scrolling functionality with tab headers.
-   Used in the Site page to pretty up Subsites and Sectors display.
+   Used in the Site page to pretty up SubSites and Sectors display.
    
    int -> itemCount: Number of tabs/pages to build
    tabBuilder -> IndexedWidgetBuilder: Used to iteratively generate tabs

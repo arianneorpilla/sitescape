@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import "package:flutter/material.dart";
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 
 import "package:tfsitescape/main.dart";
 import "package:tfsitescape/pages/root.dart";
 import "package:tfsitescape/services/auth.dart";
 import 'package:tfsitescape/services/util.dart';
+import 'package:tfsitescape/main.dart';
 
 /* App-wide pop-up menu used in most screens, shows the following options
    in the following order:
@@ -66,13 +68,14 @@ PopupMenuItem<String> popupOption(IconData icon, Color color, String message,
                 Icon(
                   icon,
                   color: color,
-                  size: 16,
+                  size: ScreenUtil().setSp(42),
                 ),
                 Text(
                   "   " + message,
                   style: TextStyle(
                     color: color,
                     fontWeight: fontWeight,
+                    fontSize: ScreenUtil().setSp(42),
                   ),
                 ),
               ],
@@ -97,7 +100,7 @@ void showSignoutDialog(BuildContext context) async {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.red,
-        fontSize: 16,
+        fontSize: ScreenUtil().setSp(42),
       ),
     ),
     onPressed: () async {
@@ -106,20 +109,21 @@ void showSignoutDialog(BuildContext context) async {
         Get.back();
 
         // Sign out the user and wipe their AuthStatus.
-        await userAuth.signOut();
-        userAuth = new Auth();
+        await gUserAuth.signOut();
+        gUserAuth = new Auth();
 
-        sites = [];
-        String siteCacheDir = extDir.path + "/.sites";
+        gSites = [];
+
+        String siteCacheDir = gExtDir.path + "/.sites";
         File siteCache = File(siteCacheDir);
         siteCache.deleteSync();
-
-        // Prevent the user from returning to previous screens.
-        Get.off(
-          RootPage(auth: userAuth),
-        );
       } catch (e) {
         print(e);
+      } finally {
+        // Prevent the user from returning to previous screens.
+        Get.off(
+          RootPage(auth: gUserAuth),
+        );
       }
     },
   );
@@ -129,7 +133,7 @@ void showSignoutDialog(BuildContext context) async {
       "CANCEL",
       style: TextStyle(
         color: Colors.black,
-        fontSize: 16,
+        fontSize: ScreenUtil().setSp(42),
       ),
     ),
     onPressed: () {
@@ -145,14 +149,18 @@ void showSignoutDialog(BuildContext context) async {
       return AlertDialog(
         title: Text(
           "Are you sure?",
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(
+              fontWeight: FontWeight.w600, fontSize: ScreenUtil().setSp(48)),
         ),
         content: SingleChildScrollView(
           child: Text(
             "Photos not yet in the cloud will remain on your device " +
                 "and can be synced upon your return.",
             textAlign: TextAlign.justify,
-            style: TextStyle(fontWeight: FontWeight.w400),
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: ScreenUtil().setSp(42),
+            ),
           ),
         ),
         actions: [logout, cancel],
@@ -168,7 +176,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.red,
-        fontSize: 16,
+        fontSize: ScreenUtil().setSp(42),
       ),
     ),
     onPressed: () async {
@@ -176,7 +184,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
         // Pop the sign-out dialog.
         Get.back();
         freeUpSpace();
-        Get.offAll(RootPage(auth: userAuth));
+        Get.offAll(RootPage(auth: gUserAuth));
       } catch (e) {
         print(e);
       }
@@ -188,7 +196,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
       "CANCEL",
       style: TextStyle(
         color: Colors.black,
-        fontSize: 16,
+        fontSize: ScreenUtil().setSp(42),
       ),
     ),
     onPressed: () {
@@ -204,7 +212,10 @@ void showFreeUpSpaceDialog(BuildContext context) async {
       return AlertDialog(
         title: Text(
           "Free up space?",
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: ScreenUtil().setSp(48),
+          ),
         ),
         content: SingleChildScrollView(
           child: Text(
@@ -213,7 +224,10 @@ void showFreeUpSpaceDialog(BuildContext context) async {
                 "been uploaded will remain and task progress will reset " +
                 "accordingly.",
             textAlign: TextAlign.justify,
-            style: TextStyle(fontWeight: FontWeight.w400),
+            style: TextStyle(
+              fontWeight: FontWeight.w400,
+              fontSize: ScreenUtil().setSp(42),
+            ),
           ),
         ),
         actions: [free, cancel],
@@ -249,14 +263,16 @@ class CreditsScreen extends StatelessWidget {
           alignment: Alignment.center,
           child: new Column(
             children: [
-              new Text("SITESCAPE",
+              new Text("sitescape",
                   style: TextStyle(
+                      fontFamily: "Quicksand",
                       color: Colors.white,
                       fontWeight: FontWeight.w300,
-                      fontSize: 72)),
+                      fontSize: 96)),
               new Text(
                 "H A N D O V E R  T O O L  P A C K",
                 style: TextStyle(
+                  fontFamily: "Quicksand",
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w300,
@@ -265,7 +281,7 @@ class CreditsScreen extends StatelessWidget {
               ),
               new Text(""),
               new Text(
-                versionAndBuild,
+                gVersionAndBuild,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -325,7 +341,7 @@ class CreditsScreen extends StatelessWidget {
                   Get.to(
                     LicensePage(
                       applicationName: "Sitescape",
-                      applicationVersion: versionAndBuild,
+                      applicationVersion: gVersion,
                       applicationLegalese: "© Sitescape 2020",
                     ),
                   );

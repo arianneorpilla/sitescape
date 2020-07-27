@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flushbar/flushbar.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 
 import 'package:tfsitescape/main.dart';
@@ -55,7 +56,7 @@ class ScannerPageState extends State<ScannerPage> {
               image: DecorationImage(
                 image: AssetImage('images/login.jpg'),
                 colorFilter: new ColorFilter.mode(
-                    Colors.indigo.withOpacity(0.7), BlendMode.dstATop),
+                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
                 fit: BoxFit.cover,
               ),
             ),
@@ -93,7 +94,12 @@ class ScannerPageState extends State<ScannerPage> {
                 onPressed: () async {
                   _scaffoldKey.currentState.showSnackBar(
                     SnackBar(
-                      content: Text("This feature is under construction."),
+                      content: Text(
+                        "This feature is under construction.",
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                        ),
+                      ),
                       duration: Duration(milliseconds: 500),
                     ),
                   );
@@ -241,7 +247,7 @@ class ScannerPageState extends State<ScannerPage> {
 
           if (hasEmpties) {
             String result = await Get.to(
-              CameraScanScreen(camera: cam),
+              CameraScanScreen(camera: gCam),
             );
 
             if (result != null) {
@@ -301,7 +307,7 @@ class ScannerPageState extends State<ScannerPage> {
                     new Text(
                       pair.key,
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: ScreenUtil().setSp(48),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -312,9 +318,11 @@ class ScannerPageState extends State<ScannerPage> {
                           ? new TextStyle(
                               color: Colors.black54,
                               fontStyle: FontStyle.italic,
+                              fontSize: ScreenUtil().setSp(36),
                             )
                           : new TextStyle(
                               color: Colors.black54,
+                              fontSize: ScreenUtil().setSp(36),
                             ),
                     ),
                   ],
@@ -404,19 +412,24 @@ class ScannerPageState extends State<ScannerPage> {
             prefixIcon: Icon(
               Icons.insert_comment,
               color: Colors.grey,
+              size: ScreenUtil().setSp(48),
             ),
             suffixIcon: Icon(
               Icons.keyboard_return,
               color: Colors.grey,
+              size: ScreenUtil().setSp(48),
             ),
             hintText: "Add an entry name",
             hintStyle: TextStyle(
               color: Colors.grey,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(48),
               fontWeight: FontWeight.w300,
             ),
           ),
-          style: TextStyle(color: Colors.black, fontSize: 20),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: ScreenUtil().setSp(48),
+          ),
           // Must be valid entry
         ),
       ),
@@ -432,7 +445,11 @@ class ScannerPageState extends State<ScannerPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: MediaQuery.of(context).size.height / 3),
-            Icon(Icons.insert_comment, color: Colors.white70, size: 36),
+            Icon(
+              Icons.insert_comment,
+              color: Colors.white70,
+              size: ScreenUtil().setSp(96),
+            ),
             SizedBox(height: 10),
             Text(
               "Add or import an entry to scan",
@@ -440,7 +457,7 @@ class ScannerPageState extends State<ScannerPage> {
               style: TextStyle(
                   color: Colors.white70,
                   fontWeight: FontWeight.w500,
-                  fontSize: 24),
+                  fontSize: ScreenUtil().setSp(60)),
             )
           ],
         ),
@@ -470,7 +487,7 @@ class ScannerPair {
 }
 
 List<ScannerPair> getScanner() {
-  String scannerDir = extDir.path + "/.scanner";
+  String scannerDir = gExtDir.path + "/.scanner";
   File scanner = File(scannerDir);
 
   List<ScannerPair> scannerList = [];
@@ -491,7 +508,7 @@ List<ScannerPair> getScanner() {
 }
 
 void setScanner(List<ScannerPair> updated) {
-  String scannerDir = extDir.path + "/.scanner";
+  String scannerDir = gExtDir.path + "/.scanner";
   File scanner = File(scannerDir);
 
   scanner.createSync();
@@ -514,7 +531,7 @@ void setScanner(List<ScannerPair> updated) {
 }
 
 void shareScanner(List<ScannerPair> updated) {
-  String scannerDir = extDir.path + "/.scanner";
+  String scannerDir = gExtDir.path + "/.scanner";
   File scanner = File(scannerDir);
 
   scanner.createSync();
