@@ -174,8 +174,8 @@ class Site {
           if (thumb != null) {
             return Image(
               image: thumb.image,
-              height: 64,
-              width: 64,
+              height: 96,
+              width: 96,
               fit: BoxFit.fill,
             );
           }

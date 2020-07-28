@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import "package:flutter/material.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,7 +9,6 @@ import "package:tfsitescape/main.dart";
 import "package:tfsitescape/pages/root.dart";
 import "package:tfsitescape/services/auth.dart";
 import 'package:tfsitescape/services/util.dart';
-import 'package:tfsitescape/main.dart';
 
 /* App-wide pop-up menu used in most screens, shows the following options
    in the following order:
@@ -27,6 +27,7 @@ Future showPopupMenu(BuildContext context, Offset offset) async {
 
   String choice = await showMenu(
     context: context,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
     position: RelativeRect.fromLTRB(left, top, 0, 0),
     items: [
       popupOption(Icons.info, Colors.black, "About this app"),
@@ -259,97 +260,106 @@ class CreditsScreen extends StatelessWidget {
       body: new Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-        child: new FittedBox(
-          alignment: Alignment.center,
-          child: new Column(
-            children: [
-              new Text("sitescape",
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+          child: new FittedBox(
+            alignment: Alignment.center,
+            child: new Column(
+              children: [
+                new Text("sitescape",
+                    style: TextStyle(
+                        fontFamily: "Quicksand",
+                        color: Colors.white,
+                        fontWeight: FontWeight.w300,
+                        fontSize: 112)),
+                new Text(
+                  "H A N D O V E R  T O O L  P A C K",
                   style: TextStyle(
-                      fontFamily: "Quicksand",
-                      color: Colors.white,
-                      fontWeight: FontWeight.w300,
-                      fontSize: 96)),
-              new Text(
-                "H A N D O V E R  T O O L  P A C K",
-                style: TextStyle(
-                  fontFamily: "Quicksand",
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w300,
-                ),
-                textAlign: TextAlign.justify,
-              ),
-              new Text(""),
-              new Text(
-                gVersionAndBuild,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-                textAlign: TextAlign.justify,
-              ),
-              showCreditColumn(
-                "Programming and Design",
-                "Leo Rafael Orpilla",
-              ),
-              showCreditColumn(
-                "Technical and Planning",
-                "Leodegario Orpilla Jr.",
-              ),
-              // showCreditColumn(
-              //   "Powered by",
-              //   "TOWERFORCE PTY LTD.",
-              // ),
-              showCreditColumn(
-                "Data Sources",
-                "Weather forecast from OpenWeatherMap",
-              ),
-              new Text(
-                "Maps and navigation from Mapbox",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-              new Text(""),
-              new Text(""),
-              new Text(
-                "Sitescape is built with open source software.",
-                style: TextStyle(
+                    fontFamily: "Quicksand",
                     color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w300),
-                textAlign: TextAlign.center,
-              ),
-              new Text(""),
-              new RaisedButton(
-                elevation: 20,
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(20.0),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w300,
+                  ),
+                  textAlign: TextAlign.justify,
                 ),
-                color: Colors.white.withOpacity(0.4),
-                child: new Text(
-                  "Licenses",
-                  style: new TextStyle(
-                      fontSize: 24.0,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w200),
+                new Text(""),
+                new Text(
+                  gVersion,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.justify,
                 ),
-                onPressed: () {
-                  Get.to(
-                    LicensePage(
-                      applicationName: "Sitescape",
-                      applicationVersion: gVersion,
-                      applicationLegalese: "© Sitescape 2020",
-                    ),
-                  );
-                },
-              ),
-            ],
+                showCreditColumn(
+                  "Programming and Systems Design",
+                  "Leo Rafael Orpilla",
+                ),
+                showCreditColumn(
+                  "Technical and Planning",
+                  "Leodegario Orpilla Jr.",
+                ),
+                showCreditColumn(
+                  "Graphic Design",
+                  "Aaron Marbella",
+                ),
+                // showCreditColumn(
+                //   "Powered by",
+                //   "TOWERFORCE PTY LTD.",
+                // ),
+                showCreditColumn(
+                  "Data Sources",
+                  "Weather forecast from OpenWeatherMap",
+                ),
+                new Text(
+                  "Maps and navigation from Mapbox",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w200,
+                  ),
+                ),
+                new Text(""),
+                new Text(""),
+                new Text(
+                  "Sitescape is built with open source software.",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: "Quicksand",
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                new Text(""),
+                new RaisedButton(
+                  elevation: 20,
+                  shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(20.0),
+                  ),
+                  color: Colors.white.withOpacity(0.4),
+                  child: new Text(
+                    "Licenses",
+                    style: new TextStyle(
+                        fontSize: 24.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w200),
+                  ),
+                  onPressed: () {
+                    Get.to(
+                      LicensePage(
+                        applicationName: "Sitescape",
+                        applicationVersion: gVersion,
+                        applicationLegalese: "© Sitescape 2020",
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
+            fit: BoxFit.contain,
           ),
-          fit: BoxFit.contain,
         ),
       ),
     );
@@ -369,16 +379,17 @@ class CreditsScreen extends StatelessWidget {
           header,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 16,
+            fontSize: 20,
             fontWeight: FontWeight.w600,
+            fontFamily: "Quicksand",
           ),
         ),
         new Text(
           caption,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w300,
+            fontSize: 22,
+            fontWeight: FontWeight.w200,
           ),
         ),
       ],

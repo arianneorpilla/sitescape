@@ -225,6 +225,40 @@ String getTimeFlavour() {
   }
 }
 
+ImageProvider getWeatherImage(Weather weather) {
+  switch (weather.weatherIcon) {
+    case "01d":
+    case "01n":
+      return AssetImage("images/home/weather_clear.png");
+    case "02d":
+    case "02n":
+    case "03d":
+    case "03n":
+    case "04d":
+    case "04n":
+      return AssetImage("images/home/weather_cloudy.png");
+    case "09d":
+    case "09n":
+    case "10d":
+    case "10n":
+      return AssetImage("images/home/weather_rainy.png");
+    case "11d":
+    case "11n":
+      return AssetImage("images/home/weather_stormy.png");
+    case "13d":
+    case "13n":
+      return AssetImage("images/home/weather_snowy.png");
+      break;
+    case "50d":
+    case "50n":
+      return AssetImage("images/home/weather_foggy.png");
+      break;
+    default:
+      return AssetImage("images/home/weather_clear.png");
+      break;
+  }
+}
+
 /* Returns weather from OpenWeather API. */
 Future<Weather> getWeather() async {
   if (gUserLatitude == null || gUserLongitude == null) {

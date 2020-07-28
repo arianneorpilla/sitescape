@@ -61,6 +61,28 @@ class LoginPageState extends State<LoginPage> {
     super.initState();
   }
 
+  Future cacheHomeImages() async {
+    await precacheImage(AssetImage("images/home/hill.png"), context);
+    await precacheImage(AssetImage("images/home/tower.png"), context);
+    await precacheImage(AssetImage("images/home/koalas.png"), context);
+    await precacheImage(AssetImage("images/home/day.png"), context);
+    await precacheImage(AssetImage("images/home/weather_clear.png"), context);
+    await precacheImage(AssetImage("images/home/weather_foggy.png"), context);
+    await precacheImage(AssetImage("images/home/weather_rainy.png"), context);
+    await precacheImage(AssetImage("images/home/weather_stormy.png"), context);
+    await precacheImage(AssetImage("images/home/weather_cloudy.png"), context);
+    await precacheImage(AssetImage("images/home/weather_snowy.png"), context);
+    await precacheImage(AssetImage("images/home/icon_menu.png"), context);
+    await precacheImage(AssetImage("images/home/icon_help.png"), context);
+    await precacheImage(AssetImage("images/home/divider.png"), context);
+    await precacheImage(AssetImage("images/home/icon_scanner.png"), context);
+    await precacheImage(
+        AssetImage("images/home/icon_calculations.png"), context);
+    await precacheImage(AssetImage("images/home/icon_reports.png"), context);
+
+    return;
+  }
+
   /* Check if form is valid before perform login or signup */
   bool validateAndSave() {
     final form = _formKey.currentState;
@@ -119,6 +141,7 @@ class LoginPageState extends State<LoginPage> {
             userId != null &&
             _isLoginForm &&
             user.isEmailVerified) {
+          await cacheHomeImages();
           widget.loginCallback();
         }
       } on PlatformException catch (e) {
@@ -145,7 +168,7 @@ class LoginPageState extends State<LoginPage> {
       }
     }
     /* Remove loading circle at the end of Auth attempt. */
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(seconds: 2));
     setState(() {
       _isLoading = false;
     });
@@ -192,24 +215,125 @@ class LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return new Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.indigo[900],
+      backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
           Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.fill,
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                image: AssetImage('images/login.jpg'),
+          ),
+          _showCloudTop(),
+          _showCloudBottom(),
+          _showTower(),
+          _showTower(),
+          _showHill(),
+          _showLogo(),
+          _showTitle(),
+          _showFooter(),
+          // _showCircularProgress(),
+        ],
+      ),
+    );
+  }
+
+  Widget _showLogo() {
+    return Container(
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(220)),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.topCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/login/logo.png'),
+        ),
+      ),
+    );
+  }
+
+  /* Title above fields */
+  Widget _showTitle() {
+    return Container(
+      margin: EdgeInsets.only(
+          left: 16, right: 16, top: ScreenUtil().setHeight(320)),
+      alignment: Alignment.topCenter,
+      child: Column(
+        children: [
+          FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(
+              "sitescape",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w300,
+                fontFamily: "Quicksand",
+                fontSize: 1000.0,
+              ),
+            ),
+          ),
+          FittedBox(
+            fit: BoxFit.fitWidth,
+            child: Text(
+              "H A N D O V E R  T O O L  P A C K",
+              style: TextStyle(
+                color: Colors.white,
+                fontFamily: "Quicksand",
+                fontWeight: FontWeight.w200,
+                fontSize: ScreenUtil().setSp(54),
               ),
             ),
           ),
           _showForm(),
-          // _showCircularProgress(),
         ],
+      ),
+    );
+  }
+
+  Widget _showCloudBottom() {
+    return Container(
+      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(200)),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.bottomCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/login/cloud_bottom.png'),
+        ),
+      ),
+    );
+  }
+
+  Widget _showCloudTop() {
+    return Container(
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.topCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/login/cloud_top.png'),
+        ),
+      ),
+    );
+  }
+
+  Widget _showHill() {
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.bottomCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/login/hill.png'),
+        ),
+      ),
+    );
+  }
+
+  Widget _showTower() {
+    return Container(
+      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(120)),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.bottomCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/login/tower.png'),
+        ),
       ),
     );
   }
@@ -217,7 +341,7 @@ class LoginPageState extends State<LoginPage> {
   /* Overall widget structure passed in build. */
   Widget _showForm() {
     return new Container(
-      padding: EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
+      padding: EdgeInsets.fromLTRB(24.0, 0, 24.0, 0),
       child: new Center(
         child: Form(
           key: _formKey,
@@ -225,26 +349,22 @@ class LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-              showTitle(),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
               Container(
                 child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      SizedBox(height: ScreenUtil().setHeight(50)),
                       showEmailInput(),
                       showPasswordInput(),
                       showConfirmPassword(),
                       showErrorMessage(_errorColor),
+                      SizedBox(height: ScreenUtil().setHeight(30)),
                       showForgotPassword(),
                     ]),
               ),
               showPrimaryButton(),
               showSecondaryButton(),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-              showFooter(),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             ],
           ),
         ),
@@ -253,77 +373,25 @@ class LoginPageState extends State<LoginPage> {
   }
 
   /* Logo above user/pass */
-  Widget showFooter() {
+  Widget _showFooter() {
     return Container(
-      child: new Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          // new Text(
-          //   "P O W E R E D  B Y",
-          //   style: TextStyle(
-          //     color: Colors.white,
-          //     fontSize: 12,
-          //     fontWeight: FontWeight.w300,
-          //   ),
-          //   textAlign: TextAlign.justify,
-          // ),
-          // new Text(
-          //   "T O W E R F O R C E",
-          //   style: TextStyle(
-          //     color: Colors.white,
-          //     fontSize: 20,
-          //     fontWeight: FontWeight.w300,
-          //   ),
-          // ),
-          // new Text(""),
-          new Text(
-            gVersion,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: ScreenUtil().setSp(28),
-              fontWeight: FontWeight.w500,
-            ),
-            textAlign: TextAlign.justify,
-          ),
-        ],
+      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(50)),
+      alignment: Alignment.bottomCenter,
+      child: new Text(
+        gVersion,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: ScreenUtil().setSp(28),
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.justify,
       ),
-    );
-  }
-
-  /* Title above fields */
-  Widget showTitle() {
-    return Container(
-      child: new FittedBox(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              new Text(
-                "sitescape",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300,
-                  fontFamily: "Quicksand",
-                ),
-              ),
-              new Text(
-                "H A N D O V E R  T O O L  P A C K",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 3,
-                  fontWeight: FontWeight.w300,
-                  fontFamily: "Quicksand",
-                ),
-                textAlign: TextAlign.justify,
-              ),
-            ],
-          ),
-          fit: BoxFit.contain),
     );
   }
 
   /* E-mail, on field submit will pass focus to pass */
   Widget showEmailInput() {
-    return Container(
+    return new Container(
       child: TextFormField(
         controller: emailController,
         textCapitalization: TextCapitalization.none,
@@ -333,46 +401,9 @@ class LoginPageState extends State<LoginPage> {
         obscureText: false,
         decoration: InputDecoration(
           fillColor: Colors.indigo[400].withOpacity(0.8),
-          filled: true,
           prefixIcon: Icon(
             Icons.mail,
             color: Colors.white,
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5),
-            ),
-            borderSide: BorderSide(
-              width: 1,
-              color: Colors.red,
-            ),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5),
-            ),
-            borderSide: BorderSide(
-              width: 1,
-              color: Colors.red,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5),
-            ),
-            borderSide: BorderSide(
-              width: 1,
-              color: Colors.white,
-            ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5),
-            ),
-            borderSide: BorderSide(
-              width: 1,
-              color: Colors.grey[600],
-            ),
           ),
           hintText: 'E-mail',
           hintStyle: TextStyle(
@@ -382,6 +413,18 @@ class LoginPageState extends State<LoginPage> {
           errorStyle: TextStyle(
             color: Colors.red,
             fontSize: ScreenUtil().setSp(36),
+          ),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey[400]),
+          ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.white, width: 2.0),
+          ),
+          border: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey[400]),
+          ),
+          errorBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
           ),
         ),
         style: TextStyle(
@@ -418,46 +461,9 @@ class LoginPageState extends State<LoginPage> {
           obscureText: true,
           decoration: InputDecoration(
             fillColor: Colors.indigo[400].withOpacity(0.8),
-            filled: true,
             prefixIcon: Icon(
               Icons.vpn_key,
               color: Colors.white,
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5),
-              ),
-              borderSide: BorderSide(
-                width: 1,
-                color: Colors.grey,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5),
-              ),
-              borderSide: BorderSide(
-                width: 1,
-                color: Colors.red,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5),
-              ),
-              borderSide: BorderSide(
-                width: 1,
-                color: Colors.white,
-              ),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5),
-              ),
-              borderSide: BorderSide(
-                width: 1,
-                color: Colors.grey[600],
-              ),
             ),
             hintText: 'Password',
             hintStyle: TextStyle(
@@ -467,6 +473,18 @@ class LoginPageState extends State<LoginPage> {
             errorStyle: TextStyle(
               color: Colors.red,
               fontSize: ScreenUtil().setSp(36),
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey[400]),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white, width: 2.0),
+            ),
+            border: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey[400]),
+            ),
+            errorBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
             ),
           ),
           style: TextStyle(
@@ -507,47 +525,9 @@ class LoginPageState extends State<LoginPage> {
                 cursorColor: Colors.white,
                 obscureText: true,
                 decoration: InputDecoration(
-                  fillColor: Colors.indigo[400].withOpacity(0.8),
-                  filled: true,
                   prefixIcon: Icon(
                     Icons.check_box,
                     color: Colors.white,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5),
-                    ),
-                    borderSide: BorderSide(
-                      width: 1,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5),
-                    ),
-                    borderSide: BorderSide(
-                      width: 1,
-                      color: Colors.red,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5),
-                    ),
-                    borderSide: BorderSide(
-                      width: 1,
-                      color: Colors.white,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(5),
-                    ),
-                    borderSide: BorderSide(
-                      width: 1,
-                      color: Colors.grey[600],
-                    ),
                   ),
                   hintText: 'Confirm Password',
                   hintStyle: TextStyle(
@@ -557,6 +537,18 @@ class LoginPageState extends State<LoginPage> {
                   errorStyle: TextStyle(
                     color: Colors.red,
                     fontSize: ScreenUtil().setSp(36),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[400]),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white, width: 2.0),
+                  ),
+                  border: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[400]),
+                  ),
+                  errorBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
                   ),
                 ),
                 style: TextStyle(
@@ -588,6 +580,7 @@ class LoginPageState extends State<LoginPage> {
           child: FittedBox(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation(Colors.white),
+              strokeWidth: 2,
             ),
           ),
         ),
@@ -607,7 +600,7 @@ class LoginPageState extends State<LoginPage> {
         child: Text(
           _errorMessage,
           style: TextStyle(
-            fontSize: 14.0,
+            fontSize: ScreenUtil().setSp(36),
             color: color,
             height: 1.0,
           ),
@@ -624,7 +617,8 @@ class LoginPageState extends State<LoginPage> {
   Widget showForgotPassword() {
     if (_isLoginForm) {
       return Container(
-        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+        alignment: Alignment.center,
+        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
         child: InkWell(
           onTap: () {
             widget.auth.sendPasswordResetEmail(
@@ -655,20 +649,19 @@ class LoginPageState extends State<LoginPage> {
       child: SizedBox(
         height: ScreenUtil().setSp(48) * 3,
         child: new RaisedButton(
-          elevation: 20,
           shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(20.0),
+            borderRadius: new BorderRadius.circular(0.0),
           ),
-          color: _isLoginForm
-              ? Colors.green[400].withOpacity(0.9)
-              : Colors.indigoAccent[400].withOpacity(0.9),
+          color: Color.fromRGBO(86, 189, 162, 1.0),
           child: !_isLoading
               ? new Text(
                   _isLoginForm ? 'Login' : 'Create account',
                   style: new TextStyle(
-                      fontSize: ScreenUtil().setSp(48),
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
+                    fontFamily: "Quicksand",
+                    fontSize: ScreenUtil().setSp(48),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 )
               : showCircularProgress(),
           onPressed: validateAndSubmit,
@@ -680,22 +673,20 @@ class LoginPageState extends State<LoginPage> {
   /* Used to swap between login/signup */
   Widget showSecondaryButton() {
     return new Container(
-      padding: EdgeInsets.fromLTRB(0.0, 10, 0.0, 0.0),
+      padding: EdgeInsets.fromLTRB(36.0, 10, 36.0, 0.0),
       child: SizedBox(
         height: ScreenUtil().setSp(48) * 2.5,
         child: new RaisedButton(
-          elevation: 20,
           shape: new RoundedRectangleBorder(
-            borderRadius: new BorderRadius.circular(20.0),
+            borderRadius: new BorderRadius.circular(0.0),
           ),
-          color: _isLoginForm
-              ? Colors.indigoAccent[400].withOpacity(0.9)
-              : Colors.red[300].withOpacity(0.9),
+          color: Colors.white,
           child: new Text(
             _isLoginForm ? 'I don\'t have an account' : 'Return to login',
             style: new TextStyle(
+                fontFamily: "Quicksand",
                 fontSize: ScreenUtil().setSp(42),
-                color: Colors.white,
+                color: Color.fromRGBO(86, 189, 162, 1.0),
                 fontWeight: FontWeight.w500),
           ),
           onPressed: toggleFormMode,

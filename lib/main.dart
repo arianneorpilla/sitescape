@@ -56,7 +56,11 @@ Future<void> main() async {
   gExtDir = await getExternalStorageDirectory();
   gTempDir = await getTemporaryDirectory();
 
-  await loadImage('images/login.jpg');
+  await loadImage("images/login/hill.png");
+  await loadImage("images/login/tower.png");
+  await loadImage("images/login/cloud_top.png");
+  await loadImage("images/login/cloud_bottom.png");
+  await loadImage("images/login/logo.png");
   await loadLocalSites();
 
   // Run the application.
@@ -88,8 +92,9 @@ class App extends StatelessWidget {
       transitionDuration: Duration(milliseconds: 0),
       title: "Sitescape",
       theme: new ThemeData(
-          // fontFamily: "Montserrat",
-          primaryColor: Color.fromRGBO(58, 65, 120, 1.0),
+          fontFamily: "OpenSans",
+          primaryColor: Color.fromRGBO(69, 80, 161, 1.0),
+          accentColor: Color.fromRGBO(42, 52, 121, 1.0),
           visualDensity: VisualDensity.adaptivePlatformDensity),
       // Home is a root page which depends on Auth status initialised on startup.
       home: new RootPage(auth: gUserAuth),

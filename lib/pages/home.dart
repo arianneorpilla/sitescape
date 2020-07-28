@@ -38,11 +38,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  Weather _currentWeather;
+
   @override
   void initState() {
+    getWeather().then((weather) {
+      setState(() {
+        _currentWeather = weather;
+      });
+    });
+    // Future.delayed(Duration(seconds: 1))
+    //     .then((onValue) => {showWhatsNewModal()});
+
     super.initState();
-    Future.delayed(Duration(seconds: 1))
-        .then((onValue) => {showWhatsNewModal()});
   }
 
   @override
@@ -53,65 +61,209 @@ class _HomePageState extends State<HomePage> {
       extendBody: true,
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
+        fit: StackFit.expand,
         children: <Widget>[
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/login.jpg'),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(color: Colors.indigo.withOpacity(0.7)),
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: showHome(widget.auth, widget.logoutCallback),
-          )
+          _showTime(),
+          _showWeatherArtwork(),
+          _showTower(),
+          _showKoalas(),
+          _showHill(),
+          _showHeader(),
+          _showMenu(),
+          // Container(
+          //   alignment: Alignment.center,
+          //   child: showHome(widget.auth, widget.logoutCallback),
+          // ),
         ],
       ),
+      // floatingActionButton:
+      //     FloatingActionButton(child: Icon(Icons.camera_alt, size: 36)),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.help_outline),
-                color: Colors.white,
-                iconSize: 36,
-                onPressed: () async {
-                  _scaffoldKey.currentState.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "This feature is under construction.",
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(36),
+        // shape: CircularNotchedRectangle(),
+        child: Container(
+          padding: EdgeInsets.only(left: 36, right: 36),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: ImageIcon(AssetImage("images/home/icon_help.png")),
+                  color: Colors.white,
+                  iconSize: 28,
+                  onPressed: () async {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                        content: Text(
+                          "This feature is under construction.",
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
                         ),
+                        duration: Duration(milliseconds: 200),
                       ),
-                      duration: Duration(milliseconds: 500),
-                    ),
-                  );
-                }),
-            GestureDetector(
-              onTapDown: (TapDownDetails details) {
-                showPopupMenu(context, details.globalPosition);
-              },
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.white,
-                size: 36,
+                    );
+                  }),
+              GestureDetector(
+                onTapDown: (TapDownDetails details) {
+                  showPopupMenu(context, details.globalPosition);
+                },
+                child: ImageIcon(
+                  AssetImage("images/home/icon_menu.png"),
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ],
+          ),
+        ),
+        elevation: 0,
+        color: Colors.black.withOpacity(0.25),
+      ),
+    );
+  }
+
+  Widget _showMenu() {
+    return Container(
+      padding: EdgeInsets.only(bottom: 256.h),
+      alignment: Alignment.bottomCenter,
+      child: Column(
+        verticalDirection: VerticalDirection.up,
+        children: [
+          // showDummySearchBar(),
+          showOptions(),
+          SizedBox(height: 8),
+          // showAccountBanner(),
+          showNearestSitesOnLocation(),
+          SizedBox(height: 8),
+          showPrimarySuggestion(),
+          SizedBox(height: 8),
+          showDummySearchBar(),
+        ],
+      ),
+    );
+  }
+
+  Widget _showWeatherOrLoading() {
+    if (_currentWeather == null) {
+      return Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.fromLTRB(16, 12, 12, 0),
+        child: CircularProgressIndicator(
+          strokeWidth: 2,
+          valueColor: AlwaysStoppedAnimation(Colors.white),
+        ),
+      );
+    } else {
+      return showWeather(_currentWeather);
+    }
+  }
+
+  Widget _showHeader() {
+    return Container(
+      padding: EdgeInsets.only(
+        left: ScreenUtil().setWidth(36),
+        top: ScreenUtil().setHeight(244),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          _showGreeting(),
+          SizedBox(height: ScreenUtil().setHeight(4)),
+          _showWeatherOrLoading(),
+        ],
+      ),
+    );
+  }
+
+  Widget _showTower() {
+    return Container(
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(250)),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.topCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/home/tower.png'),
+        ),
+      ),
+    );
+  }
+
+  Widget _showKoalas() {
+    return Container(
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(350)),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.topCenter,
+          fit: BoxFit.contain,
+          image: AssetImage('images/home/koalas.png'),
+        ),
+      ),
+    );
+  }
+
+  Widget _showTime() {
+    bool isDay = false;
+    TimeOfDay now = TimeOfDay.now();
+    if ((now.hour >= 5 && now.hour < 12) ||
+        (now.hour >= 12 && now.hour <= 17)) {
+      isDay = true;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          alignment: Alignment.topCenter,
+          fit: BoxFit.contain,
+          image: isDay
+              ? AssetImage("images/home/day.png")
+              : AssetImage("images/home/night.png"),
+        ),
+      ),
+    );
+  }
+
+  Widget _showHill() {
+    bool isDay = false;
+    TimeOfDay now = TimeOfDay.now();
+    if ((now.hour >= 5 && now.hour < 12) ||
+        (now.hour >= 12 && now.hour <= 17)) {
+      isDay = true;
+    }
+
+    return Container(
+      margin: EdgeInsets.only(top: ScreenUtil().setHeight(500)),
+      child: Container(
+        child: Column(
+          children: [
+            Image(
+              alignment: Alignment.topCenter,
+              fit: BoxFit.contain,
+              image: AssetImage('images/home/hill.png'),
+            ),
+            Flexible(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 0,
+                    color: Color.fromRGBO(84, 176, 159, 1.0),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromRGBO(84, 176, 159, 1.0),
+                      isDay
+                          ? Theme.of(context).primaryColor
+                          : Color.fromRGBO(54, 61, 114, 1.0),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
         ),
-        elevation: 0,
-        color: Colors.black.withOpacity(0.25),
       ),
     );
   }
@@ -123,18 +275,17 @@ class _HomePageState extends State<HomePage> {
       child:
           Column(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         Column(children: [
-          showGreeting(),
+          _showGreeting(),
           SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-          showWeatherOrLoading(),
+          // showWeatherOrLoading(),
         ]),
         Column(children: [
           showOptions(),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+          SizedBox(height: 8),
           showDummySearchBar(),
-          // showAccountBanner(),
+          SizedBox(height: 8),
           showPrimarySuggestion(),
           showNearestSitesOnLocation(),
-          SizedBox(height: MediaQuery.of(context).size.height * 0.01),
         ]),
       ]),
     );
@@ -153,20 +304,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   /* Appropriate time greeting on top right of page */
-  Widget showGreeting() {
+  Widget _showGreeting() {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.03,
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
         child: FittedBox(
-          alignment: Alignment.centerRight,
+          alignment: Alignment.centerLeft,
           child: Text(
             getTimeFlavour(),
             style: TextStyle(
               color: Colors.white,
+              fontFamily: "Quicksand",
               fontSize: ScreenUtil().setSp(48),
-              fontWeight: FontWeight.w200,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
@@ -175,31 +327,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   /* Below time greeting, shows loading circle if weather is not ready */
-  Widget showWeatherOrLoading() {
-    return FutureBuilder(
-        future: getWeather(),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.data == null) {
-            return Container(
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
-              child: CircularProgressIndicator(
-                strokeWidth: 1,
-                valueColor: AlwaysStoppedAnimation(Colors.white),
-              ),
-            );
-          }
-          // Weather data and icon
-          return Align(
-            alignment: Alignment.center,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              child: FittedBox(
-                child: showWeather(snapshot.data),
-              ),
-            ),
-          );
-        });
+  Widget _showWeatherArtwork() {
+    if (_currentWeather == null) {
+      return Container();
+    } else {
+      ImageProvider weatherImage = getWeatherImage(_currentWeather);
+
+      // Weather data and icon
+      return FadeInImage(
+        alignment: Alignment.topCenter,
+        fit: BoxFit.contain,
+        placeholder: AssetImage("images/placeholder.png"),
+        image: weatherImage,
+      );
+    }
   }
 
   /* Shows weather below time greeting
@@ -209,51 +350,61 @@ class _HomePageState extends State<HomePage> {
     String celsius = weather.temperature.celsius.truncate().toString();
     String icon = weather.weatherIcon;
 
-    return Padding(
-      padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Image.network(
+                "http://openweathermap.org/img/wn/" + icon + "@4x.png",
+                height: 48,
+                width: 48),
+            Text(
+              celsius + "°C",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil().setSp(144),
+                  fontWeight: FontWeight.w200),
+            ),
+          ],
+        ),
+        Container(
+          padding: EdgeInsets.only(
+            left: 12,
+            top: ScreenUtil().setHeight(48),
+          ),
+          alignment: Alignment.centerLeft,
+          width: ScreenUtil().setWidth(750),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Image.network(
-                      "http://openweathermap.org/img/wn/" + icon + "@4x.png",
-                      height: 48,
-                      width: 48),
-                  Text(
-                    celsius + "°C",
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: ScreenUtil().setSp(128),
-                        fontWeight: FontWeight.w200),
-                  ),
+                  showWeatherParameter(
+                      "Wind Speed", weather.windSpeed.toString() + "m/s"),
+                  showWeatherParameter(
+                      "Humidity", weather.humidity.toString() + "%"),
+                  Expanded(child: Container()),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  showWeatherParameter(
+                      "Pressure", weather.pressure.round().toString() + "Pa"),
+                  showWeatherParameter(
+                      "Cloudiness", weather.cloudiness.toString() + "kta"),
+                  showWeatherParameter(
+                      "Rainfall (1hr)", weather.rainLastHour.toString() + "mm"),
                 ],
               )
             ],
           ),
-          Text("                        "),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              showWeatherParameter(
-                  "Wind Speed", weather.windSpeed.toString() + "m/s"),
-              showWeatherParameter(
-                  "Cloudiness", weather.cloudiness.toString() + "kta"),
-              showWeatherParameter(
-                  "Pressure", weather.pressure.round().toString() + "Pa"),
-              showWeatherParameter(
-                  "Humidity", weather.windSpeed.toString() + "%"),
-              showWeatherParameter(
-                  "Rain", weather.rainLastHour.toString() + "mm"),
-            ],
-          )
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -263,36 +414,63 @@ class _HomePageState extends State<HomePage> {
      data -> String: Actual data with units to shwow
   */
   Widget showWeatherParameter(String parameter, String data) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Text(
-          parameter + ":",
-          textAlign: TextAlign.right,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: ScreenUtil().setSp(36),
-            fontWeight: FontWeight.w300,
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            parameter + ":",
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              fontFamily: "Quicksand",
+              color: Colors.white,
+              fontSize: ScreenUtil().setSp(36),
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        Text(
-          " " + data,
-          textAlign: TextAlign.right,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: ScreenUtil().setSp(36),
-            fontWeight: FontWeight.w200,
+          Text(
+            "   " + data,
+            textAlign: TextAlign.left,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: ScreenUtil().setSp(48),
+              fontWeight: FontWeight.w200,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   /* On center of screen, clicking on this will open the search screen */
   Widget showDummySearchBar() {
-    return GestureDetector(
-      child: Card(
-        child: Container(
+    return Container(
+      margin: EdgeInsets.fromLTRB(
+        32,
+        ScreenUtil().setHeight(16),
+        32,
+        ScreenUtil().setHeight(16),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Get.to(
+              SearchPage(),
+              transition: Transition.fade,
+            );
+          },
           child: TextField(
             textCapitalization: TextCapitalization.none,
             autofocus: false,
@@ -314,75 +492,77 @@ class _HomePageState extends State<HomePage> {
               ),
               hintText: 'Search for site',
               hintStyle: TextStyle(
-                  color: Colors.grey,
-                  fontSize: ScreenUtil().setSp(48),
-                  fontWeight: FontWeight.w300),
+                color: Colors.grey,
+                fontSize: ScreenUtil().setSp(42),
+                fontWeight: FontWeight.w400,
+              ),
             ),
-            style: TextStyle(color: Colors.black, fontSize: 20),
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: ScreenUtil().setSp(42),
+            ),
             // Must be valid entry
           ),
         ),
-        elevation: 10,
-        color: Colors.white.withOpacity(0.9),
       ),
-      onTap: () {
-        Get.to(
-          SearchPage(),
-          transition: Transition.fade,
-        );
-      },
     );
   }
 
   /* For three options on the menu, Calculator, Reports, Scanner */
-  Widget iconBox(String name, IconData icon, int actionIndex) {
-    return InkWell(
-      child: Container(
-        height: 69,
-        width: 96,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
-            SizedBox(height: 5),
-            Text(
-              name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
+  Widget iconBox(String name, AssetImage icon, int actionIndex) {
+    return Container(
+      height: 75,
+      width: 104,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            switch (actionIndex) {
+              case 1:
+                Get.to(CalculatorPage());
+                break;
+              case 2:
+                Get.to(ScannerPage());
+                break;
+              case 3:
+                _scaffoldKey.currentState.showSnackBar(
+                  SnackBar(
+                    backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                    content: Text(
+                      "This feature is under construction.",
+                      style: TextStyle(
+                        fontSize: ScreenUtil().setSp(36),
+                      ),
+                    ),
+                    duration: Duration(milliseconds: 200),
+                  ),
+                );
+                break;
+            }
+          },
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ImageIcon(
+                icon,
+                color: Colors.white,
+                size: 28,
+              ),
+              SizedBox(height: 5),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   fontSize: ScreenUtil().setSp(42),
-                  fontWeight: FontWeight.w200,
-                  color: Colors.white),
-            )
-          ],
+                  fontWeight: FontWeight.w400,
+                  fontFamily: "Quicksand",
+                  color: Colors.white,
+                ),
+              )
+            ],
+          ),
         ),
       ),
-      onTap: () {
-        switch (actionIndex) {
-          case 1:
-            Get.to(CalculatorPage());
-            break;
-          case 2:
-            _scaffoldKey.currentState.showSnackBar(
-              SnackBar(
-                content: Text(
-                  "This feature is under construction.",
-                  style: TextStyle(
-                    fontSize: ScreenUtil().setSp(36),
-                  ),
-                ),
-                duration: Duration(milliseconds: 500),
-              ),
-            );
-            break;
-          case 3:
-            Get.to(ScannerPage());
-            break;
-        }
-      },
     );
   }
 
@@ -394,20 +574,34 @@ class _HomePageState extends State<HomePage> {
         width: MediaQuery.of(context).size.width,
         child: FittedBox(
           child: Padding(
-            padding: EdgeInsets.fromLTRB(12, 0, 12, 0),
+            padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
             child: FittedBox(
               child: Container(
-                child: Column(children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      iconBox("Calculations", Icons.iso, 1),
-                      iconBox("Reports", Icons.chrome_reader_mode, 2),
-                      iconBox("Scanner", Icons.center_focus_weak, 3)
-                    ],
-                  ),
-                ]),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        iconBox(
+                          "Calculations",
+                          AssetImage("images/home/icon_calculations.png"),
+                          1,
+                        ),
+                        iconBox(
+                          "Scanner",
+                          AssetImage("images/home/icon_scanner.png"),
+                          2,
+                        ),
+                        iconBox(
+                          "Reports",
+                          AssetImage("images/home/icon_reports.png"),
+                          3,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -427,65 +621,94 @@ class _HomePageState extends State<HomePage> {
 
         Site lastSite = snapshot.data;
 
-        return InkWell(
-          child: Card(
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 1,
+                blurRadius: 10,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+            ],
+          ),
+          margin: EdgeInsets.fromLTRB(
+            24,
+            ScreenUtil().setHeight(16),
+            24,
+            ScreenUtil().setHeight(16),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                Get.to(SitePage(site: lastSite))
+                    .then((onValue) => setState(() {}));
+              },
+              child: Stack(
                 children: [
-                  Flexible(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Your last accessed site",
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: ScreenUtil().setSp(36),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      (lastSite.getSiteThumbnail() != null)
+                          ? lastSite.getSiteThumbnail()
+                          : Container(
+                              height: 96, width: 96, color: Colors.grey[400]),
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(left: 16, right: 16),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                lastSite.name.toUpperCase(),
+                                textAlign: TextAlign.start,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    fontSize: ScreenUtil().setSp(42),
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black54),
+                              ),
+                              Text(
+                                lastSite.code.toUpperCase(),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    fontSize: ScreenUtil().setSp(36),
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black54),
+                              )
+                            ],
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Text(
-                          lastSite.name.toUpperCase(),
+                      ),
+                    ],
+                  ),
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: Container(
+                        child: Text(
+                          " Last accessed site ",
                           textAlign: TextAlign.start,
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
                           style: TextStyle(
-                              fontSize: ScreenUtil().setSp(48),
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black54),
+                            color: Colors.white,
+                            fontSize: ScreenUtil().setSp(32),
+                          ),
                         ),
-                        Text(
-                          lastSite.code.toUpperCase(),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              fontSize: ScreenUtil().setSp(36),
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black54),
-                        )
-                      ],
+                        padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+                        color: Color.fromRGBO(84, 176, 159, 1.0),
+                      ),
                     ),
                   ),
-                  (lastSite.getSiteThumbnail() != null)
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(5.0),
-                          child: lastSite.getSiteThumbnail(),
-                        )
-                      : Icon(Icons.photo_library,
-                          size: 64.0, color: Colors.grey),
                 ],
               ),
-              padding: const EdgeInsets.all(15.0),
             ),
-            elevation: 10,
           ),
-          onTap: () {
-            Get.to(SitePage(site: lastSite)).then((onValue) => setState(() {}));
-          },
         );
       },
     );
@@ -497,49 +720,63 @@ class _HomePageState extends State<HomePage> {
      distance -> String: Distance in km or m with getDistanceText()
   */
   Widget showNearest(Site site, String distance) {
-    return InkWell(
-      child: Card(
-        child: Container(
-          height: 96.h,
+    return Container(
+      margin: EdgeInsets.fromLTRB(
+        42,
+        ScreenUtil().setHeight(16),
+        42,
+        ScreenUtil().setHeight(16),
+      ),
+      height: 96.h,
+      padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(84, 176, 159, 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Flexible(
+              SizedBox(width: 16),
+              Icon(Icons.location_on, color: Colors.white),
+              Expanded(
                 child: Text(
-                  site.name.toUpperCase(),
+                  " " + site.name.toUpperCase(),
                   textAlign: TextAlign.start,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: TextStyle(
-                      fontSize: ScreenUtil().setSp(42),
-                      fontWeight: FontWeight.w500,
+                      fontSize: ScreenUtil().setSp(36),
+                      fontWeight: FontWeight.w600,
                       color: Colors.grey[100]),
                 ),
               ),
-              Row(
-                children: [
-                  Text(
-                    distance + " away ",
-                    textAlign: TextAlign.start,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: ScreenUtil().setSp(36),
-                    ),
-                  ),
-                  Icon(Icons.location_on, color: Colors.white)
-                ],
+              Text(
+                " " + distance + " away ",
+                textAlign: TextAlign.start,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: ScreenUtil().setSp(32),
+                ),
               ),
+              SizedBox(width: 16),
             ],
           ),
-          padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+          onTap: () async {
+            Get.to(SitePage(site: site)).then((onValue) => setState(() {}));
+          },
         ),
-        elevation: 10,
-        color: Colors.green[400],
       ),
-      onTap: () async {
-        Get.to(SitePage(site: site)).then((onValue) => setState(() {}));
-      },
     );
   }
 
