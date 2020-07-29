@@ -1,8 +1,4 @@
-import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase/firebase.dart' as fb;
-import 'package:path/path.dart' as ph;
 import 'package:tfsitescapeweb/main.dart';
 
 Future<List<String>> getPhotosInCloudFolder(String path) async {

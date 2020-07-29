@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase/firebase.dart' as fb;
-import 'package:firebase_core/firebase_core.dart';
 
 enum AuthStatus {
   NOT_DETERMINED,

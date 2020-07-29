@@ -195,7 +195,10 @@ class SecPageState extends State<SecPage> {
 
           if (notDuplicate && secController.text.isNotEmpty) {
             setState(() {
-              sub.sectors.add(Sector(secController.text, {}, false, false));
+              Sector sec = Sector(secController.text, {}, false, false);
+              sec.populate();
+
+              sub.sectors.add(sec);
               sub.sectors.sort((a, b) => a.name.compareTo(b.name));
             });
           }
@@ -325,6 +328,9 @@ class SecPageState extends State<SecPage> {
       margin: EdgeInsets.only(bottom: 15),
       child: TextField(
         controller: secController,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+        ],
         textCapitalization: TextCapitalization.none,
         autofocus: false,
         cursorColor: Colors.white,

@@ -78,13 +78,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.5"
-  dio:
-    dependency: "direct main"
+  csslib:
+    dependency: transitive
     description:
-      name: dio
+      name: csslib
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.9"
+    version: "0.16.1"
   fake_async:
     dependency: transitive
     description:
@@ -163,8 +163,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.3"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0+3"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -308,6 +315,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  universal_html:
+    dependency: "direct main"
+    description:
+      name: universal_html
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.3"
+  universal_io:
+    dependency: transitive
+    description:
+      name: universal_io
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   url_launcher:
     dependency: "direct main"
     description:
@@ -350,6 +371,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
+  zone_local:
+    dependency: transitive
+    description:
+      name: zone_local
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
 sdks:
   dart: ">=2.9.0-14.0.dev <3.0.0"
   flutter: ">=1.12.13+hotfix.5 <2.0.0"

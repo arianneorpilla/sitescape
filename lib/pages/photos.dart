@@ -1,11 +1,10 @@
 import 'dart:ui';
-import 'dart:js' as js;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universal_html/js.dart' as js;
 
 import 'package:tfsitescapeweb/main.dart';
-
 import 'package:tfsitescapeweb/pages/root.dart';
 import 'package:tfsitescapeweb/services/auth.dart';
 import 'package:tfsitescapeweb/services/classes.dart';
@@ -311,6 +310,7 @@ class PhotosPageState extends State<PhotosPage> {
                         _selectedIndex = index;
                         _selectedImage = netTask;
                         messageController.text = netTask.message;
+                        messageFocus.requestFocus();
                       });
                     },
                   );
@@ -561,6 +561,7 @@ class PhotosPageState extends State<PhotosPage> {
       margin: EdgeInsets.only(bottom: 15),
       child: TextField(
         controller: messageController,
+        focusNode: messageFocus,
         textCapitalization: TextCapitalization.none,
         autofocus: false,
         cursorColor: Colors.white,

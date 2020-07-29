@@ -197,7 +197,10 @@ class SubPageState extends State<SubPage> {
 
           if (notDuplicate && subController.text.isNotEmpty) {
             setState(() {
-              site.subsites.add(Subsite(subController.text, {}));
+              Subsite sub = Subsite(subController.text, {});
+              sub.populate();
+
+              site.subsites.add(sub);
               site.subsites.sort((a, b) => a.name.compareTo(b.name));
             });
           }
@@ -364,6 +367,9 @@ class SubPageState extends State<SubPage> {
       child: TextField(
         controller: subController,
         textCapitalization: TextCapitalization.none,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+        ],
         autofocus: false,
         cursorColor: Colors.white,
         obscureText: false,

@@ -1,15 +1,11 @@
 import 'dart:convert';
 import 'dart:core';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:path/path.dart' as ph;
 import 'package:tfsitescapeweb/main.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:tfsitescapeweb/services/cloud.dart';
-import 'package:tfsitescapeweb/services/util.dart';
 import 'package:http/http.dart' as http;
 
 /* Represents a cell-site with a unique code. Top-level nested 
@@ -65,6 +61,14 @@ class Site {
     double latitude = value["latitude"].toDouble();
     double longitude = value["longitude"].toDouble();
 
+    Map<dynamic, dynamic> maps;
+
+    if (value["subsites"] == null) {
+      maps = {};
+    } else {
+      maps = value["subsites"];
+    }
+
     return Site(
       key,
       value["sitename"],
@@ -73,7 +77,7 @@ class Site {
       value["network"],
       latitude,
       longitude,
-      value["subsites"],
+      maps,
     );
   }
 
@@ -119,29 +123,48 @@ class Site {
         tasksMap = {};
         for (Task task in sec.tasks) {
           tasksMap.addAll({
-            task.name: {"note": task.note, "required": 0}
+            task.name: {
+              "note": task.note,
+              "required": 0,
+              "lastUpdated": DateTime.now().millisecondsSinceEpoch
+            }
           });
         }
         sectorsMap.addAll({
-          sec.name: {"tasks": tasksMap}
+          sec.name: {
+            "tasks": tasksMap,
+            "name": sec.name,
+          }
         });
       }
       subsitesMap.addAll({
-        sub.name: {"sectors": sectorsMap}
+        sub.name: {
+          "sectors": sectorsMap,
+          "name": sub.name,
+        }
       });
     }
 
-    final firestoreInstance = Firestore.instance;
-    firestoreInstance.collection("sites").document(this.code).delete();
-    firestoreInstance.collection("sites").document(this.code).setData({
-      "sitename": this.name,
-      "address": this.address,
-      "build": this.build,
-      "network": this.network,
-      "latitude": this.latitude,
-      "longitude": this.longitude,
-      "subsites": subsitesMap
-    });
+    userAuth
+        .getDatabase()
+        .refFromURL("gs://tfsitescape.firebaseio.com")
+        .child("sites")
+        .child(
+          ph.basenameWithoutExtension(
+            ph.basenameWithoutExtension(this.code),
+          ),
+        )
+        .set(
+      {
+        "sitename": this.name,
+        "address": this.address,
+        "build": this.build,
+        "network": this.network,
+        "latitude": this.latitude,
+        "longitude": this.longitude,
+        "subsites": subsitesMap
+      },
+    );
   }
 
   /* From the site's network String value, get the appropriate AssetImage.
@@ -229,7 +252,15 @@ class Subsite {
      value -> Map<dynamic, dynamic>: A JSON map containing subsite data
   */
   factory Subsite.fromMap(String key, Map<dynamic, dynamic> value) {
-    return Subsite(key, value["sectors"]);
+    Map<dynamic, dynamic> maps;
+
+    if (value["sectors"] == null) {
+      maps = {};
+    } else {
+      maps = value["sectors"];
+    }
+
+    return Subsite(key, maps);
   }
 
   void populate() {
@@ -281,9 +312,17 @@ class Sector {
      value -> Map<dynamic, dynamic>: A JSON map containing sector data
   */
   factory Sector.fromMap(String key, Map<dynamic, dynamic> value) {
+    Map<dynamic, dynamic> maps;
+
+    if (value["tasks"] == null) {
+      maps = {};
+    } else {
+      maps = value["tasks"];
+    }
+
     return Sector(
       key,
-      value["tasks"],
+      maps,
       false,
       false,
     );
@@ -422,9 +461,9 @@ class Task {
         )
         .update(
       {
-        "rejected": false,
+        "rejected": true,
         "message": message,
-        "approved": true,
+        "approved": false,
       },
     );
   }
@@ -435,16 +474,16 @@ class Task {
     netTask.rejected = true;
     netTask.approved = false;
 
-    final firestoreInstance = Firestore.instance;
+    fb.DatabaseReference tokensRef = userAuth
+        .getDatabase()
+        .refFromURL("gs://tfsitescape.firebaseio.com")
+        .child("users")
+        .child(netTask.uid);
 
-    final tokens = await firestoreInstance
-        .collection('users')
-        .document(netTask.uid)
-        .collection('tokens')
-        .getDocuments();
+    fb.QueryEvent allTokens = await tokensRef.once('value');
 
-    tokens.documents.forEach((result) {
-      String token = result.documentID;
+    allTokens.snapshot.forEach((result) {
+      String token = result.key;
       sendNote(netTask, token);
     });
 

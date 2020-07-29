@@ -1,10 +1,8 @@
 import 'dart:ui';
-import 'dart:js' as js;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase/firebase.dart' as fb;
+import 'package:universal_html/js.dart' as js;
 
 import 'package:tfsitescapeweb/main.dart';
 import 'package:tfsitescapeweb/pages/site.dart';
@@ -12,7 +10,6 @@ import 'package:tfsitescapeweb/pages/root.dart';
 import 'package:tfsitescapeweb/pages/sub.dart';
 import 'package:tfsitescapeweb/services/auth.dart';
 import 'package:tfsitescapeweb/services/classes.dart';
-import 'package:tfsitescapeweb/services/util.dart';
 
 /* Login page taking a previously initialised Auth and a void function
    which executes after authentication attempt.
@@ -266,11 +263,15 @@ class HomePageState extends State<HomePage> {
         ),
         onPressed: () {
           Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          SubPage(auth: userAuth, site: site, readOnly: true)))
-              .then((onValue) => setState(() {}));
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => SubPage(
+                auth: userAuth,
+                site: site,
+                readOnly: true,
+              ),
+            ),
+          ).then((onValue) => setState(() {}));
         },
       ),
     );
@@ -287,11 +288,15 @@ class HomePageState extends State<HomePage> {
         ),
         onPressed: () {
           Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          SitePage(auth: userAuth, site: site, create: false)))
-              .then((onValue) => setState(() {}));
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => SitePage(
+                auth: userAuth,
+                site: site,
+                create: false,
+              ),
+            ),
+          ).then((onValue) => setState(() {}));
         },
       ),
     );
@@ -335,12 +340,10 @@ class HomePageState extends State<HomePage> {
         return SizedBox(
           height: 36,
           width: 36,
-          child: IconButton(
-            icon: Icon(
-              Icons.file_download,
-              size: 16,
-            ),
-            disabledColor: Colors.grey,
+          child: Icon(
+            Icons.file_download,
+            size: 16,
+            color: Colors.grey,
           ),
         );
       }
@@ -349,31 +352,32 @@ class HomePageState extends State<HomePage> {
         height: 36,
         width: 36,
         child: IconButton(
-            icon: Icon(
-              Icons.file_download,
-              size: 16,
-            ),
-            onPressed: () async {
-              setState(() {
-                _downloading = true;
-                _downloadingIndex = index;
-              });
+          icon: Icon(
+            Icons.file_download,
+            size: 16,
+          ),
+          onPressed: () async {
+            setState(() {
+              _downloading = true;
+              _downloadingIndex = index;
+            });
 
-              List<Uri> links = await getDownloadInfo(site);
-              List<String> urls = [];
-              links.forEach((a) => urls.add(a.toString()));
+            List<Uri> links = await getDownloadInfo(site);
+            List<String> urls = [];
+            links.forEach((a) => urls.add(a.toString()));
 
-              await js.context.callMethod("generateZIP", [
-                js.JsArray.from(urls),
-              ]);
+            await js.context.callMethod("generateZIP", [
+              js.JsArray.from(urls),
+            ]);
 
-              await Future.delayed(Duration(seconds: 10));
+            await Future.delayed(Duration(seconds: 10));
 
-              setState(() {
-                _downloading = false;
-                _downloadingIndex = -1;
-              });
-            }),
+            setState(() {
+              _downloading = false;
+              _downloadingIndex = -1;
+            });
+          },
+        ),
       );
     }
   }

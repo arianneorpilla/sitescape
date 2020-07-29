@@ -8,11 +8,8 @@ import 'dart:ui' as ui;
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:fuzzy/fuzzy.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:tfsitescapeweb/main.dart';
 import 'package:firebase/firebase.dart' as fb;
-import 'package:http/http.dart' as http;
+import 'package:tfsitescapeweb/main.dart';
 
 import 'package:tfsitescapeweb/services/classes.dart';
 
@@ -87,12 +84,17 @@ String generateStringHash(String text) {
 Future<List<Site>> fetchSites() async {
   List<Site> sites = [];
 
-  final firestoreInstance = Firestore.instance;
+  fb.DatabaseReference sitesRef = userAuth
+      .getDatabase()
+      .refFromURL("gs://tfsitescape.firebaseio.com")
+      .child("sites");
 
-  final snapshot = await firestoreInstance.collection("sites").getDocuments();
+  fb.QueryEvent allSites = await sitesRef.once('value');
 
-  snapshot.documents.forEach((result) {
-    Site site = Site.fromMap(result.documentID, result.data);
+  allSites.snapshot.forEach((result) {
+    Map<dynamic, dynamic> value = result.val();
+    print(value);
+    Site site = Site.fromMap(result.key, value);
     site.populate();
     sites.add(site);
   });
@@ -165,41 +167,4 @@ List<Site> filterSitesByNameOrCode(
   }
 
   return bestResults;
-}
-
-Future<void> sendNotification(subject, title, topic) async {
-  final postUrl = 'https://fcm.googleapis.com/fcm/send';
-
-  String toParams = "/topics/" + topic;
-
-  final data = {
-    "notification": {"body": subject, "title": title},
-    "priority": "high",
-    "data": {
-      "click_action": "FLUTTER_NOTIFICATION_CLICK",
-      "id": "1",
-      "status": "done",
-      "sound": 'default',
-      "screen": topic,
-    },
-    "to": "${toParams}"
-  };
-
-  final headers = {
-    'content-type': 'application/json',
-    'Authorization': 'key=key'
-  };
-
-  final response = await http.post(postUrl,
-      body: json.encode(data),
-      encoding: Encoding.getByName('utf-8'),
-      headers: headers);
-
-  if (response.statusCode == 200) {
-// on success do
-    print("true");
-  } else {
-// on failure do
-    print("false");
-  }
 }

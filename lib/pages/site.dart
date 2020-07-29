@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -240,6 +239,9 @@ class SitePageState extends State<SitePage> {
         autofocus: false,
         cursorColor: Colors.white,
         obscureText: false,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+        ],
         decoration: InputDecoration(
           fillColor: widget.create
               ? Colors.indigo[400].withOpacity(0.8)
