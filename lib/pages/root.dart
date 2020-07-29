@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -53,18 +54,14 @@ class _RootPageState extends State<RootPage> {
   Future loginCallback() async {
     String fcmToken = await FirebaseMessaging().getToken();
     FirebaseUser user = await widget.auth.getCurrentUser();
-    final firestoreInstance = Firestore.instance;
+
+    final DatabaseReference usersRef =
+        FirebaseDatabase.instance.reference().child("users");
 
     if (fcmToken != null) {
-      var tokens = firestoreInstance
-          .collection('users')
-          .document(user.uid)
-          .collection('tokens')
-          .document(fcmToken);
-
-      await tokens.setData({
+      await usersRef.child(user.uid).child("tokens").child(fcmToken).set({
         'token': fcmToken,
-        'createdAt': FieldValue.serverTimestamp(), // optional
+        'createdAt': ServerValue.timestamp,
         'platform': Platform.operatingSystem // optional
       });
     }

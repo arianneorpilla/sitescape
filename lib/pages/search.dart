@@ -99,20 +99,22 @@ class SearchPageState extends State<SearchPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/login.jpg'),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                fit: BoxFit.cover,
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 0,
+                  color: Color.fromRGBO(84, 176, 159, 1.0),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(84, 176, 159, 1.0),
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
               ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(color: Colors.indigo.withOpacity(0.7)),
             ),
           ),
           LazyLoadScrollView(
@@ -135,41 +137,45 @@ class SearchPageState extends State<SearchPage> {
       ),
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.help_outline),
-                color: Colors.white,
-                iconSize: 36,
-                onPressed: () async {
-                  _scaffoldKey.currentState.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "This feature is under construction.",
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(36),
+        shape: CircularNotchedRectangle(),
+        child: Container(
+          padding: EdgeInsets.only(left: 36, right: 36),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: ImageIcon(AssetImage("images/home/icon_help.png")),
+                  color: Colors.white,
+                  iconSize: 28,
+                  onPressed: () async {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                        content: Text(
+                          "This feature is under construction.",
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
                         ),
+                        duration: Duration(milliseconds: 200),
                       ),
-                      duration: Duration(milliseconds: 500),
-                    ),
-                  );
-                }),
-            GestureDetector(
-              onTapDown: (TapDownDetails details) {
-                showPopupMenu(context, details.globalPosition);
-              },
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.white,
-                size: 36,
+                    );
+                  }),
+              GestureDetector(
+                onTapDown: (TapDownDetails details) {
+                  showPopupMenu(context, details.globalPosition);
+                },
+                child: ImageIcon(
+                  AssetImage("images/home/icon_menu.png"),
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        // shape: CircularNotchedRectangle(),
         elevation: 0,
-        color: Colors.black.withOpacity(0.25),
+        color: Color.fromRGBO(51, 57, 104, 1),
       ),
     );
   }
@@ -177,8 +183,26 @@ class SearchPageState extends State<SearchPage> {
   /* Auto focus on widget spawn, used for text filtering, on top below
      the back button */
   Widget showSearchBar() {
-    return Card(
-      child: Container(
+    return Container(
+      margin: EdgeInsets.fromLTRB(
+        16,
+        ScreenUtil().setHeight(16),
+        16,
+        ScreenUtil().setHeight(16),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
         child: TextField(
           onChanged: ((search) async {
             setState(() {
@@ -205,19 +229,20 @@ class SearchPageState extends State<SearchPage> {
               size: ScreenUtil().setSp(48),
               color: Colors.grey,
             ),
-            hintText: "Search for site",
+            hintText: 'Search for site',
             hintStyle: TextStyle(
               color: Colors.grey,
-              fontSize: ScreenUtil().setSp(48),
-              fontWeight: FontWeight.w300,
+              fontSize: ScreenUtil().setSp(42),
+              fontWeight: FontWeight.w400,
             ),
           ),
-          style: TextStyle(color: Colors.black, fontSize: 20),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: ScreenUtil().setSp(42),
+          ),
           // Must be valid entry
         ),
       ),
-      elevation: 10,
-      color: Colors.white.withOpacity(0.9),
     );
   }
 
@@ -317,68 +342,172 @@ class SearchPageState extends State<SearchPage> {
     );
   }
 
+  // return Container(
+  //         decoration: BoxDecoration(
+  //           color: Colors.white.withOpacity(0.9),
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: Colors.black.withOpacity(0.2),
+  //               spreadRadius: 1,
+  //               blurRadius: 10,
+  //               offset: Offset(0, 3), // changes position of shadow
+  //             ),
+  //           ],
+  //         ),
+  //         margin: EdgeInsets.fromLTRB(
+  //           24,
+  //           ScreenUtil().setHeight(16),
+  //           24,
+  //           ScreenUtil().setHeight(16),
+  //         ),
+  //         child: Material(
+  //           color: Colors.transparent,
+  //           child: InkWell(
+  //             onTap: () {
+  //               Get.to(SitePage(site: lastSite))
+  //                   .then((onValue) => setState(() {}));
+  //             },
+  //             child: Stack(
+  //               children: [
+  //                 Row(
+  //                   mainAxisAlignment: MainAxisAlignment.start,
+  //                   children: [
+  //                     (lastSite.getSiteThumbnail() != null)
+  //                         ? lastSite.getSiteThumbnail()
+  //                         : Container(
+  //                             height: 96, width: 96, color: Colors.grey[400]),
+  //                     Expanded(
+  //                       child: Container(
+  //                         margin: EdgeInsets.only(left: 16, right: 16),
+  //                         child: Column(
+  //                           mainAxisAlignment: MainAxisAlignment.start,
+  //                           crossAxisAlignment: CrossAxisAlignment.start,
+  //                           children: [
+  //                             Text(
+  //                               lastSite.name.toUpperCase(),
+  //                               textAlign: TextAlign.start,
+  //                               overflow: TextOverflow.ellipsis,
+  //                               maxLines: 1,
+  //                               style: TextStyle(
+  //                                   fontSize: ScreenUtil().setSp(42),
+  //                                   fontWeight: FontWeight.w600,
+  //                                   color: Colors.black54),
+  //                             ),
+  //                             Text(
+  //                               lastSite.code.toUpperCase(),
+  //                               overflow: TextOverflow.ellipsis,
+  //                               maxLines: 1,
+  //                               textAlign: TextAlign.start,
+  //                               style: TextStyle(
+  //                                   fontSize: ScreenUtil().setSp(36),
+  //                                   fontWeight: FontWeight.w400,
+  //                                   color: Colors.black54),
+  //                             )
+  //                           ],
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 Positioned.fill(
+  //                   child: Align(
+  //                     alignment: Alignment.topRight,
+  //                     child: Container(
+  //                       child: Text(
+  //                         " Last accessed site ",
+  //                         textAlign: TextAlign.start,
+  //                         style: TextStyle(
+  //                           color: Colors.white,
+  //                           fontSize: ScreenUtil().setSp(32),
+  //                         ),
+  //                       ),
+  //                       padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
+  //                       color: Color.fromRGBO(84, 176, 159, 1.0),
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+
   /* Site card which shows site name, code and network icon
      site -> Site: The site pertaining to the card */
   Widget showSiteCard(Site site) {
-    return InkWell(
-      child: new Card(
-        elevation: 5,
-        child: new Container(
-          child: new Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      margin: EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            Get.to(SitePage(site: site), transition: Transition.downToUp);
+            SystemChannels.textInput.invokeMethod("TextInput.hide");
+          },
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // Stretch the cards in horizontal axis
+                    children: <Widget>[
+                      Text(
+                        site.name.toUpperCase(),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(42),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        site.code.toUpperCase(),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          fontSize: ScreenUtil().setSp(36),
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   // Stretch the cards in horizontal axis
                   children: <Widget>[
-                    new Text(
-                      site.name.toUpperCase(),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        fontSize: ScreenUtil().setSp(42),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    ImageIcon(
+                      site.getIconFromNetwork(),
+                      color: Colors.black54,
+                      size: ScreenUtil().setSp(64),
                     ),
-                    new Text(
-                      site.code.toUpperCase(),
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: new TextStyle(
-                        fontSize: ScreenUtil().setSp(36),
-                        color: Colors.black54,
-                      ),
-                    ),
+                    Text(" "),
+                    Icon(
+                      Icons.chevron_right,
+                      color: Colors.black54,
+                      size: ScreenUtil().setSp(42),
+                    )
                   ],
                 ),
-              ),
-              new Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                // Stretch the cards in horizontal axis
-                children: <Widget>[
-                  ImageIcon(
-                    site.getIconFromNetwork(),
-                    color: Colors.black54,
-                    size: ScreenUtil().setSp(72),
-                  ),
-                  Text(" "),
-                  Icon(
-                    Icons.chevron_right,
-                    color: Colors.black54,
-                    size: ScreenUtil().setSp(42),
-                  )
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
-          padding: const EdgeInsets.all(15.0),
         ),
       ),
-      onTap: () {
-        Get.to(SitePage(site: site), transition: Transition.downToUp);
-        SystemChannels.textInput.invokeMethod("TextInput.hide");
-      },
     );
   }
 }

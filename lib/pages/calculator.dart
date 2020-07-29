@@ -44,7 +44,6 @@ class CalculatorPageState extends State<CalculatorPage> {
 
   @override
   void initState() {
-    super.initState();
     // Show first 10 Sites alphabetically
     chrAGCValue = "";
     chrRSLValueLER = "";
@@ -61,6 +60,8 @@ class CalculatorPageState extends State<CalculatorPage> {
     eSPV = new TextEditingController();
     eBPV = new TextEditingController();
     eRSLV = new TextEditingController();
+
+    super.initState();
   }
 
   void updateValues() {
@@ -122,36 +123,39 @@ class CalculatorPageState extends State<CalculatorPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/login.jpg'),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                fit: BoxFit.cover,
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 0,
+                  color: Color.fromRGBO(84, 176, 159, 1.0),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(84, 176, 159, 1.0),
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
               ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(color: Colors.indigo.withOpacity(0.7)),
             ),
           ),
           Container(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: new ListView(
               shrinkWrap: true,
-              padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+              padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
               children: [
-                SizedBox(height: MediaQuery.of(context).size.height / 4),
+                SizedBox(height: MediaQuery.of(context).size.height / 6),
                 Container(
                   child: Text(
                     "Ceragon / Harris / RTN",
                     style: TextStyle(
-                      fontSize: ScreenUtil().setSp(96),
+                      fontSize: ScreenUtil().setSp(72),
+                      fontFamily: "Quicksand",
                       color: Colors.white,
-                      fontWeight: FontWeight.w100,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -162,37 +166,41 @@ class CalculatorPageState extends State<CalculatorPage> {
                   "Enter RSL Value from LER",
                   "-dBm",
                 ),
-                InkWell(
-                  child: Card(
-                    color: Colors.black.withOpacity(0.4),
-                    child: Container(
-                      child: Column(
-                        children: [
-                          showOutput(
-                            Icons.exposure_zero,
-                            "Ideal Value",
-                            "AGC Volts",
-                            chrIV,
-                          ),
-                          showOutput(
-                            Icons.exposure_plus_1,
-                            "Safe Passing Value",
-                            "AGC Volts",
-                            chrSPV,
-                          ),
-                          showOutput(
-                            Icons.exposure_plus_2,
-                            "Borderline Passing Value",
-                            "AGC Volts",
-                            chrBPV,
-                          ),
-                        ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(51, 57, 104, 0.7),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 3), // changes position of shadow
                       ),
-                      padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                    ),
-                    elevation: 10,
+                    ],
                   ),
-                  onTap: () {},
+                  child: Column(
+                    children: [
+                      showOutput(
+                        Icons.exposure_zero,
+                        "Ideal Value",
+                        "AGC Volts",
+                        chrIV,
+                      ),
+                      showOutput(
+                        Icons.exposure_plus_1,
+                        "Safe Passing Value",
+                        "AGC Volts",
+                        chrSPV,
+                      ),
+                      showOutput(
+                        Icons.exposure_plus_2,
+                        "Borderline Passing Value",
+                        "AGC Volts",
+                        chrBPV,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
                 ),
                 showInputBox(
                   CalculatorValues.CHR_AGC_VALUE,
@@ -200,34 +208,39 @@ class CalculatorPageState extends State<CalculatorPage> {
                   "Enter AGC Value",
                   "AGC Volts",
                 ),
-                InkWell(
-                  child: Card(
-                    color: Colors.black.withOpacity(0.4),
-                    child: Container(
-                      child: Column(
-                        children: [
-                          showOutput(
-                            Icons.show_chart,
-                            "RSL Value",
-                            "-dBm",
-                            chrRSLV,
-                          ),
-                        ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(51, 57, 104, 0.7),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 3), // changes position of shadow
                       ),
-                      padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                    ),
-                    elevation: 10,
+                    ],
                   ),
-                  onTap: () {},
+                  child: Column(
+                    children: [
+                      showOutput(
+                        Icons.show_chart,
+                        "RSL Value",
+                        "-dBm",
+                        chrRSLV,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height / 8),
                 Container(
                   child: Text(
                     "Ericsson",
                     style: TextStyle(
-                      fontSize: ScreenUtil().setSp(96),
+                      fontSize: ScreenUtil().setSp(72),
+                      fontFamily: "Quicksand",
                       color: Colors.white,
-                      fontWeight: FontWeight.w100,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),
@@ -238,37 +251,41 @@ class CalculatorPageState extends State<CalculatorPage> {
                   "Enter RSL Value from LER",
                   "-dBm",
                 ),
-                InkWell(
-                  child: Card(
-                    color: Colors.black.withOpacity(0.4),
-                    child: Container(
-                      child: Column(
-                        children: [
-                          showOutput(
-                            Icons.exposure_zero,
-                            "Ideal Value",
-                            "AGC Volts",
-                            eIV,
-                          ),
-                          showOutput(
-                            Icons.exposure_plus_1,
-                            "Safe Passing Value",
-                            "AGC Volts",
-                            eSPV,
-                          ),
-                          showOutput(
-                            Icons.exposure_plus_2,
-                            "Borderline Passing Value",
-                            "AGC Volts",
-                            eBPV,
-                          ),
-                        ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(51, 57, 104, 0.7),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 3), // changes position of shadow
                       ),
-                      padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                    ),
-                    elevation: 10,
+                    ],
                   ),
-                  onTap: () {},
+                  child: Column(
+                    children: [
+                      showOutput(
+                        Icons.exposure_zero,
+                        "Ideal Value",
+                        "AGC Volts",
+                        eIV,
+                      ),
+                      showOutput(
+                        Icons.exposure_plus_1,
+                        "Safe Passing Value",
+                        "AGC Volts",
+                        eSPV,
+                      ),
+                      showOutput(
+                        Icons.exposure_plus_2,
+                        "Borderline Passing Value",
+                        "AGC Volts",
+                        eBPV,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
                 ),
                 showInputBox(
                   CalculatorValues.ERIC_AGC_VALUE,
@@ -276,27 +293,31 @@ class CalculatorPageState extends State<CalculatorPage> {
                   "Enter AGC Value",
                   "AGC Volts",
                 ),
-                InkWell(
-                  child: Card(
-                    color: Colors.black.withOpacity(0.35),
-                    child: Container(
-                      child: Column(
-                        children: [
-                          showOutput(
-                            Icons.show_chart,
-                            "RSL Value",
-                            "-dBm",
-                            eRSLV,
-                          ),
-                        ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(51, 57, 104, 0.7),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 10,
+                        offset: Offset(0, 3), // changes position of shadow
                       ),
-                      padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                    ),
-                    elevation: 10,
+                    ],
                   ),
-                  onTap: () {},
+                  child: Column(
+                    children: [
+                      showOutput(
+                        Icons.show_chart,
+                        "RSL Value",
+                        "-dBm",
+                        eRSLV,
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height / 3),
+                SizedBox(height: MediaQuery.of(context).size.height / 5),
               ],
             ),
           ),
@@ -307,41 +328,45 @@ class CalculatorPageState extends State<CalculatorPage> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.help_outline),
-                color: Colors.white,
-                iconSize: 36,
-                onPressed: () async {
-                  _scaffoldKey.currentState.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "This feature is under construction.",
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(36),
+        shape: CircularNotchedRectangle(),
+        child: Container(
+          padding: EdgeInsets.only(left: 36, right: 36),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: ImageIcon(AssetImage("images/home/icon_help.png")),
+                  color: Colors.white,
+                  iconSize: 28,
+                  onPressed: () async {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                        content: Text(
+                          "This feature is under construction.",
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
                         ),
+                        duration: Duration(milliseconds: 200),
                       ),
-                      duration: Duration(milliseconds: 500),
-                    ),
-                  );
-                }),
-            GestureDetector(
-              onTapDown: (TapDownDetails details) {
-                showPopupMenu(context, details.globalPosition);
-              },
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.white,
-                size: 36,
+                    );
+                  }),
+              GestureDetector(
+                onTapDown: (TapDownDetails details) {
+                  showPopupMenu(context, details.globalPosition);
+                },
+                child: ImageIcon(
+                  AssetImage("images/home/icon_menu.png"),
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        // shape: CircularNotchedRectangle(),
         elevation: 0,
-        color: Colors.black.withOpacity(0.25),
+        color: Color.fromRGBO(51, 57, 104, 1),
       ),
     );
   }
@@ -355,6 +380,7 @@ class CalculatorPageState extends State<CalculatorPage> {
           title,
           textAlign: TextAlign.end,
           style: TextStyle(
+            fontFamily: "Quicksand",
             fontSize: ScreenUtil().setSp(36),
             fontWeight: FontWeight.w600,
             color: Colors.grey[300].withOpacity(0.7),
@@ -396,68 +422,87 @@ class CalculatorPageState extends State<CalculatorPage> {
 
   Widget showInputBox(CalculatorValues valueToChange, IconData icon,
       String caption, String suffix) {
-    return Card(
-      child: Container(
-        child: TextField(
-          onChanged: ((val) async {
-            setState(() {
-              switch (valueToChange) {
-                case CalculatorValues.CHR_RSL_VALUE_LER:
-                  chrRSLValueLER = val;
-                  break;
-                case CalculatorValues.CHR_AGC_VALUE:
-                  chrAGCValue = val;
-                  break;
-                case CalculatorValues.ERIC_RSL_VALUE_LER:
-                  eRSLValueLER = val;
-                  break;
-                case CalculatorValues.ERIC_AGC_VALUE:
-                  eAGCValue = val;
-                  break;
-              }
-            });
-          }),
-          textCapitalization: TextCapitalization.none,
-          autofocus: false,
+    return Container(
+      margin: EdgeInsets.fromLTRB(
+        0,
+        ScreenUtil().setHeight(16),
+        0,
+        ScreenUtil().setHeight(16),
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {},
+          child: TextField(
+            onChanged: ((val) async {
+              setState(() {
+                switch (valueToChange) {
+                  case CalculatorValues.CHR_RSL_VALUE_LER:
+                    chrRSLValueLER = val;
+                    break;
+                  case CalculatorValues.CHR_AGC_VALUE:
+                    chrAGCValue = val;
+                    break;
+                  case CalculatorValues.ERIC_RSL_VALUE_LER:
+                    eRSLValueLER = val;
+                    break;
+                  case CalculatorValues.ERIC_AGC_VALUE:
+                    eAGCValue = val;
+                    break;
+                }
+              });
+            }),
+            textCapitalization: TextCapitalization.none,
+            autofocus: false,
 
-          keyboardType:
-              TextInputType.numberWithOptions(decimal: true, signed: false),
-          cursorColor: Colors.grey,
-          obscureText: false,
-          showCursor: true,
-          decoration: InputDecoration(
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.all(12.0),
-            prefixIcon: Icon(
-              icon,
-              color: Colors.grey,
-              size: ScreenUtil().setSp(48),
+            keyboardType:
+                TextInputType.numberWithOptions(decimal: true, signed: false),
+            cursorColor: Colors.grey,
+            obscureText: false,
+            showCursor: true,
+            decoration: InputDecoration(
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              contentPadding: EdgeInsets.all(12.0),
+              prefixIcon: Icon(
+                icon,
+                size: ScreenUtil().setSp(48),
+                color: Colors.grey,
+              ),
+              suffixText: suffix,
+              suffixStyle: TextStyle(
+                  color: Colors.grey[800],
+                  fontSize: ScreenUtil().setSp(42),
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.italic),
+              hintText: caption,
+              hintStyle: TextStyle(
+                color: Colors.grey,
+                fontSize: ScreenUtil().setSp(42),
+                fontWeight: FontWeight.w400,
+              ),
             ),
-            suffixText: suffix,
-            suffixStyle: TextStyle(
-                color: Colors.grey[800],
-                fontSize: ScreenUtil().setSp(48),
-                fontWeight: FontWeight.w600,
-                fontStyle: FontStyle.italic),
-            hintText: caption,
-            hintStyle: TextStyle(
-              color: Colors.grey,
-              fontSize: ScreenUtil().setSp(48),
-              fontWeight: FontWeight.w300,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: ScreenUtil().setSp(42),
             ),
+            // Must be valid entry
           ),
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: ScreenUtil().setSp(48),
-          ),
-          // Must be valid entry
         ),
       ),
-      elevation: 10,
-      color: Colors.white.withOpacity(0.9),
     );
   }
 

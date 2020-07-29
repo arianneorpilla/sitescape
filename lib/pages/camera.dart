@@ -67,17 +67,17 @@ class CameraScreenState extends State<CameraScreen> {
       int scaleWidth = (properties.width * 1080 / properties.height).round();
       int scaleHeight = (properties.height * 1920 / properties.width).round();
 
-      if (properties.width > 1920) {
-        processed = await FlutterNativeImage.compressImage(
-          path,
-          targetHeight: scaleHeight,
-          targetWidth: 1920,
-        );
-      } else if (properties.height > 1080) {
+      if (properties.height > 1080) {
         processed = await FlutterNativeImage.compressImage(
           path,
           targetWidth: scaleWidth,
           targetHeight: 1080,
+        );
+      } else if (properties.width > 1920) {
+        processed = await FlutterNativeImage.compressImage(
+          path,
+          targetHeight: scaleHeight,
+          targetWidth: 1920,
         );
       } else {
         processed = File(path);

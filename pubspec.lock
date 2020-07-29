@@ -43,13 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.2"
-  batching_future:
-    dependency: "direct main"
-    description:
-      name: batching_future
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.0"
   bazel_worker:
     dependency: transitive
     description:
@@ -190,13 +183,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.14.13"
-  color:
-    dependency: transitive
-    description:
-      name: color
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.1"
   convert:
     dependency: transitive
     description:
@@ -239,13 +225,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.5"
-  disk_space:
-    dependency: "direct main"
-    description:
-      name: disk_space
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.3"
   equatable:
     dependency: transitive
     description:
@@ -435,13 +414,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.10"
-  flutter_markdown:
-    dependency: transitive
-    description:
-      name: flutter_markdown
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.0"
   flutter_native_image:
     dependency: "direct main"
     description:
@@ -449,13 +421,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.5+2"
-  flutter_native_splash:
-    dependency: "direct main"
-    description:
-      name: flutter_native_splash
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.1.9"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -480,13 +445,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_whatsnew:
-    dependency: "direct main"
-    description:
-      name: flutter_whatsnew
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   font_awesome_flutter:
     dependency: transitive
     description:
@@ -584,7 +542,7 @@ packages:
       name: image_editor
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.7.0"
+    version: "0.7.1"
   intl:
     dependency: transitive
     description:
@@ -648,13 +606,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.5"
-  markdown:
-    dependency: transitive
-    description:
-      name: markdown
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.5"
   matcher:
     dependency: transitive
     description:
@@ -963,13 +914,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
-  synchronized:
-    dependency: transitive
-    description:
-      name: synchronized
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.2.0+2"
   term_glyph:
     dependency: transitive
     description:

@@ -65,7 +65,7 @@ Future<void> main() async {
 
   // Run the application.
   SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Colors.black.withOpacity(0.4)));
+      SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(51, 57, 104, 1)));
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(App());
@@ -94,7 +94,8 @@ class App extends StatelessWidget {
       theme: new ThemeData(
           fontFamily: "OpenSans",
           primaryColor: Color.fromRGBO(69, 80, 161, 1.0),
-          accentColor: Color.fromRGBO(42, 52, 121, 1.0),
+          accentColor: Color.fromRGBO(84, 176, 159, 1.0),
+          backgroundColor: Color.fromRGBO(69, 80, 161, 1.0),
           visualDensity: VisualDensity.adaptivePlatformDensity),
       // Home is a root page which depends on Auth status initialised on startup.
       home: new RootPage(auth: gUserAuth),

@@ -127,43 +127,45 @@ class _TaskPageState extends State<TaskPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.help_outline),
-                color: Colors.white,
-                iconSize: 36,
-                onPressed: () async {
-                  _scaffoldKey.currentState.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "This feature is under construction.",
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(36),
+        shape: CircularNotchedRectangle(),
+        child: Container(
+          padding: EdgeInsets.only(left: 36, right: 36),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: ImageIcon(AssetImage("images/home/icon_help.png")),
+                  color: Colors.white,
+                  iconSize: 28,
+                  onPressed: () async {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                        content: Text(
+                          "This feature is under construction.",
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
                         ),
+                        duration: Duration(milliseconds: 200),
                       ),
-                      duration: Duration(milliseconds: 500),
-                    ),
-                  );
-                }),
-            GestureDetector(
-              onTapDown: (TapDownDetails details) {
-                showPopupMenu(context, details.globalPosition);
-              },
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.white,
-                size: 36,
+                    );
+                  }),
+              GestureDetector(
+                onTapDown: (TapDownDetails details) {
+                  showPopupMenu(context, details.globalPosition);
+                },
+                child: ImageIcon(
+                  AssetImage("images/home/icon_menu.png"),
+                  color: Colors.white,
+                  size: 28,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        shape: (task.getTaskProgress() == TaskStatus.NOT_REQUIRED)
-            ? null
-            : CircularNotchedRectangle(),
         elevation: 0,
-        color: Colors.black.withOpacity(0.35),
+        color: Color.fromRGBO(51, 57, 104, 1),
       ),
     );
   }
@@ -850,17 +852,17 @@ class _TaskPageState extends State<TaskPage> {
       int scaleWidth = (properties.width * 1080 / properties.height).round();
       int scaleHeight = (properties.height * 1920 / properties.width).round();
 
-      if (properties.width > 1920) {
-        processed = await FlutterNativeImage.compressImage(
-          file.path,
-          targetHeight: scaleHeight,
-          targetWidth: 1920,
-        );
-      } else if (properties.height > 1080) {
+      if (properties.height > 1080) {
         processed = await FlutterNativeImage.compressImage(
           file.path,
           targetWidth: scaleWidth,
           targetHeight: 1080,
+        );
+      } else if (properties.width > 1920) {
+        processed = await FlutterNativeImage.compressImage(
+          file.path,
+          targetHeight: scaleHeight,
+          targetWidth: 1920,
         );
       } else {
         // Copy the file to the temporary directory.

@@ -248,7 +248,7 @@ class CreditsScreen extends StatelessWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 24.0),
         child: FloatingActionButton(
-          backgroundColor: Colors.grey,
+          backgroundColor: Colors.white.withOpacity(0.4),
           child: Icon(Icons.close, color: Colors.white),
           onPressed: () {
             Get.back(closeOverlays: true);
@@ -256,7 +256,7 @@ class CreditsScreen extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      backgroundColor: Colors.black.withOpacity(0.75),
+      backgroundColor: Color.fromRGBO(51, 57, 104, 0.6),
       body: new Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -271,7 +271,7 @@ class CreditsScreen extends StatelessWidget {
                         fontFamily: "Quicksand",
                         color: Colors.white,
                         fontWeight: FontWeight.w300,
-                        fontSize: 112)),
+                        fontSize: 100)),
                 new Text(
                   "H A N D O V E R  T O O L  P A C K",
                   style: TextStyle(
@@ -310,10 +310,10 @@ class CreditsScreen extends StatelessWidget {
                 // ),
                 showCreditColumn(
                   "Data Sources",
-                  "Weather forecast from OpenWeatherMap",
+                  "Weather Forecast from OpenWeatherMap",
                 ),
                 new Text(
-                  "Maps and navigation from Mapbox",
+                  "Maps and Navigation from Mapbox",
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 22,

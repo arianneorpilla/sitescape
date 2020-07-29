@@ -35,7 +35,6 @@ dependencies:
       path: packages/firebase_storage
   cloud_firestore: ^0.12.9+5
   path_provider:
-  disk_space:
   flushbar: ^1.10.4
   persistent_bottom_nav_bar: any
   get:
@@ -55,7 +54,7 @@ dependencies:
   esys_flutter_share:
   file_picker:
   flutter_image_compress: ^0.6.8
-  image_editor:
+  image_editor: ^0.7.1
   http:
   permission_handler: ^5.0.1+1
   flutter_compass: '^0.4.1'
@@ -66,12 +65,9 @@ dependencies:
   faro_torch: ^0.0.3
   ext_storage:
   ntp:
-  flutter_native_splash:
-  flutter_whatsnew:
   shared_preferences:
   expandable:
   flutter_native_image:
-  batching_future:
   firebase_messaging:
   flutter_local_notifications:
   flutter_screenutil:

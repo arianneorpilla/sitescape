@@ -49,20 +49,22 @@ class ScannerPageState extends State<ScannerPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/login.jpg'),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                fit: BoxFit.cover,
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 0,
+                  color: Color.fromRGBO(84, 176, 159, 1.0),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(84, 176, 159, 1.0),
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
               ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(color: Colors.indigo.withOpacity(0.7)),
             ),
           ),
           ListView(
@@ -84,41 +86,45 @@ class ScannerPageState extends State<ScannerPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.help_outline),
-                color: Colors.white,
-                iconSize: 36,
-                onPressed: () async {
-                  _scaffoldKey.currentState.showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        "This feature is under construction.",
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(36),
-                        ),
-                      ),
-                      duration: Duration(milliseconds: 500),
-                    ),
-                  );
-                }),
-            GestureDetector(
-              onTapDown: (TapDownDetails details) {
-                showPopupMenu(context, details.globalPosition);
-              },
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.white,
-                size: 36,
-              ),
-            ),
-          ],
-        ),
         shape: CircularNotchedRectangle(),
+        child: Container(
+          padding: EdgeInsets.only(left: 36, right: 36),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: ImageIcon(AssetImage("images/home/icon_help.png")),
+                  color: Colors.white,
+                  iconSize: 28,
+                  onPressed: () async {
+                    _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(
+                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                        content: Text(
+                          "This feature is under construction.",
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                          ),
+                        ),
+                        duration: Duration(milliseconds: 200),
+                      ),
+                    );
+                  }),
+              GestureDetector(
+                onTapDown: (TapDownDetails details) {
+                  showPopupMenu(context, details.globalPosition);
+                },
+                child: ImageIcon(
+                  AssetImage("images/home/icon_menu.png"),
+                  color: Colors.white,
+                  size: 28,
+                ),
+              ),
+            ],
+          ),
+        ),
         elevation: 0,
-        color: Colors.black.withOpacity(0.25),
+        color: Color.fromRGBO(51, 57, 104, 1),
       ),
     );
   }

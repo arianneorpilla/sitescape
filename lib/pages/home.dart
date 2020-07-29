@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         elevation: 0,
-        color: Colors.black.withOpacity(0.25),
+        color: Color.fromRGBO(51, 57, 104, 1),
       ),
     );
   }
@@ -670,7 +670,7 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     fontSize: ScreenUtil().setSp(42),
                                     fontWeight: FontWeight.w600,
-                                    color: Colors.black54),
+                                    color: Colors.black),
                               ),
                               Text(
                                 lastSite.code.toUpperCase(),

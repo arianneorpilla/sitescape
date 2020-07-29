@@ -8,14 +8,19 @@ import 'package:path/path.dart' as ph;
 import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/services/classes.dart';
 
-Future<List<dynamic>> getPhotosInCloudFolder(String path) async {
+Future<List<String>> getPhotosInCloudFolder(String path) async {
   // print(gCloudPath + path);
   final StorageReference storageRef =
       FirebaseStorage.instance.ref().child(path);
   Map<dynamic, dynamic> listed = (await storageRef.listAll());
 
   // print(listed["items"].keys.toList());
-  return listed["items"].keys.toList();
+  List<dynamic> items = listed["items"].keys.toList();
+  List<String> fileNames = new List<String>.from(items);
+
+  fileNames.sort((a, b) => b.compareTo(a));
+
+  return fileNames;
 }
 
 Future syncPhoto(FileTaskImage taskImage) async {

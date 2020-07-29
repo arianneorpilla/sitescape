@@ -64,6 +64,13 @@ class Site {
     double latitude = value["latitude"].toDouble();
     double longitude = value["longitude"].toDouble();
 
+    Map<dynamic, dynamic> maps;
+    if (value["subsites"] == null) {
+      maps = {};
+    } else {
+      maps = value["subsites"];
+    }
+
     return Site(
       key,
       value["sitename"],
@@ -72,7 +79,7 @@ class Site {
       value["network"],
       latitude,
       longitude,
-      value["subsites"],
+      maps,
     );
   }
 
@@ -235,20 +242,20 @@ enum SyncStatus {
    text -> String: Text containing JSON site data
 */
 List<Site> jsonToSites(String text) {
-  List<Site> Sites = [];
+  List<Site> sites = [];
 
-  Map SitesJson = json.decode(text);
+  Map sitesJson = json.decode(text);
 
-  SitesJson.forEach((key, value) {
+  sitesJson.forEach((key, value) {
     Site site = Site.fromMap(key, value);
     site.populate();
 
-    Sites.add(site);
+    sites.add(site);
   });
 
-  Sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.compareTo(b.name));
 
-  return Sites;
+  return sites;
 }
 
 /* From the cloud, convert the database mappings to an appropriate
@@ -296,7 +303,18 @@ class Subsite {
      value -> Map<dynamic, dynamic>: A JSON map containing subsite data
   */
   factory Subsite.fromMap(String key, Map<dynamic, dynamic> value) {
-    return Subsite(key, value["sectors"]);
+    Map<dynamic, dynamic> maps;
+
+    if (value["sectors"] == null) {
+      maps = {};
+    } else {
+      maps = value["sectors"];
+    }
+
+    return Subsite(
+      key,
+      maps,
+    );
   }
 
   void populate() {
@@ -365,9 +383,16 @@ class Sector {
      value -> Map<dynamic, dynamic>: A JSON map containing sector data
   */
   factory Sector.fromMap(String key, Map<dynamic, dynamic> value) {
+    Map<dynamic, dynamic> maps;
+    if (value["tasks"] == null) {
+      maps = {};
+    } else {
+      maps = value["tasks"];
+    }
+
     return Sector(
       key,
-      value["tasks"],
+      maps,
       GlobalKey(),
       false,
       false,
@@ -550,7 +575,7 @@ class Sector {
   Future<List<dynamic>> getSectorCloudThumbnails() async {
     var thumbs = [];
 
-    List<dynamic> fileNames = await getPhotosInCloudFolder(getCloudPath());
+    List<String> fileNames = await getPhotosInCloudFolder(getCloudPath());
 
     for (Task task in tasks) {
       bool found = false;
@@ -574,7 +599,7 @@ class Sector {
   Future<List<int>> getSectorCloudProgress() async {
     List<int> secProgress = [];
 
-    List<dynamic> fileNames = await getPhotosInCloudFolder(getCloudPath());
+    List<String> fileNames = await getPhotosInCloudFolder(getCloudPath());
 
     for (Task task in tasks) {
       int taskImageCount = 0;
@@ -781,7 +806,7 @@ class Task {
   }
 
   Future<List<Future<NetworkTaskImage>>> getCloudPhotos({Task task}) async {
-    List<dynamic> filenames = await getPhotosInCloudFolder(getCloudPath());
+    List<String> filenames = await getPhotosInCloudFolder(getCloudPath());
 
     List<Future<NetworkTaskImage>> futures = [];
 

@@ -104,41 +104,45 @@ class _SitePageState extends State<SitePage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           notchMargin: 12.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.help_outline),
-                  color: Colors.white,
-                  iconSize: 36,
-                  onPressed: () async {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "This feature is under construction.",
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(36),
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 500),
-                      ),
-                    );
-                  }),
-              GestureDetector(
-                onTapDown: (TapDownDetails details) async {
-                  showPopupMenu(context, details.globalPosition);
-                },
-                child: Icon(
-                  Icons.more_vert,
-                  color: Colors.white,
-                  size: 36,
-                ),
-              ),
-            ],
-          ),
           shape: CircularNotchedRectangle(),
+          child: Container(
+            padding: EdgeInsets.only(left: 36, right: 36),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                IconButton(
+                    icon: ImageIcon(AssetImage("images/home/icon_help.png")),
+                    color: Colors.white,
+                    iconSize: 28,
+                    onPressed: () async {
+                      _scaffoldKey.currentState.showSnackBar(
+                        SnackBar(
+                          backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
+                          content: Text(
+                            "This feature is under construction.",
+                            style: TextStyle(
+                              fontSize: ScreenUtil().setSp(36),
+                            ),
+                          ),
+                          duration: Duration(milliseconds: 200),
+                        ),
+                      );
+                    }),
+                GestureDetector(
+                  onTapDown: (TapDownDetails details) {
+                    showPopupMenu(context, details.globalPosition);
+                  },
+                  child: ImageIcon(
+                    AssetImage("images/home/icon_menu.png"),
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+              ],
+            ),
+          ),
           elevation: 0,
-          color: Colors.black.withOpacity(0.35),
+          color: Color.fromRGBO(51, 57, 104, 1),
         ),
       ),
     );
@@ -671,7 +675,7 @@ class _SitePageState extends State<SitePage> {
         sec.downloading = true;
         sec.key.currentState.refresh();
 
-        List<dynamic> images = await getPhotosInCloudFolder(sec.getCloudPath());
+        List<String> images = await getPhotosInCloudFolder(sec.getCloudPath());
 
         sec.key.currentState.setDownloadCount(images.length);
         sec.key.currentState.refresh();
@@ -775,7 +779,6 @@ class _SitePageState extends State<SitePage> {
     }
 
     _tabKey.currentState.animateTo(leftOff);
-
     setState(() {
       _uploading = false;
     });
@@ -1077,7 +1080,7 @@ class SectorCardState extends State<SectorCard> {
         alignment: AlignmentDirectional.bottomStart,
         children: [
           Card(
-            color: (sector.inTransaction()) ? Colors.grey[200] : Colors.white,
+            color: (sector.inTransaction()) ? Colors.grey[300] : Colors.white,
             elevation: 1,
             child: Container(
               child: Row(
@@ -1096,7 +1099,9 @@ class SectorCardState extends State<SectorCard> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      sector.getUnsynced() ? showUnsyncedCount() : Container(),
+                      sector.getUnsynced() || sector.downloading
+                          ? showUnsyncedCount()
+                          : Container(),
                       sector.inTransaction()
                           ? showLoading(sector.downloading)
                           : Icon(
@@ -1153,22 +1158,7 @@ class SectorCardState extends State<SectorCard> {
     }
 
     if (unsynced == 0) {
-      return Row(
-        children: [
-          Icon(
-            unsyncIcon,
-            color: unsyncColor,
-            size: ScreenUtil().setSp(42),
-          ),
-          Text(
-            " Not required ",
-            style: TextStyle(
-              fontSize: ScreenUtil().setSp(42),
-              color: unsyncColor,
-            ),
-          ),
-        ],
-      );
+      return Container();
     } else {
       return Row(
         children: [

@@ -7,7 +7,7 @@ import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
-import 'package:disk_space/disk_space.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
@@ -83,14 +83,6 @@ String generateStringHash(String text) {
   return base64Str;
 }
 
-/* Used to get ratio of free/total device storage information, 
-   useful in Free up space menu option. */
-Future<double> getDiskSpaceInfo() async {
-  double a = await DiskSpace.getFreeDiskSpace;
-  double b = await DiskSpace.getTotalDiskSpace;
-  return (a / b);
-}
-
 /* Used to check if an internet connection is available to prevent futile
    connection attempts in app behaviour. */
 Future<bool> isConnectionAvailable() async {
@@ -132,25 +124,26 @@ Future refreshSites({offlineCallback}) async {
     return;
   }
 
-  final firestoreInstance = Firestore.instance;
+  final DatabaseReference dbRef =
+      FirebaseDatabase.instance.reference().child("sites");
+
+  DataSnapshot dbSnapshot = await dbRef.once();
   Map<dynamic, dynamic> sitesChild = {};
 
-  firestoreInstance.collection("sites").snapshots().listen((result) {
-    if (result.documents.isNotEmpty) {
-      gSites = [];
-      result.documents.forEach((entry) {
-        Site site = Site.fromMap(entry.documentID, entry.data);
-        site.populate();
-        gSites.add(site);
-        sitesChild.addAll({entry.documentID: entry.data});
-      });
-      gSites.sort((a, b) => a.name.compareTo(b.name));
-
-      String cacheContents = json.encode(sitesChild);
-      print(cacheContents);
-      siteCache.writeAsString(cacheContents);
-    }
+  gSites = [];
+  Map<dynamic, dynamic> data = dbSnapshot.value;
+  data.forEach((key, value) {
+    Site site = Site.fromMap(key, value);
+    site.populate();
+    gSites.add(site);
+    sitesChild.addAll({key: value});
   });
+
+  gSites.sort((a, b) => a.name.compareTo(b.name));
+
+  String cacheContents = json.encode(sitesChild);
+  print(cacheContents);
+  siteCache.writeAsString(cacheContents);
 
   return;
 }
@@ -420,7 +413,6 @@ Future<File> bakeTimestamp(File file, {bool bearings = false}) async {
 
   // Set up the text option to use to edit the image
   final textOption = AddTextOption();
-
   // For code redundancy as this is called four times
   void addWatermark(
     double x,
@@ -459,19 +451,19 @@ Future<File> bakeTimestamp(File file, {bool bearings = false}) async {
   String compass = trueBearing + ", " + relativeBearing;
 
   // For black border
-  addWatermark(8, 12, Colors.black, timeStamp);
-  addWatermark(12, 8, Colors.black, timeStamp);
-  addWatermark(12, 12, Colors.black, timeStamp);
-  addWatermark(8, 8, Colors.black, timeStamp);
+  addWatermark(9, 11, Colors.black, timeStamp);
+  addWatermark(11, 9, Colors.black, timeStamp);
+  addWatermark(11, 11, Colors.black, timeStamp);
+  addWatermark(9, 9, Colors.black, timeStamp);
   // For white on top of the black border
   addWatermark(10, 10, Colors.white, timeStamp);
 
   if (bearings == true) {
     // For black border
-    addWatermark(8, 60, Colors.black, compass);
-    addWatermark(12, 56, Colors.black, compass);
-    addWatermark(12, 60, Colors.black, compass);
-    addWatermark(8, 56, Colors.black, compass);
+    addWatermark(9, 59, Colors.black, compass);
+    addWatermark(11, 57, Colors.black, compass);
+    addWatermark(11, 59, Colors.black, compass);
+    addWatermark(9, 57, Colors.black, compass);
     // For white on top of the black border
     addWatermark(10, 58, Colors.white, compass);
   }
