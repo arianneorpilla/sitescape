@@ -8,6 +8,7 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:tfsitescape/pages/task.dart';
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 /* Sector Page with option to pick a Task, also showing progress 
 
@@ -100,49 +101,39 @@ class _SectorPageState extends State<SectorPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
+          ColorFiltered(
+            child: showBottomArtFaded(),
+            colorFilter: ColorFilter.mode(
+                Theme.of(context).primaryColor, BlendMode.color),
+          ),
           Container(
-            width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/login.jpg'),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(color: Colors.white.withOpacity(0.5)),
-            ),
+            width: MediaQuery.of(context).size.width,
+            color: Colors.white.withOpacity(0.4),
           ),
           Container(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: Column(
               children: [
-                showTaskInfo(),
+                showSectorInfo(),
                 showProgress(),
                 showTasks(),
               ],
             ),
           ),
-          Container(
-            padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-            height: 96,
-            width: 96,
-            child: FittedBox(child: showBackButton()),
-          ),
+          showBackButton(),
           Align(
             alignment: Alignment.topRight,
             child: Container(
-              padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+              padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
               height: 96,
               width: 96,
               child: FittedBox(
                 child: showMarkDoneButton(),
               ),
             ),
-          )
+          ),
+          showStatusBarBox()
         ],
       ),
       // floatingActionButton: FloatingActionButton(
@@ -201,36 +192,20 @@ class _SectorPageState extends State<SectorPage> {
       animateFromLastPercent: true,
       animation: true,
       lineHeight: 4.0,
-      animationDuration: 600,
+      animationDuration: 300,
       percent: _sectorProgress,
       progressColor: _sectorProgressColor,
+      backgroundColor: Colors.white.withOpacity(0.2),
       padding: EdgeInsets.zero,
       linearStrokeCap: LinearStrokeCap.roundAll,
     );
   }
 
-  /* On top left */
-  Widget showBackButton() {
-    return FlatButton(
-      onPressed: () {
-        Get.back();
-      },
-      color: Colors.black.withOpacity(0.35),
-      child: Icon(
-        Icons.arrow_back,
-        size: 28,
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(0.1),
-      shape: CircleBorder(),
-    );
-  }
-
   /* On top center */
-  Widget showTaskInfo() {
+  Widget showSectorInfo() {
     return Container(
       height: 96,
-      color: Colors.black.withOpacity(0.35),
+      color: Color.fromRGBO(55, 63, 125, 1),
       padding: EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -543,11 +518,11 @@ class _SectorPageState extends State<SectorPage> {
       onPressed: () {
         setAllMarkNotRequired();
       },
-      color: Colors.black.withOpacity(0.35),
-      child: Icon(
-        Icons.check_circle,
-        size: 28,
-        color: Colors.blueGrey[300],
+      color: Colors.transparent,
+      child: ImageIcon(
+        AssetImage("images/icons/icon_mark_all_done.png"),
+        size: 36,
+        color: Colors.lightBlueAccent,
       ),
       padding: EdgeInsets.all(0.1),
       shape: CircleBorder(),

@@ -35,7 +35,6 @@ dependencies:
       path: packages/firebase_storage
   cloud_firestore: ^0.12.9+5
   path_provider:
-  flushbar: ^1.10.4
   persistent_bottom_nav_bar: any
   get:
   geolocator: ^5.3.2+2
@@ -76,6 +75,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
   package_info:
+  
 
 dev_dependencies:
   flutter_test:
@@ -126,6 +126,28 @@ flutter:
     - images/home/icon_menu.png
     - images/home/icon_help.png
     - images/home/divider.png
+    - images/icons/icon_upload.png
+    - images/icons/icon_share.png
+    - images/icons/icon_caret_left.png
+    - images/icons/icon_caret_right.png
+    - images/icons/icon_entry.png
+    - images/icons/icon_back.png
+    - images/icons/icon_back_float.png
+    - images/icons/icon_delete.png
+    - images/icons/icon_copy.png
+    - images/icons/icon_torch.png
+    - images/icons/icon_flash_on.png
+    - images/icons/icon_flash_off.png
+    - images/icons/icon_cloud_upload.png
+    - images/icons/icon_cloud_download.png
+    - images/icons/icon_add_issue.png
+    - images/icons/icon_directions.png
+    - images/icons/icon_camera.png
+    - images/icons/icon_mark_all_done.png
+    - images/icons/icon_compass.png
+    - images/icons/icon_location.png
+    - images/icons/icon_camera_alt.png
+    - images/icons/icon_info.png
 
 
   fonts:

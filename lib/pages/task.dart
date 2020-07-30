@@ -16,6 +16,7 @@ import 'package:tfsitescape/pages/preview_cloud.dart';
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/tabs.dart';
 import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 import 'package:tfsitescape/services/util.dart';
 
 /* Page for Task Selection, shows tasks in list order with option to take
@@ -77,21 +78,15 @@ class _TaskPageState extends State<TaskPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: <Widget>[
+          ColorFiltered(
+            child: showBottomArtFaded(),
+            colorFilter: ColorFilter.mode(
+                Theme.of(context).primaryColor, BlendMode.color),
+          ),
           Container(
-            width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/login.jpg'),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-              child: Container(color: Colors.white.withOpacity(0.5)),
-            ),
+            width: MediaQuery.of(context).size.width,
+            color: Colors.white.withOpacity(0.4),
           ),
           Container(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -104,23 +99,9 @@ class _TaskPageState extends State<TaskPage> {
               // showPhotos(),
             ]),
           ),
-          Container(
-            padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-            height: 96,
-            width: 96,
-            child: FittedBox(child: showBackButton()),
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-              height: 96,
-              width: 96,
-              child: FittedBox(
-                child: showUploadButton(),
-              ),
-            ),
-          )
+          showBackButton(),
+          showUploadButton(),
+          showStatusBarBox()
         ],
       ),
       floatingActionButton: showFloatingActionButton(),
@@ -229,34 +210,31 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
-  /* On upper left */
-  Widget showBackButton() {
-    return FlatButton(
-      onPressed: () {
-        Get.back();
-      },
-      color: Colors.black.withOpacity(0.35),
-      child: Icon(Icons.arrow_back, size: 28, color: Colors.white),
-      padding: EdgeInsets.all(0.1),
-      shape: CircleBorder(),
-    );
-  }
-
   /* On top right */
   Widget showUploadButton() {
     if (task.getTaskProgress() != TaskStatus.NOT_REQUIRED) {
-      return FlatButton(
-        onPressed: () async {
-          uploadFiles();
-        },
-        color: Colors.black.withOpacity(0.35),
-        child: Icon(
-          Icons.file_upload,
-          size: 28,
-          color: Colors.greenAccent,
+      return Align(
+        alignment: Alignment.topRight,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
+          height: 96,
+          width: 96,
+          child: FittedBox(
+            child: FlatButton(
+              onPressed: () async {
+                uploadFiles();
+              },
+              color: Colors.transparent,
+              child: ImageIcon(
+                AssetImage("images/icons/icon_upload.png"),
+                size: 32,
+                color: Colors.greenAccent,
+              ),
+              padding: EdgeInsets.all(0.1),
+              shape: CircleBorder(),
+            ),
+          ),
         ),
-        padding: EdgeInsets.all(0.1),
-        shape: CircleBorder(),
       );
     } else {
       return Container();
@@ -267,7 +245,7 @@ class _TaskPageState extends State<TaskPage> {
   Widget showTaskInfo(BuildContext context) {
     return Container(
       height: 96,
-      color: Colors.black.withOpacity(0.35),
+      color: Color.fromRGBO(55, 63, 125, 1),
       padding: EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -312,7 +290,8 @@ class _TaskPageState extends State<TaskPage> {
           header: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(Icons.info, size: 18, color: Colors.black),
+              ImageIcon(AssetImage("images/icons/icon_info.png"),
+                  size: 18, color: Colors.black),
               SizedBox(width: 6),
               Text(
                 " Description",
@@ -362,6 +341,7 @@ class _TaskPageState extends State<TaskPage> {
                 children: [
                   CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation(Colors.white70),
+                    strokeWidth: 2,
                   ),
                   SizedBox(height: 96),
                 ],
@@ -456,6 +436,9 @@ class _TaskPageState extends State<TaskPage> {
 
                   if (!snapshot.hasData) {
                     return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
                       elevation: 5,
                       color: Colors.black.withOpacity(0.1),
                       clipBehavior: Clip.antiAlias,
@@ -473,6 +456,9 @@ class _TaskPageState extends State<TaskPage> {
 
                   return InkWell(
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
                       elevation: 5,
                       color: Colors.black.withOpacity(0.1),
                       clipBehavior: Clip.antiAlias,
@@ -563,6 +549,9 @@ class _TaskPageState extends State<TaskPage> {
                 itemBuilder: (BuildContext context, int index) {
                   return InkWell(
                     child: Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
                       elevation: 5,
                       color: Colors.black.withOpacity(0.1),
                       clipBehavior: Clip.antiAlias,
@@ -786,14 +775,31 @@ class _TaskPageState extends State<TaskPage> {
      go to the camera screen */
   Widget showFloatingActionButton() {
     if (task.getTaskProgress() != TaskStatus.NOT_REQUIRED) {
-      return FloatingActionButton(
-          backgroundColor: Colors.black.withOpacity(0.35),
-          child: Icon(Icons.add_a_photo, color: Colors.white, size: 36),
-          elevation: 0,
-          onPressed: () async {
-            int oldCount = task.getTaskImageCount();
+      return SizedBox(
+        width: 56,
+        height: 56,
+        child: InkWell(
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: ImageIcon(AssetImage("images/icons/icon_camera.png"),
+                  size: 48, color: Colors.white),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color.fromRGBO(84, 176, 159, 1.0),
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
+              ),
+            ),
+            onTap: () async {
+              int oldCount = task.getTaskImageCount();
 
-            Get.to(CameraScreen(camera: gCam, task: task)).then((onValue) => {
+              Get.to(CameraScreen(camera: gCam, task: task)).then(
+                (onValue) => {
                   setState(() {
                     int newCount = task.getTaskImageCount();
 
@@ -801,9 +807,11 @@ class _TaskPageState extends State<TaskPage> {
                       _tabKey.currentState.animateTo(0);
                       scrollToTop();
                     }
-                  })
-                });
-          });
+                  }),
+                },
+              );
+            }),
+      );
     } else {
       return FloatingActionButton(
           backgroundColor: Colors.transparent, elevation: 0, onPressed: () {});

@@ -69,14 +69,14 @@ PopupMenuItem<String> popupOption(IconData icon, Color color, String message,
                 Icon(
                   icon,
                   color: color,
-                  size: ScreenUtil().setSp(42),
+                  size: ScreenUtil().setSp(40),
                 ),
                 Text(
                   "   " + message,
                   style: TextStyle(
                     color: color,
                     fontWeight: fontWeight,
-                    fontSize: ScreenUtil().setSp(42),
+                    fontSize: ScreenUtil().setSp(40),
                   ),
                 ),
               ],
@@ -101,7 +101,7 @@ void showSignoutDialog(BuildContext context) async {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.red,
-        fontSize: ScreenUtil().setSp(42),
+        fontSize: ScreenUtil().setSp(40),
       ),
     ),
     onPressed: () async {
@@ -134,7 +134,7 @@ void showSignoutDialog(BuildContext context) async {
       "CANCEL",
       style: TextStyle(
         color: Colors.black,
-        fontSize: ScreenUtil().setSp(42),
+        fontSize: ScreenUtil().setSp(40),
       ),
     ),
     onPressed: () {
@@ -151,7 +151,7 @@ void showSignoutDialog(BuildContext context) async {
         title: Text(
           "Are you sure?",
           style: TextStyle(
-              fontWeight: FontWeight.w600, fontSize: ScreenUtil().setSp(48)),
+              fontWeight: FontWeight.w600, fontSize: ScreenUtil().setSp(42)),
         ),
         content: SingleChildScrollView(
           child: Text(
@@ -160,7 +160,7 @@ void showSignoutDialog(BuildContext context) async {
             textAlign: TextAlign.justify,
             style: TextStyle(
               fontWeight: FontWeight.w400,
-              fontSize: ScreenUtil().setSp(42),
+              fontSize: ScreenUtil().setSp(40),
             ),
           ),
         ),
@@ -177,7 +177,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.red,
-        fontSize: ScreenUtil().setSp(42),
+        fontSize: ScreenUtil().setSp(40),
       ),
     ),
     onPressed: () async {
@@ -197,7 +197,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
       "CANCEL",
       style: TextStyle(
         color: Colors.black,
-        fontSize: ScreenUtil().setSp(42),
+        fontSize: ScreenUtil().setSp(40),
       ),
     ),
     onPressed: () {
@@ -227,7 +227,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
             textAlign: TextAlign.justify,
             style: TextStyle(
               fontWeight: FontWeight.w400,
-              fontSize: ScreenUtil().setSp(42),
+              fontSize: ScreenUtil().setSp(40),
             ),
           ),
         ),
@@ -256,7 +256,7 @@ class CreditsScreen extends StatelessWidget {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      backgroundColor: Color.fromRGBO(51, 57, 104, 0.6),
+      backgroundColor: Color.fromRGBO(51, 57, 104, 0.8),
       body: new Container(
         height: MediaQuery.of(context).size.height,
         padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
@@ -287,7 +287,7 @@ class CreditsScreen extends StatelessWidget {
                   gVersion,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
                   ),
                   textAlign: TextAlign.justify,
@@ -389,7 +389,7 @@ class CreditsScreen extends StatelessWidget {
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
-            fontWeight: FontWeight.w200,
+            fontWeight: FontWeight.w300,
           ),
         ),
       ],

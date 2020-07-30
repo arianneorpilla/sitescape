@@ -46,9 +46,14 @@ class CustomTabsState extends State<CustomTabView>
   TabController _controller;
   int _currentCount;
   int _currentPosition;
+  bool _scrollable;
 
   void animateTo(int position) {
     _controller.animateTo(position);
+  }
+
+  void toggleScrollable() {
+    _scrollable = !_scrollable;
   }
 
   int getCurrentPosition() {
@@ -66,6 +71,7 @@ class CustomTabsState extends State<CustomTabView>
     _controller.addListener(onPositionChange);
     _controller.animation.addListener(onScroll);
     _currentCount = widget.itemCount;
+    _scrollable = true;
     super.initState();
   }
 
@@ -128,27 +134,51 @@ class CustomTabsState extends State<CustomTabView>
         Container(
           color: widget.backgroundColor,
           alignment: widget.alignment,
-          child: TabBar(
-            isScrollable: true,
-            controller: _controller,
-            labelColor: Colors.blue,
-            unselectedLabelColor: Theme.of(context).hintColor,
-            indicator: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.blue,
-                  width: 2,
+          child: _scrollable
+              ? TabBar(
+                  isScrollable: true,
+                  controller: _controller,
+                  labelColor: Theme.of(context).accentColor,
+                  unselectedLabelColor: Theme.of(context).hintColor,
+                  indicator: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Theme.of(context).accentColor,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                  tabs: List.generate(
+                    widget.itemCount,
+                    (index) => widget.tabBuilder(context, index),
+                  ),
+                )
+              : IgnorePointer(
+                  child: TabBar(
+                    isScrollable: true,
+                    controller: _controller,
+                    labelColor: Theme.of(context).accentColor,
+                    unselectedLabelColor: Theme.of(context).hintColor,
+                    indicator: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Theme.of(context).accentColor,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    tabs: List.generate(
+                      widget.itemCount,
+                      (index) => widget.tabBuilder(context, index),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            tabs: List.generate(
-              widget.itemCount,
-              (index) => widget.tabBuilder(context, index),
-            ),
-          ),
         ),
         Expanded(
           child: TabBarView(
+            physics: _scrollable
+                ? AlwaysScrollableScrollPhysics()
+                : NeverScrollableScrollPhysics(),
             controller: _controller,
             children: List.generate(
               widget.itemCount,

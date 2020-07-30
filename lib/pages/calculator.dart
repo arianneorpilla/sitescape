@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 
 import 'package:tfsitescape/services/modal.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 class CalculatorPage extends StatefulWidget {
   CalculatorPage({Key key}) : super(key: key);
@@ -123,205 +124,11 @@ class CalculatorPageState extends State<CalculatorPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 0,
-                  color: Color.fromRGBO(84, 176, 159, 1.0),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromRGBO(84, 176, 159, 1.0),
-                    Theme.of(context).primaryColor,
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: new ListView(
-              shrinkWrap: true,
-              padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height / 6),
-                Container(
-                  child: Text(
-                    "Ceragon / Harris / RTN",
-                    style: TextStyle(
-                      fontSize: ScreenUtil().setSp(72),
-                      fontFamily: "Quicksand",
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 8),
-                showInputBox(
-                  CalculatorValues.CHR_RSL_VALUE_LER,
-                  Icons.show_chart,
-                  "Enter RSL Value from LER",
-                  "-dBm",
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(51, 57, 104, 0.7),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      showOutput(
-                        Icons.exposure_zero,
-                        "Ideal Value",
-                        "AGC Volts",
-                        chrIV,
-                      ),
-                      showOutput(
-                        Icons.exposure_plus_1,
-                        "Safe Passing Value",
-                        "AGC Volts",
-                        chrSPV,
-                      ),
-                      showOutput(
-                        Icons.exposure_plus_2,
-                        "Borderline Passing Value",
-                        "AGC Volts",
-                        chrBPV,
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                ),
-                showInputBox(
-                  CalculatorValues.CHR_AGC_VALUE,
-                  Icons.flash_on,
-                  "Enter AGC Value",
-                  "AGC Volts",
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(51, 57, 104, 0.7),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      showOutput(
-                        Icons.show_chart,
-                        "RSL Value",
-                        "-dBm",
-                        chrRSLV,
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height / 8),
-                Container(
-                  child: Text(
-                    "Ericsson",
-                    style: TextStyle(
-                      fontSize: ScreenUtil().setSp(72),
-                      fontFamily: "Quicksand",
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 8),
-                showInputBox(
-                  CalculatorValues.ERIC_RSL_VALUE_LER,
-                  Icons.show_chart,
-                  "Enter RSL Value from LER",
-                  "-dBm",
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(51, 57, 104, 0.7),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      showOutput(
-                        Icons.exposure_zero,
-                        "Ideal Value",
-                        "AGC Volts",
-                        eIV,
-                      ),
-                      showOutput(
-                        Icons.exposure_plus_1,
-                        "Safe Passing Value",
-                        "AGC Volts",
-                        eSPV,
-                      ),
-                      showOutput(
-                        Icons.exposure_plus_2,
-                        "Borderline Passing Value",
-                        "AGC Volts",
-                        eBPV,
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                ),
-                showInputBox(
-                  CalculatorValues.ERIC_AGC_VALUE,
-                  Icons.flash_on,
-                  "Enter AGC Value",
-                  "AGC Volts",
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(51, 57, 104, 0.7),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 10,
-                        offset: Offset(0, 3), // changes position of shadow
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      showOutput(
-                        Icons.show_chart,
-                        "RSL Value",
-                        "-dBm",
-                        eRSLV,
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height / 5),
-              ],
-            ),
-          ),
+          showBottomArt(),
+          showCalculatorWidgets(),
+          showTopNavBox(),
           showBackButton(),
+          showStatusBarBox(),
         ],
       ),
       // floatingActionButton: showFloatingActionButton(),
@@ -367,6 +174,192 @@ class CalculatorPageState extends State<CalculatorPage> {
         ),
         elevation: 0,
         color: Color.fromRGBO(51, 57, 104, 1),
+      ),
+    );
+  }
+
+  Widget showCalculatorWidgets() {
+    return Container(
+      child: new ListView(
+        shrinkWrap: true,
+        padding: EdgeInsets.fromLTRB(24, 0, 24, 0),
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height / 6),
+          Container(
+            child: Text(
+              "Ceragon / Harris / RTN",
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(72),
+                fontFamily: "Quicksand",
+                color: Colors.white,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          showInputBox(
+            CalculatorValues.CHR_RSL_VALUE_LER,
+            Icons.show_chart,
+            "Enter RSL Value from LER",
+            "-dBm",
+          ),
+          SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(42, 47, 93, 0.85),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                showOutput(
+                  Icons.exposure_zero,
+                  "Ideal Value",
+                  "AGC Volts",
+                  chrIV,
+                ),
+                showOutput(
+                  Icons.exposure_plus_1,
+                  "Safe Passing Value",
+                  "AGC Volts",
+                  chrSPV,
+                ),
+                showOutput(
+                  Icons.exposure_plus_2,
+                  "Borderline Passing Value",
+                  "AGC Volts",
+                  chrBPV,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.fromLTRB(30, 30, 30, 15),
+          ),
+          SizedBox(height: 8),
+          showInputBox(
+            CalculatorValues.CHR_AGC_VALUE,
+            Icons.flash_on,
+            "Enter AGC Value",
+            "AGC Volts",
+          ),
+          SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(42, 47, 93, 0.85),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                showOutput(
+                  Icons.show_chart,
+                  "RSL Value",
+                  "-dBm",
+                  chrRSLV,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height / 8),
+          Container(
+            child: Text(
+              "Ericsson",
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(72),
+                fontFamily: "Quicksand",
+                color: Colors.white,
+                fontWeight: FontWeight.w300,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          showInputBox(
+            CalculatorValues.ERIC_RSL_VALUE_LER,
+            Icons.show_chart,
+            "Enter RSL Value from LER",
+            "-dBm",
+          ),
+          SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(42, 47, 93, 0.85),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                showOutput(
+                  Icons.exposure_zero,
+                  "Ideal Value",
+                  "AGC Volts",
+                  eIV,
+                ),
+                showOutput(
+                  Icons.exposure_plus_1,
+                  "Safe Passing Value",
+                  "AGC Volts",
+                  eSPV,
+                ),
+                showOutput(
+                  Icons.exposure_plus_2,
+                  "Borderline Passing Value",
+                  "AGC Volts",
+                  eBPV,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+          ),
+          showInputBox(
+            CalculatorValues.ERIC_AGC_VALUE,
+            Icons.flash_on,
+            "Enter AGC Value",
+            "AGC Volts",
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: Color.fromRGBO(42, 47, 93, 0.85),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                showOutput(
+                  Icons.show_chart,
+                  "RSL Value",
+                  "-dBm",
+                  eRSLV,
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
+          ),
+          SizedBox(height: MediaQuery.of(context).size.height / 3),
+        ],
       ),
     );
   }
@@ -430,7 +423,7 @@ class CalculatorPageState extends State<CalculatorPage> {
         ScreenUtil().setHeight(16),
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withOpacity(1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -464,8 +457,10 @@ class CalculatorPageState extends State<CalculatorPage> {
               });
             }),
             textCapitalization: TextCapitalization.none,
+            inputFormatters: [
+              DecimalTextInputFormatter(),
+            ],
             autofocus: false,
-
             keyboardType:
                 TextInputType.numberWithOptions(decimal: true, signed: false),
             cursorColor: Colors.grey,
@@ -517,28 +512,14 @@ class CalculatorPageState extends State<CalculatorPage> {
       },
     );
   }
+}
 
-  /* On top left */
-  Widget showBackButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-      height: 96,
-      width: 96,
-      child: FittedBox(
-        child: FlatButton(
-          color: Colors.black.withOpacity(0.25),
-          child: Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.all(0.1),
-          shape: CircleBorder(),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-      ),
-    );
+class DecimalTextInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final regEx = RegExp(r"^\d*\.?\d*");
+    String newString = regEx.stringMatch(newValue.text) ?? "";
+    return newString == newValue.text ? newValue : oldValue;
   }
 }

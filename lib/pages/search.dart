@@ -1,6 +1,5 @@
 import "dart:ui";
 
-import "package:flushbar/flushbar.dart";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,6 +10,7 @@ import "package:tfsitescape/main.dart";
 import "package:tfsitescape/pages/site.dart";
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 import "package:tfsitescape/services/util.dart";
 
 class SearchPage extends StatefulWidget {
@@ -69,27 +69,6 @@ class SearchPageState extends State<SearchPage> {
     _isLoading = false;
   }
 
-  /* If network error on refresh, show an error message on top */
-  void offlineError() {
-    Flushbar(
-      title: "Error fetching site manifest from server.",
-      message: "Please try again with a better connection. " +
-          "If you already had a site manifest, you can " +
-          "continue to use your current one until you " +
-          "can request another.",
-      duration: Duration(seconds: 5),
-      flushbarPosition: FlushbarPosition.TOP,
-      backgroundColor: Colors.red[900],
-      animationDuration: Duration(milliseconds: 500),
-      icon: Icon(
-        Icons.error,
-        size: 36,
-        color: Colors.white,
-      ),
-      shouldIconPulse: false,
-    )..show(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,30 +78,13 @@ class SearchPageState extends State<SearchPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 0,
-                  color: Color.fromRGBO(84, 176, 159, 1.0),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromRGBO(84, 176, 159, 1.0),
-                    Theme.of(context).primaryColor,
-                  ],
-                ),
-              ),
-            ),
-          ),
+          showBottomArt(),
           LazyLoadScrollView(
             scrollOffset: (512.h).round(),
             onEndOfPage: () => loadMore(),
             child: ListView(
               shrinkWrap: true,
-              padding: EdgeInsets.fromLTRB(16, 96, 16, 64),
+              padding: EdgeInsets.fromLTRB(16, 116, 16, 64),
               children: [
                 // Search Bar
                 showSearchBar(),
@@ -132,7 +94,9 @@ class SearchPageState extends State<SearchPage> {
               ],
             ),
           ),
-          showBackButton()
+          showTopNavBox(),
+          showBackButton(),
+          showStatusBarBox(),
         ],
       ),
       bottomNavigationBar: BottomAppBar(
@@ -191,7 +155,7 @@ class SearchPageState extends State<SearchPage> {
         ScreenUtil().setHeight(16),
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withOpacity(1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -246,30 +210,6 @@ class SearchPageState extends State<SearchPage> {
     );
   }
 
-  /* On top left */
-  Widget showBackButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-      height: 96,
-      width: 96,
-      child: FittedBox(
-        child: FlatButton(
-          color: Colors.black.withOpacity(0.25),
-          child: Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.all(0.1),
-          shape: CircleBorder(),
-          onPressed: () {
-            Get.back();
-          },
-        ),
-      ),
-    );
-  }
-
   /* List of Sites that can be scrolled through infinitely with pagination */
   Widget showSites() {
     if (gSites.isEmpty) {
@@ -280,6 +220,7 @@ class SearchPageState extends State<SearchPage> {
             SizedBox(height: MediaQuery.of(context).size.height / 3),
             CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation(Colors.white),
+              strokeWidth: 2,
             ),
             SizedBox(height: 10),
             Text(
@@ -337,6 +278,7 @@ class SearchPageState extends State<SearchPage> {
         alignment: Alignment.topCenter,
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation(Colors.white),
+          strokeWidth: 2,
         ),
       ),
     );
@@ -438,10 +380,10 @@ class SearchPageState extends State<SearchPage> {
     return Container(
       margin: EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.4),
             spreadRadius: 1,
             blurRadius: 10,
             offset: Offset(0, 3), // changes position of shadow
@@ -496,8 +438,8 @@ class SearchPageState extends State<SearchPage> {
                       size: ScreenUtil().setSp(64),
                     ),
                     Text(" "),
-                    Icon(
-                      Icons.chevron_right,
+                    ImageIcon(
+                      AssetImage("images/icons/icon_caret_right.png"),
                       color: Colors.black54,
                       size: ScreenUtil().setSp(42),
                     )

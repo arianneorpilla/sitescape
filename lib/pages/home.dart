@@ -42,13 +42,14 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    // Future.delayed(Duration(seconds: 1))
+    //     .then((onValue) => {showWhatsNewModal()});
+
     getWeather().then((weather) {
       setState(() {
         _currentWeather = weather;
       });
     });
-    // Future.delayed(Duration(seconds: 1))
-    //     .then((onValue) => {showWhatsNewModal()});
 
     super.initState();
   }
@@ -452,7 +453,7 @@ class _HomePageState extends State<HomePage> {
         ScreenUtil().setHeight(16),
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withOpacity(1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.2),
@@ -519,10 +520,10 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             switch (actionIndex) {
               case 1:
-                Get.to(CalculatorPage());
+                Get.to(CalculatorPage()).then((value) => setState(() {}));
                 break;
               case 2:
-                Get.to(ScannerPage());
+                Get.to(ScannerPage()).then((value) => setState(() {}));
                 break;
               case 3:
                 _scaffoldKey.currentState.showSnackBar(
@@ -748,7 +749,11 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(width: 16),
-              Icon(Icons.location_on, color: Colors.white),
+              ImageIcon(
+                AssetImage("images/icons/icon_location.png"),
+                color: Colors.white,
+                size: ScreenUtil().setSp(42),
+              ),
               Expanded(
                 child: Text(
                   " " + site.name.toUpperCase(),

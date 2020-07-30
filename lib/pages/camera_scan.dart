@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 /* Screen for taking photo, has entire preview as background and take
    picture button
@@ -19,7 +20,8 @@ class CameraScanScreen extends StatefulWidget {
 }
 
 /* State for CameraScanScreen */
-class CameraScanScreenState extends State<CameraScanScreen> {
+class CameraScanScreenState extends State<CameraScanScreen>
+    with WidgetsBindingObserver {
   CameraController _controller;
   QRViewController _qrController;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -31,6 +33,9 @@ class CameraScanScreenState extends State<CameraScanScreen> {
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
     // Controller to display the current output from camera.
     _controller = CameraController(
       // Get a specific camera from the list of available cameras.
@@ -48,6 +53,7 @@ class CameraScanScreenState extends State<CameraScanScreen> {
   void dispose() {
     // Dispose of the controller when the widget is disposed.
     _controller.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -59,6 +65,17 @@ class CameraScanScreenState extends State<CameraScanScreen> {
         Get.back(result: _qrText);
       }
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+    } else if (state == AppLifecycleState.inactive) {
+      // app is inactive
+    } else if (state == AppLifecycleState.paused) {
+      Get.back();
+      // user is about quit our app temporally
+    }
   }
 
   Widget build(BuildContext context) {
@@ -82,11 +99,11 @@ class CameraScanScreenState extends State<CameraScanScreen> {
             ],
           ),
           showLamp(),
-          showBackButton(),
+          showBackFloatButton(),
           Center(
-            child: Icon(
-              Icons.center_focus_weak,
-              size: (MediaQuery.of(context).size.width / 4) * 3,
+            child: ImageIcon(
+              AssetImage("images/home/icon_scanner.png"),
+              size: (MediaQuery.of(context).size.width / 3) * 2,
               color: Colors.white.withOpacity(0.1),
             ),
           )
@@ -120,46 +137,14 @@ class CameraScanScreenState extends State<CameraScanScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           // If the Future is complete, display the preview.
-          final size = MediaQuery.of(context).size;
-          final deviceRatio = size.width / size.height;
-          return Transform.scale(
-            scale: _controller.value.aspectRatio / deviceRatio,
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: CameraPreview(_controller),
-              ),
-            ),
+          return Center(
+            child: CameraPreview(_controller),
           );
         } else {
           // Otherwise, display a loading indicator.
-          return Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator(strokeWidth: 2));
         }
       },
-    );
-  }
-
-  /* On top left */
-  Widget showBackButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-      height: 96,
-      width: 96,
-      child: FittedBox(
-        child: FlatButton(
-          onPressed: () {
-            Get.back();
-          },
-          color: Colors.grey.withOpacity(0.4),
-          child: Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.all(0.1),
-          shape: CircleBorder(),
-        ),
-      ),
     );
   }
 
@@ -167,7 +152,7 @@ class CameraScanScreenState extends State<CameraScanScreen> {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         child: FittedBox(
@@ -179,10 +164,10 @@ class CameraScanScreenState extends State<CameraScanScreen> {
               });
             },
             color: _isLampOn
-                ? Colors.blue.withOpacity(0.5)
-                : Colors.grey.withOpacity(0.5),
-            child: Icon(
-              Icons.lightbulb_outline,
+                ? Colors.blue.withOpacity(0.7)
+                : Colors.grey.withOpacity(0.7),
+            child: ImageIcon(
+              AssetImage("images/icons/icon_torch.png"),
               size: 28,
               color: _isLampOn ? Colors.blue : Colors.white,
             ),

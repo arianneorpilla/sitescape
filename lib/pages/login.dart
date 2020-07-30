@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/services/auth.dart';
 import 'package:tfsitescape/services/util.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 /* Login page taking a previously initialised Auth and a void function
    which executes after authentication attempt.
@@ -222,11 +223,7 @@ class LoginPageState extends State<LoginPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
           ),
-          _showCloudTop(),
-          _showCloudBottom(),
-          _showTower(),
-          _showTower(),
-          _showHill(),
+          showBottomArt(),
           _showLogo(),
           _showTitle(),
           _showFooter(),
@@ -283,57 +280,6 @@ class LoginPageState extends State<LoginPage> {
           ),
           _showForm(),
         ],
-      ),
-    );
-  }
-
-  Widget _showCloudBottom() {
-    return Container(
-      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(200)),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          alignment: Alignment.bottomCenter,
-          fit: BoxFit.contain,
-          image: AssetImage('images/login/cloud_bottom.png'),
-        ),
-      ),
-    );
-  }
-
-  Widget _showCloudTop() {
-    return Container(
-      margin: EdgeInsets.only(top: ScreenUtil().setHeight(100)),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          alignment: Alignment.topCenter,
-          fit: BoxFit.contain,
-          image: AssetImage('images/login/cloud_top.png'),
-        ),
-      ),
-    );
-  }
-
-  Widget _showHill() {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          alignment: Alignment.bottomCenter,
-          fit: BoxFit.contain,
-          image: AssetImage('images/login/hill.png'),
-        ),
-      ),
-    );
-  }
-
-  Widget _showTower() {
-    return Container(
-      margin: EdgeInsets.only(bottom: ScreenUtil().setHeight(120)),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          alignment: Alignment.bottomCenter,
-          fit: BoxFit.contain,
-          image: AssetImage('images/login/tower.png'),
-        ),
       ),
     );
   }

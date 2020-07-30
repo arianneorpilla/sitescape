@@ -3,7 +3,6 @@ import "dart:ui";
 
 import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flushbar/flushbar.dart';
 import "package:flutter/material.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +11,7 @@ import "package:get/get.dart";
 import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/pages/camera_scan.dart';
 import 'package:tfsitescape/services/modal.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 class ScannerPage extends StatefulWidget {
   ScannerPage({Key key}) : super(key: key);
@@ -49,27 +49,10 @@ class ScannerPageState extends State<ScannerPage> {
       backgroundColor: Theme.of(context).primaryColor,
       body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 0,
-                  color: Color.fromRGBO(84, 176, 159, 1.0),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color.fromRGBO(84, 176, 159, 1.0),
-                    Theme.of(context).primaryColor,
-                  ],
-                ),
-              ),
-            ),
-          ),
+          showBottomArt(),
           ListView(
             shrinkWrap: true,
-            padding: EdgeInsets.fromLTRB(16, 96, 16, 64),
+            padding: EdgeInsets.fromLTRB(16, 116, 16, 64),
             children: [
               // Search Bar
               showAddEntry(),
@@ -77,9 +60,11 @@ class ScannerPageState extends State<ScannerPage> {
               // siteDisplay(context, _search)
             ],
           ),
+          showTopNavBox(),
           showShareButton(),
           showUploadButton(),
           showBackButton(),
+          showStatusBarBox(),
         ],
       ),
       floatingActionButton: showFloatingActionButton(),
@@ -134,7 +119,7 @@ class ScannerPageState extends State<ScannerPage> {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         margin: EdgeInsets.only(right: 64),
@@ -145,10 +130,10 @@ class ScannerPageState extends State<ScannerPage> {
               setScanner(_scannerHistory);
               setState(() {});
             },
-            color: Colors.black.withOpacity(0.25),
-            child: Icon(
-              Icons.file_upload,
-              size: 28,
+            color: Colors.transparent,
+            child: ImageIcon(
+              AssetImage("images/icons/icon_upload.png"),
+              size: 32,
               color: Colors.greenAccent,
             ),
             padding: EdgeInsets.all(0.1),
@@ -164,7 +149,7 @@ class ScannerPageState extends State<ScannerPage> {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         child: FittedBox(
@@ -172,11 +157,11 @@ class ScannerPageState extends State<ScannerPage> {
             onPressed: () async {
               shareScanner(_scannerHistory);
             },
-            color: Colors.black.withOpacity(0.25),
-            child: Icon(
-              Icons.share,
-              size: 28,
-              color: Colors.blueAccent[400],
+            color: Colors.transparent,
+            child: ImageIcon(
+              AssetImage("images/icons/icon_share.png"),
+              size: 32,
+              color: Colors.blueAccent,
             ),
             padding: EdgeInsets.all(0.1),
             shape: CircleBorder(),
@@ -236,73 +221,76 @@ class ScannerPageState extends State<ScannerPage> {
 
   Widget showFloatingActionButton() {
     return FloatingActionButton(
-        backgroundColor: Colors.black.withOpacity(0.25),
-        child: Icon(
-          Icons.center_focus_weak,
-          color: Colors.white,
-          size: 36,
-        ),
-        elevation: 0,
-        onPressed: () async {
-          bool hasEmpties = false;
-          for (int i = 0; i < _scannerHistory.length; i++) {
-            if (_scannerHistory[i].value.isEmpty) {
-              hasEmpties = true;
-            }
+      onPressed: () async {
+        bool hasEmpties = false;
+        for (int i = 0; i < _scannerHistory.length; i++) {
+          if (_scannerHistory[i].value.isEmpty) {
+            hasEmpties = true;
           }
+        }
 
-          if (hasEmpties) {
-            String result = await Get.to(
-              CameraScanScreen(camera: gCam),
-            );
+        if (hasEmpties) {
+          String result = await Get.to(
+            CameraScanScreen(camera: gCam),
+          );
 
-            if (result != null) {
-              for (int i = 0; i < _scannerHistory.length; i++) {
-                if (_scannerHistory[i].value.isEmpty) {
-                  _scannerHistory[i].value = result;
-                  break;
-                }
+          if (result != null) {
+            for (int i = 0; i < _scannerHistory.length; i++) {
+              if (_scannerHistory[i].value.isEmpty) {
+                _scannerHistory[i].value = result;
+                break;
               }
-              setScanner(_scannerHistory);
-              setState(() {});
             }
-          } else {
-            showNoEmpties();
+            setScanner(_scannerHistory);
+            setState(() {});
           }
-        });
-  }
-
-  /* On top left */
-  Widget showBackButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-      height: 96,
-      width: 96,
-      child: FittedBox(
-        child: FlatButton(
-          color: Colors.black.withOpacity(0.25),
-          child: Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: Colors.white,
+        } else {
+          showNoEmpties();
+        }
+      },
+      elevation: 10,
+      child: SizedBox(
+        width: 56,
+        height: 56,
+        child: Container(
+          padding: EdgeInsets.all(12),
+          child: ImageIcon(AssetImage("images/home/icon_scanner.png"),
+              size: 48, color: Colors.white),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.fromRGBO(84, 176, 159, 1.0),
+                Theme.of(context).primaryColor,
+              ],
+            ),
           ),
-          padding: EdgeInsets.all(0.1),
-          shape: CircleBorder(),
-          onPressed: () {
-            Get.back();
-          },
         ),
       ),
     );
   }
 
   Widget showScannerCard(int index, ScannerPair pair) {
-    return InkWell(
-      child: new Card(
-        elevation: 5,
-        child: new Container(
-          padding: const EdgeInsets.all(15.0),
-          child: new Row(
+    return Container(
+      margin: EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Flexible(
@@ -313,7 +301,7 @@ class ScannerPageState extends State<ScannerPage> {
                     new Text(
                       pair.key,
                       style: TextStyle(
-                        fontSize: ScreenUtil().setSp(48),
+                        fontSize: ScreenUtil().setSp(42),
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -338,9 +326,9 @@ class ScannerPageState extends State<ScannerPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                    icon: Icon(
-                      Icons.delete_outline,
-                      size: 20,
+                    icon: ImageIcon(
+                      AssetImage("images/icons/icon_delete.png"),
+                      size: 24,
                     ),
                     color: Colors.red,
                     onPressed: () {
@@ -350,20 +338,21 @@ class ScannerPageState extends State<ScannerPage> {
                       });
                     },
                   ),
+                  SizedBox(width: 12),
                   (pair.value.isNotEmpty)
                       ? IconButton(
-                          icon: Icon(
-                            Icons.content_copy,
-                            size: 20,
+                          icon: ImageIcon(
+                            AssetImage("images/icons/icon_copy.png"),
+                            size: 24,
                           ),
                           color: Colors.blue,
                           onPressed: () {
                             Clipboard.setData(ClipboardData(text: pair.value));
                           })
                       : IconButton(
-                          icon: Icon(
-                            Icons.content_copy,
-                            size: 20,
+                          icon: ImageIcon(
+                            AssetImage("images/icons/icon_copy.png"),
+                            size: 24,
                           ),
                           disabledColor: Colors.grey,
                           onPressed: null,
@@ -378,69 +367,87 @@ class ScannerPageState extends State<ScannerPage> {
   }
 
   void showNoEmpties() {
-    Flushbar(
-      title: "Need to add entry",
-      message: "No empty value entries to start scanning for. " +
-          "Add an entry with the field above before you begin " +
-          "scanning with your camera.",
-      duration: Duration(seconds: 5),
-      flushbarPosition: FlushbarPosition.TOP,
-      animationDuration: Duration(milliseconds: 500),
-      shouldIconPulse: false,
-    )..show(context);
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text(
+          "No empty value entries to start scanning for. " +
+              "Add an entry with the field above before you begin " +
+              "scanning with your camera.",
+        ),
+        backgroundColor: Theme.of(context).accentColor,
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   Widget showAddEntry() {
-    return Card(
-      child: Container(
-        child: TextField(
-          onSubmitted: (entry) {
-            if (entry.isNotEmpty) {
-              _controller.clear();
-              _scannerHistory.add(new ScannerPair(entry, ""));
-              setScanner(_scannerHistory);
-              setState(() {});
-            }
-          },
-          controller: _controller,
-          textCapitalization: TextCapitalization.none,
-          autofocus: false,
-          keyboardType: TextInputType.emailAddress,
-          cursorColor: Colors.grey,
-          obscureText: false,
-          showCursor: true,
-          decoration: InputDecoration(
-            focusedBorder: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            errorBorder: InputBorder.none,
-            disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.all(12.0),
-            prefixIcon: Icon(
-              Icons.insert_comment,
-              color: Colors.grey,
-              size: ScreenUtil().setSp(48),
-            ),
-            suffixIcon: Icon(
-              Icons.keyboard_return,
-              color: Colors.grey,
-              size: ScreenUtil().setSp(48),
-            ),
-            hintText: "Add an entry name",
-            hintStyle: TextStyle(
-              color: Colors.grey,
-              fontSize: ScreenUtil().setSp(48),
-              fontWeight: FontWeight.w300,
-            ),
+    return Container(
+      margin: EdgeInsets.only(left: 12, right: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
           ),
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: ScreenUtil().setSp(48),
-          ),
-          // Must be valid entry
-        ),
+        ],
       ),
-      elevation: 10,
-      color: Colors.white.withOpacity(0.9),
+      child: TextField(
+        onSubmitted: (entry) {
+          if (entry.isNotEmpty) {
+            _controller.clear();
+            _scannerHistory.add(new ScannerPair(entry, ""));
+            setScanner(_scannerHistory);
+            setState(() {});
+          }
+        },
+        controller: _controller,
+        textCapitalization: TextCapitalization.none,
+        autofocus: false,
+        keyboardType: TextInputType.emailAddress,
+        cursorColor: Colors.grey,
+        obscureText: false,
+        showCursor: true,
+        decoration: InputDecoration(
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          contentPadding: EdgeInsets.all(12.0),
+          prefixIcon: new IconButton(
+            icon: ImageIcon(
+              AssetImage(
+                "images/icons/icon_entry.png",
+              ),
+              color: Colors.grey,
+              size: ScreenUtil().setSp(48),
+            ),
+          ),
+          suffixIcon: new IconButton(
+            icon: ImageIcon(
+              AssetImage(
+                "images/icons/icon_caret_right.png",
+              ),
+              color: Colors.grey,
+              size: ScreenUtil().setSp(48),
+            ),
+          ),
+          hintText: "Add an entry name",
+          hintStyle: TextStyle(
+            color: Colors.grey,
+            fontSize: ScreenUtil().setSp(42),
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: ScreenUtil().setSp(42),
+          fontWeight: FontWeight.w400,
+        ),
+        // Must be valid entry
+      ),
     );
   }
 
@@ -451,9 +458,9 @@ class ScannerPageState extends State<ScannerPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(height: MediaQuery.of(context).size.height / 3),
-            Icon(
-              Icons.insert_comment,
-              color: Colors.white70,
+            ImageIcon(
+              AssetImage("images/icons/icon_entry.png"),
+              color: Colors.white.withOpacity(0.8),
               size: ScreenUtil().setSp(96),
             ),
             SizedBox(height: 10),
@@ -461,7 +468,8 @@ class ScannerPageState extends State<ScannerPage> {
               "Add or import an entry to scan",
               textAlign: TextAlign.center,
               style: TextStyle(
-                  color: Colors.white70,
+                  color: Colors.white.withOpacity(0.8),
+                  fontFamily: "Quicksand",
                   fontWeight: FontWeight.w500,
                   fontSize: ScreenUtil().setSp(60)),
             )

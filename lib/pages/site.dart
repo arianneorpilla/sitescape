@@ -17,11 +17,11 @@ import 'package:tfsitescape/pages/sector.dart';
 import 'package:tfsitescape/services/cloud.dart';
 import 'package:path/path.dart' as ph;
 import 'package:http/http.dart' as http;
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/classes.dart';
 import 'package:tfsitescape/services/tabs.dart';
+import 'package:tfsitescape/services/ui.dart';
 import 'package:tfsitescape/services/util.dart';
 
 /* Page upon Site selection, where user can pick a sector and scroll through
@@ -71,33 +71,23 @@ class _SitePageState extends State<SitePage> {
         backgroundColor: Theme.of(context).primaryColor,
         body: Stack(
           children: <Widget>[
+            ColorFiltered(
+              child: showBottomArtFaded(),
+              colorFilter: ColorFilter.mode(
+                  Theme.of(context).primaryColor, BlendMode.color),
+            ),
             Container(
-              width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('images/login.jpg'),
-                  colorFilter: new ColorFilter.mode(
-                      Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 0, sigmaY: 0),
-                child: Container(color: Colors.white.withOpacity(0.5)),
-              ),
+              width: MediaQuery.of(context).size.width,
+              color: Colors.white.withOpacity(0.4),
             ),
             Column(children: [
               showMapCard(),
               showSiteInfo(),
               showTabs(),
             ]),
-            Container(
-              padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-              height: 96,
-              width: 96,
-              child: FittedBox(child: showBackButton()),
-            ),
+            showBackFloatButton(),
+            showStatusBarBox(),
           ],
         ),
         floatingActionButton: showFloatingActionButton(),
@@ -156,7 +146,7 @@ class _SitePageState extends State<SitePage> {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.red,
-            fontSize: ScreenUtil().setSp(42),
+            fontSize: ScreenUtil().setSp(40),
           ),
         ),
         onPressed: () {
@@ -178,7 +168,7 @@ class _SitePageState extends State<SitePage> {
           "RESUME",
           style: TextStyle(
             color: Colors.blue,
-            fontSize: ScreenUtil().setSp(42),
+            fontSize: ScreenUtil().setSp(40),
           ),
         ),
         onPressed: () {
@@ -194,7 +184,7 @@ class _SitePageState extends State<SitePage> {
                 "Operation In Progress",
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: ScreenUtil().setSp(48),
+                  fontSize: ScreenUtil().setSp(42),
                 ),
               ),
               content: SingleChildScrollView(
@@ -206,7 +196,7 @@ class _SitePageState extends State<SitePage> {
                   textAlign: TextAlign.justify,
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
-                    fontSize: ScreenUtil().setSp(42),
+                    fontSize: ScreenUtil().setSp(40),
                   ),
                 ),
               ),
@@ -262,26 +252,32 @@ class _SitePageState extends State<SitePage> {
   }
 
   Widget showFloatingActionButton() {
-    if (_downloading) {
+    if (_downloading || _navigating) {
       return FloatingActionButton(
-        backgroundColor: Colors.black.withOpacity(0.35),
-        child: Icon(Icons.cloud_upload, color: Colors.grey, size: 36),
-        elevation: 0,
         onPressed: () async {},
-      );
-    }
-
-    if (_recentlyDone) {
-      _recentlyDone = false;
-
-      return FloatingActionButton(
-        backgroundColor: Colors.black.withOpacity(0.35),
-        child:
-            Icon(Icons.cloud_upload, color: Colors.greenAccent[700], size: 36),
-        elevation: 0,
-        onPressed: () async {
-          syncSite(widget.site, false);
-        },
+        elevation: 10,
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: InkWell(
+            child: Container(
+              padding: EdgeInsets.all(12),
+              child: ImageIcon(AssetImage("images/icons/icon_cloud_upload.png"),
+                  size: 48, color: Colors.white.withOpacity(0.5)),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color.fromRGBO(84, 176, 159, 1.0),
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       );
     }
 
@@ -289,33 +285,97 @@ class _SitePageState extends State<SitePage> {
       case SyncStatus.SITE_NO_ADDITIONS:
       case SyncStatus.SITE_SYNCED:
         return FloatingActionButton(
-          backgroundColor: Colors.black.withOpacity(0.35),
-          child: Icon(Icons.cloud_upload, color: Colors.white, size: 36),
-          elevation: 0,
           onPressed: () async {
             syncSite(widget.site, false);
           },
+          elevation: 10,
+          child: SizedBox(
+            width: 56,
+            height: 56,
+            child: InkWell(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                child: ImageIcon(
+                    AssetImage("images/icons/icon_cloud_upload.png"),
+                    size: 48,
+                    color: Colors.white),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromRGBO(84, 176, 159, 1.0),
+                      Theme.of(context).primaryColor,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         );
-        break;
       case SyncStatus.SITE_HAS_UNUPLOADED:
         return FloatingActionButton(
-          backgroundColor: Colors.black.withOpacity(0.35),
-          child: Icon(Icons.cloud_upload, color: Colors.yellow[700], size: 36),
-          elevation: 0,
           onPressed: () async {
             syncSite(widget.site, false);
           },
+          elevation: 10,
+          child: SizedBox(
+            width: 56,
+            height: 56,
+            child: InkWell(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                child: ImageIcon(
+                    AssetImage("images/icons/icon_cloud_upload.png"),
+                    size: 48,
+                    color: Colors.yellow[700]),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromRGBO(84, 176, 159, 1.0),
+                      Theme.of(context).primaryColor,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         );
         break;
       case SyncStatus.SITE_UPLOADING:
         return FloatingActionButton(
-          backgroundColor: Colors.black.withOpacity(0.35),
-          child: Center(
-              child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation(Colors.greenAccent[700]),
-                  strokeWidth: 6)),
-          elevation: 0,
           onPressed: () async {},
+          elevation: 10,
+          child: SizedBox(
+            width: 56,
+            height: 56,
+            child: InkWell(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                child: Center(
+                  child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation(Colors.greenAccent[700]),
+                      strokeWidth: 2),
+                ),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color.fromRGBO(84, 176, 159, 1.0),
+                      Theme.of(context).primaryColor,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
         );
         break;
     }
@@ -346,23 +406,6 @@ class _SitePageState extends State<SitePage> {
     }
   }
 
-  /* On top left */
-  Widget showBackButton() {
-    return FlatButton(
-      onPressed: () {
-        _onWillPop();
-      },
-      color: Colors.black.withOpacity(0.4),
-      child: Icon(
-        Icons.arrow_back,
-        size: 28,
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(0.1),
-      shape: CircleBorder(),
-    );
-  }
-
   /* On top center below map card */
   Widget showSiteInfo() {
     return Container(
@@ -375,7 +418,7 @@ class _SitePageState extends State<SitePage> {
             widget.site.name.toUpperCase(),
             style: TextStyle(
               color: Colors.black,
-              fontSize: ScreenUtil().setSp(48),
+              fontSize: ScreenUtil().setSp(42),
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -447,8 +490,20 @@ class _SitePageState extends State<SitePage> {
             height: 30,
             width: 30,
             child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Colors.blue),
-                strokeWidth: 6.0),
+                valueColor: AlwaysStoppedAnimation(Colors.greenAccent),
+                strokeWidth: 2.0),
+          ),
+        ),
+      );
+    } else if (_downloading || _uploading) {
+      return Container(
+        width: 48,
+        child: Center(
+          child: IconButton(
+            icon: ImageIcon(AssetImage("images/icons/icon_directions.png")),
+            iconSize: 36,
+            color: Colors.grey,
+            onPressed: () async {},
           ),
         ),
       );
@@ -457,9 +512,9 @@ class _SitePageState extends State<SitePage> {
         width: 48,
         child: Center(
           child: IconButton(
-            icon: Icon(Icons.directions),
+            icon: ImageIcon(AssetImage("images/icons/icon_directions.png")),
             iconSize: 36,
-            color: Colors.blue,
+            color: Colors.greenAccent,
             onPressed: () async {
               startSiteNavigation();
             },
@@ -480,16 +535,16 @@ class _SitePageState extends State<SitePage> {
             width: 30,
             child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation(Colors.blue),
-                strokeWidth: 6.0),
+                strokeWidth: 2.0),
           ),
         ),
       );
-    } else if (_uploading) {
+    } else if (_uploading || _navigating) {
       return Container(
         width: 48,
         child: Center(
-          child: Icon(
-            Icons.cloud_download,
+          child: ImageIcon(
+            AssetImage("images/icons/icon_cloud_download.png"),
             size: 36,
             color: Colors.grey,
           ),
@@ -501,9 +556,11 @@ class _SitePageState extends State<SitePage> {
         width: 48,
         child: Center(
           child: IconButton(
-            icon: Icon(Icons.cloud_download),
-            iconSize: 36,
-            color: Colors.blue,
+            icon: ImageIcon(
+              AssetImage("images/icons/icon_cloud_download.png"),
+              size: 36,
+              color: Colors.blue,
+            ),
             onPressed: () async {
               await downloadSite(widget.site, false);
             },
@@ -513,11 +570,24 @@ class _SitePageState extends State<SitePage> {
   }
 
   Widget showReportButton() {
+    if (_downloading || _uploading || _navigating) {
+      return Container(
+        width: 48,
+        child: Center(
+          child: IconButton(
+            icon: ImageIcon(AssetImage("images/icons/icon_add_issue.png")),
+            iconSize: 36,
+            color: Colors.grey,
+            onPressed: () async {},
+          ),
+        ),
+      );
+    }
     return Container(
       width: 48,
       child: Center(
         child: IconButton(
-          icon: Icon(Icons.note_add),
+          icon: ImageIcon(AssetImage("images/icons/icon_add_issue.png")),
           iconSize: 36,
           color: Colors.red[400],
           onPressed: () async {
@@ -643,6 +713,7 @@ class _SitePageState extends State<SitePage> {
                 key: sub.sectors[index].key,
                 sector: sub.sectors[index],
                 callback: refresh,
+                working: _downloading || _uploading,
               );
             },
           ),
@@ -654,6 +725,7 @@ class _SitePageState extends State<SitePage> {
   Future downloadSite(Site site, bool partial) async {
     bool foundStop = true;
     int leftOff = _tabKey.currentState.getCurrentPosition();
+    _tabKey.currentState.toggleScrollable();
 
     setState(() {
       _downloading = true;
@@ -711,6 +783,7 @@ class _SitePageState extends State<SitePage> {
     }
 
     _tabKey.currentState.animateTo(leftOff);
+    _tabKey.currentState.toggleScrollable();
 
     setState(() {
       _downloading = false;
@@ -720,6 +793,7 @@ class _SitePageState extends State<SitePage> {
   Future syncSite(Site site, bool partial) async {
     bool foundStop = true;
     int leftOff = _tabKey.currentState.getCurrentPosition();
+    _tabKey.currentState.toggleScrollable();
 
     setState(() {
       _uploading = true;
@@ -779,6 +853,8 @@ class _SitePageState extends State<SitePage> {
     }
 
     _tabKey.currentState.animateTo(leftOff);
+    _tabKey.currentState.toggleScrollable();
+
     setState(() {
       _uploading = false;
     });
@@ -811,9 +887,9 @@ class _SitePageState extends State<SitePage> {
                         children: [
                           SizedBox(
                               height: MediaQuery.of(context).size.height / 6),
-                          Icon(
-                            Icons.note_add,
-                            color: Colors.white70,
+                          ImageIcon(
+                            AssetImage("images/icons/icon_add_issue.png"),
+                            color: Colors.white.withOpacity(0.8),
                             size: ScreenUtil().setSp(96),
                           ),
                           SizedBox(height: 10),
@@ -821,7 +897,7 @@ class _SitePageState extends State<SitePage> {
                             "No reported issues fetched",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: Colors.white.withOpacity(0.8),
                               fontWeight: FontWeight.w500,
                               fontSize: ScreenUtil().setSp(60),
                             ),
@@ -850,6 +926,7 @@ class _SitePageState extends State<SitePage> {
                               height: MediaQuery.of(context).size.height / 6),
                           CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation(Colors.white70),
+                            strokeWidth: 2,
                           ),
                           SizedBox(height: 96),
                         ],
@@ -903,6 +980,8 @@ class _SitePageState extends State<SitePage> {
           await widget.site.addIssue(note);
           setState(() {});
           Get.back();
+
+          _tabKey.currentState.animateTo(site.subsites.length);
 
           // Prevent the user from returning to previous screens.
         } catch (e) {
@@ -979,11 +1058,13 @@ class _SitePageState extends State<SitePage> {
 class SectorCard extends StatefulWidget {
   final Sector sector;
   final VoidCallback callback;
+  final bool working;
 
   const SectorCard({
     Key key,
     @required this.sector,
     this.callback,
+    this.working,
   }) : super(key: key);
 
   @override
@@ -1060,76 +1141,91 @@ class SectorCardState extends State<SectorCard> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        if (!sector.inTransaction()) {
-          Get.to(
-            SectorPage(
-              sector: sector,
-              photos: _cloudPhotos,
-              progress: _sectorProgress,
-              color: _sectorProgressColor,
-            ),
-          ).then((onValue) {
-            refreshProgress();
-            widget.callback();
-          });
-        }
-      },
-      child: Stack(
-        alignment: AlignmentDirectional.bottomStart,
-        children: [
-          Card(
-            color: (sector.inTransaction()) ? Colors.grey[300] : Colors.white,
-            elevation: 1,
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Text(
-                      sector.name,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: ScreenUtil().setSp(42),
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      sector.getUnsynced() || sector.downloading
-                          ? showUnsyncedCount()
-                          : Container(),
-                      sector.inTransaction()
-                          ? showLoading(sector.downloading)
-                          : Icon(
-                              Icons.chevron_right,
-                              color: Colors.black54,
-                              size: ScreenUtil().setSp(42),
-                            )
-                    ],
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(15.0),
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.fromLTRB(6, 0, 6, 3),
-            child: LinearPercentIndicator(
-              animateFromLastPercent: true,
-              animation: true,
-              lineHeight: 4.0,
-              animationDuration: 600,
-              padding: EdgeInsets.zero,
-              linearStrokeCap: LinearStrokeCap.roundAll,
-              percent: _sectorProgress,
-              progressColor: _sectorProgressColor,
-            ),
+    return Container(
+      margin: EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: widget.working && !sector.inTransaction()
+            ? Colors.grey[300]
+            : Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 10,
+            offset: Offset(0, 3), // changes position of shadow
           ),
         ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            if (!widget.working) {
+              Get.to(
+                SectorPage(
+                  sector: sector,
+                  photos: _cloudPhotos,
+                  progress: _sectorProgress,
+                  color: _sectorProgressColor,
+                ),
+              ).then((onValue) {
+                refreshProgress();
+                widget.callback();
+              });
+            }
+          },
+          child: Stack(
+            alignment: AlignmentDirectional.bottomStart,
+            children: [
+              Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        sector.name,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: ScreenUtil().setSp(42),
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        sector.getUnsynced() || sector.downloading
+                            ? showUnsyncedCount()
+                            : Container(),
+                        sector.inTransaction()
+                            ? showLoading(sector.downloading)
+                            : Icon(
+                                Icons.chevron_right,
+                                color: Colors.black54,
+                                size: ScreenUtil().setSp(42),
+                              )
+                      ],
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(16.0),
+              ),
+              Container(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                child: LinearPercentIndicator(
+                  animateFromLastPercent: true,
+                  animation: true,
+                  lineHeight: 4.0,
+                  animationDuration: 300,
+                  padding: EdgeInsets.zero,
+                  linearStrokeCap: LinearStrokeCap.butt,
+                  percent: _sectorProgress,
+                  progressColor: _sectorProgressColor,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1188,6 +1284,7 @@ class SectorCardState extends State<SectorCard> {
           height: 12,
           width: 12,
           child: CircularProgressIndicator(
+            strokeWidth: 2,
             valueColor: downloading
                 ? AlwaysStoppedAnimation(Colors.blue)
                 : AlwaysStoppedAnimation(Colors.greenAccent[700]),
@@ -1218,90 +1315,117 @@ class NoteCardState extends State<NoteCard> {
   @override
   Widget build(BuildContext context) {
     if (note.resolved) {
-      return Card(
-        color: Colors.green[300],
-        elevation: 1,
-        child: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                '"' + note.contents + '"',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
+      return Container(
+        margin: EdgeInsets.all(6),
+        decoration: BoxDecoration(
+          color: Colors.green[300],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: Offset(0, 3), // changes position of shadow
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '"' + note.contents + '"',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    "Reported on " + note.getTimeString(note.reportTime),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: ScreenUtil().setSp(24),
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black.withOpacity(0.64),
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                  Text(
+                    "Resolved on " + note.getTimeString(note.resolveTime),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: ScreenUtil().setSp(24),
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black.withOpacity(0.36),
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ],
               ),
-              SizedBox(height: 5),
-              Text(
-                "Reported on " + note.getTimeString(note.reportTime),
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black.withOpacity(0.64),
-                ),
-                textAlign: TextAlign.right,
-              ),
-              Text(
-                "Resolved on " + note.getTimeString(note.resolveTime),
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black.withOpacity(0.36),
-                ),
-                textAlign: TextAlign.right,
-              ),
-            ],
+            ),
           ),
-          padding: const EdgeInsets.all(15.0),
         ),
       );
     } else {
-      return InkWell(
-        onTap: showResolveDialog,
-        child: Card(
+      return Container(
+        margin: EdgeInsets.all(6),
+        decoration: BoxDecoration(
           color: Colors.red[300],
-          elevation: 1,
-          child: Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '"' + note.contents + '"',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  "Reported on " + note.getTimeString(note.reportTime),
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black.withOpacity(0.64),
-                  ),
-                  textAlign: TextAlign.right,
-                ),
-                Text(
-                  "Click to resolve this issue",
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontStyle: FontStyle.italic,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black.withOpacity(0.36),
-                  ),
-                  textAlign: TextAlign.right,
-                ),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 10,
+              offset: Offset(0, 3), // changes position of shadow
             ),
-            padding: const EdgeInsets.all(15.0),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '"' + note.contents + '"',
+                    style: TextStyle(
+                      fontSize: ScreenUtil().setSp(36),
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    "Reported on " + note.getTimeString(note.reportTime),
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: ScreenUtil().setSp(24),
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black.withOpacity(0.64),
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                  Text(
+                    "Click to resolve this issue",
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      fontSize: ScreenUtil().setSp(24),
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black.withOpacity(0.36),
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       );
@@ -1309,13 +1433,13 @@ class NoteCardState extends State<NoteCard> {
   }
 
   void showResolveDialog() async {
-    Widget logout = FlatButton(
+    Widget resolve = FlatButton(
       child: Text(
         "RESOLVE ISSUE",
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.green,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () async {
@@ -1346,7 +1470,7 @@ class NoteCardState extends State<NoteCard> {
         "CANCEL",
         style: TextStyle(
           color: Colors.black,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -1362,37 +1486,22 @@ class NoteCardState extends State<NoteCard> {
         return AlertDialog(
           title: Text(
             "Resolve this issue?",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: ScreenUtil().setSp(42),
+            ),
           ),
-          content: Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            width: MediaQuery.of(context).size.width * 0.8,
-            child: TextField(
-              autofocus: true,
-              enabled: false,
-              maxLines: 5,
+          content: SingleChildScrollView(
+            child: Text(
+              widget.note.contents,
               style: TextStyle(
-                fontSize: 16,
+                fontSize: ScreenUtil().setSp(40),
                 fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-              decoration: new InputDecoration(
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                ),
-                hintText: widget.note.contents,
-                hintStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey,
-                ),
+                color: Colors.grey,
               ),
             ),
           ),
-          actions: [logout, cancel],
+          actions: [resolve, cancel],
         );
       },
     );

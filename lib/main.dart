@@ -40,8 +40,7 @@ Auth gUserAuth = new Auth();
 /* App execution starts here. */
 Future<void> main() async {
   // Wait for camera and other things to get ready.
-  SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
   WidgetsFlutterBinding.ensureInitialized();
 
   PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
@@ -65,7 +64,7 @@ Future<void> main() async {
 
   // Run the application.
   SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Color.fromRGBO(51, 57, 104, 1)));
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(App());

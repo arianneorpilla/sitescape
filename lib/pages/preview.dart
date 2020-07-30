@@ -10,6 +10,7 @@ import "package:photo_view/photo_view_gallery.dart";
 import "package:path/path.dart" as ph;
 
 import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 /* The Preview Page is for photo inspection and interaction; the user can
    zoom, pinch and scroll through a task"s gallery
@@ -65,7 +66,7 @@ class _PreviewScreenState extends State<PreviewPage> {
         body: Stack(
           children: <Widget>[
             showPreviewGallery(),
-            showBackButton(),
+            showBackFloatButton(),
             showShareButton(),
             showDeleteButton(),
           ],
@@ -122,36 +123,12 @@ class _PreviewScreenState extends State<PreviewPage> {
     );
   }
 
-  /* On top left */
-  Widget showBackButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-      height: 96,
-      width: 96,
-      child: FittedBox(
-        child: FlatButton(
-          onPressed: () {
-            Get.back();
-          },
-          color: Colors.white.withOpacity(0.1),
-          child: Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.all(0.1),
-          shape: CircleBorder(),
-        ),
-      ),
-    );
-  }
-
   /* On top right */
   Widget showShareButton() {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         child: FittedBox(
@@ -160,10 +137,10 @@ class _PreviewScreenState extends State<PreviewPage> {
               await sharePhoto();
             },
             color: Colors.blueAccent.withOpacity(0.2),
-            child: Icon(
-              Icons.share,
+            child: ImageIcon(
+              AssetImage("images/icons/icon_share.png"),
               size: 28,
-              color: Colors.blueAccent[700],
+              color: Colors.blueAccent,
             ),
             padding: EdgeInsets.all(0.1),
             shape: CircleBorder(),
@@ -196,7 +173,7 @@ class _PreviewScreenState extends State<PreviewPage> {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         margin: EdgeInsets.only(right: 64),
@@ -206,8 +183,8 @@ class _PreviewScreenState extends State<PreviewPage> {
               deletePhoto();
             },
             color: Colors.red.withOpacity(0.2),
-            child: Icon(
-              Icons.delete_forever,
+            child: ImageIcon(
+              AssetImage("images/icons/icon_delete.png"),
               size: 28,
               color: Colors.red,
             ),

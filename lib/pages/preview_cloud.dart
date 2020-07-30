@@ -7,6 +7,7 @@ import "package:photo_view/photo_view.dart";
 import "package:photo_view/photo_view_gallery.dart";
 
 import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 
 /* The Preview Page is for photo inspection and interaction; the user can
    zoom, pinch and scroll through a task"s gallery
@@ -72,7 +73,7 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
         body: Stack(
           children: <Widget>[
             showPreviewGallery(),
-            showBackButton(),
+            showBackFloatButton(),
           ],
         ),
         bottomNavigationBar: BottomAppBar(
@@ -231,30 +232,6 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
                   ? FontStyle.italic
                   : FontStyle.normal),
           softWrap: true,
-        ),
-      ),
-    );
-  }
-
-  /* On top left */
-  Widget showBackButton() {
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
-      height: 96,
-      width: 96,
-      child: FittedBox(
-        child: FlatButton(
-          onPressed: () {
-            Get.back();
-          },
-          color: Colors.white.withOpacity(0.1),
-          child: Icon(
-            Icons.arrow_back,
-            size: 28,
-            color: Colors.white,
-          ),
-          padding: EdgeInsets.all(0.1),
-          shape: CircleBorder(),
         ),
       ),
     );

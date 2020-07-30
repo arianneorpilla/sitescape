@@ -9,6 +9,7 @@ import 'package:adv_camera/adv_camera.dart';
 import 'package:tfsitescape/main.dart';
 
 import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 import 'package:tfsitescape/services/util.dart';
 
 /* Screen for taking photo, has entire preview as background and take
@@ -31,7 +32,8 @@ class CameraScreen extends StatefulWidget {
 }
 
 /* State for CameraScreen */
-class CameraScreenState extends State<CameraScreen> {
+class CameraScreenState extends State<CameraScreen>
+    with WidgetsBindingObserver {
   AdvCameraController _cameraController;
 
   bool _isBearingsOn;
@@ -45,12 +47,26 @@ class CameraScreenState extends State<CameraScreen> {
     // Next, initialize the controller. This returns a Future.
     _isBearingsOn = false;
     _flashType = 0;
+
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     // Dispose of the controller when the widget is disposed.
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+    } else if (state == AppLifecycleState.inactive) {
+      // app is inactive
+    } else if (state == AppLifecycleState.paused) {
+      Get.back();
+      // user is about quit our app temporally
+    }
   }
 
   /* Take a picture and return the file to save */
@@ -111,18 +127,18 @@ class CameraScreenState extends State<CameraScreen> {
     _cameraController.setPictureSize(1920, 1080);
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       extendBody: true,
       backgroundColor: Colors.black,
       body: Stack(
-        fit: StackFit.expand,
         children: <Widget>[
           showCameraPreview(),
-          showBackButton(),
-          showCompass(),
-          showFlash(),
+          showBackFloatButton(),
+          showCompassButton(),
+          showFlashButton(),
         ],
       ),
       floatingActionButton: showFloatingActionButton(),
@@ -163,7 +179,8 @@ class CameraScreenState extends State<CameraScreen> {
   Widget showFloatingActionButton() {
     return FloatingActionButton(
       backgroundColor: Colors.white.withOpacity(0.8),
-      child: Icon(Icons.camera_alt, color: Colors.black, size: 36),
+      child: ImageIcon(AssetImage("images/icons/icon_camera.png"),
+          color: Colors.black, size: 36),
       elevation: 0,
       onPressed: () async {
         _cameraController.captureImage();
@@ -176,7 +193,7 @@ class CameraScreenState extends State<CameraScreen> {
     return Align(
       alignment: Alignment.topLeft,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         child: FittedBox(
@@ -184,7 +201,7 @@ class CameraScreenState extends State<CameraScreen> {
             onPressed: () {
               Get.back();
             },
-            color: Colors.grey.withOpacity(0.5),
+            color: Colors.grey.withOpacity(0.7),
             child: Icon(
               Icons.arrow_back,
               size: 28,
@@ -198,11 +215,11 @@ class CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  Widget showCompass() {
+  Widget showCompassButton() {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         margin: EdgeInsets.only(right: 64),
@@ -214,10 +231,10 @@ class CameraScreenState extends State<CameraScreen> {
               });
             },
             color: _isBearingsOn
-                ? Colors.blue.withOpacity(0.5)
-                : Colors.grey.withOpacity(0.5),
-            child: Icon(
-              Icons.explore,
+                ? Colors.blue.withOpacity(0.7)
+                : Colors.grey.withOpacity(0.7),
+            child: ImageIcon(
+              AssetImage("images/icons/icon_compass.png"),
               size: 28,
               color: _isBearingsOn ? Colors.blue : Colors.white,
             ),
@@ -229,24 +246,24 @@ class CameraScreenState extends State<CameraScreen> {
     );
   }
 
-  Widget showFlash() {
-    IconData flashIcon;
+  Widget showFlashButton() {
+    AssetImage flashIcon;
     Color flashColor;
     Color backColor;
 
     switch (_flashType) {
       case 0:
-        flashIcon = Icons.flash_off;
+        flashIcon = AssetImage("images/icons/icon_flash_off.png");
         flashColor = Colors.white;
         backColor = Colors.grey.withOpacity(0.5);
         break;
       case 1:
-        flashIcon = Icons.flash_on;
+        flashIcon = AssetImage("images/icons/icon_flash_on.png");
         flashColor = Colors.blue;
         backColor = Colors.blue.withOpacity(0.5);
         break;
       case 2:
-        flashIcon = Icons.lightbulb_outline;
+        flashIcon = AssetImage("images/icons/icon_torch.png");
         flashColor = Colors.blue;
         backColor = Colors.blue.withOpacity(0.5);
         break;
@@ -255,7 +272,7 @@ class CameraScreenState extends State<CameraScreen> {
     return Align(
       alignment: Alignment.topRight,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 36, 16, 0),
+        padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
         height: 96,
         width: 96,
         child: FittedBox(
@@ -279,7 +296,7 @@ class CameraScreenState extends State<CameraScreen> {
               });
             },
             color: backColor,
-            child: Icon(
+            child: ImageIcon(
               flashIcon,
               size: 28,
               color: flashColor,
