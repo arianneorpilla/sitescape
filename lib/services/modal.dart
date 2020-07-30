@@ -30,11 +30,23 @@ Future showPopupMenu(BuildContext context, Offset offset) async {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
     position: RelativeRect.fromLTRB(left, top, 0, 0),
     items: [
-      popupOption(Icons.info, Colors.black, "About this app"),
-      popupOption(Icons.storage, Colors.black, "Free up space"),
+      popupOption(
+        AssetImage("images/icons/icon_info.png"),
+        Colors.black,
+        "About this app",
+      ),
+      popupOption(
+        AssetImage("images/icons/icon_storage.png"),
+        Colors.black,
+        "Free up space",
+      ),
       // popupOption(Icons.settings, Colors.black, "Settings"),
-      popupOption(Icons.exit_to_app, Colors.red, "Log out",
-          fontWeight: FontWeight.bold),
+      popupOption(
+        AssetImage("images/icons/icon_logout.png"),
+        Colors.red,
+        "Log out",
+        fontWeight: FontWeight.bold,
+      ),
     ],
   );
 
@@ -55,7 +67,7 @@ Future showPopupMenu(BuildContext context, Offset offset) async {
    - message -> String: The option and value for the pop-up menu
    - {fontWeight} -> FontWeight: Used to style bold/italic options
 */
-PopupMenuItem<String> popupOption(IconData icon, Color color, String message,
+PopupMenuItem<String> popupOption(AssetImage image, Color color, String message,
     {FontWeight fontWeight = FontWeight.normal}) {
   return PopupMenuItem<String>(
     value: message,
@@ -66,8 +78,8 @@ PopupMenuItem<String> popupOption(IconData icon, Color color, String message,
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
+                ImageIcon(
+                  image,
                   color: color,
                   size: ScreenUtil().setSp(40),
                 ),

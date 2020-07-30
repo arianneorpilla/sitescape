@@ -165,20 +165,20 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
 
     Color color;
     String header;
-    IconData icon;
+    AssetImage image;
 
     if (netTask.approved) {
       color = Colors.green.withOpacity(0.15);
       header = " This photo has been approved";
-      icon = Icons.check_box;
+      image = AssetImage("images/icons/icon_check.png");
     } else if (netTask.rejected) {
       color = Colors.red.withOpacity(0.15);
       header = " This photo has been rejected";
-      icon = Icons.error;
+      image = AssetImage("images/icons/icon_status_alert.png");
     } else {
-      color = Colors.grey.withOpacity(0.05);
+      color = Colors.grey.withOpacity(0.1);
       header = " This photo is pending for approval";
-      icon = Icons.check_box_outline_blank;
+      image = AssetImage("images/icons/icon_pending.png");
     }
 
     return Container(
@@ -194,7 +194,7 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
         header: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(icon, size: 18, color: Colors.white),
+            ImageIcon(image, size: 18, color: Colors.white),
             SizedBox(width: 6),
             Text(
               header,
@@ -202,6 +202,7 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
                 fontSize: ScreenUtil().setSp(42),
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
+                fontFamily: "Quicksand",
               ),
             ),
           ],

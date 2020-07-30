@@ -265,15 +265,16 @@ class _SectorPageState extends State<SectorPage> {
   Widget showTaskCard(Task task, int index) {
     return InkWell(
       child: new Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         elevation: 5,
         child: new Container(
-          padding: const EdgeInsets.all(15.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               Row(
                 children: [
                   showThumbnail(task, index),
-                  SizedBox(width: 8),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,10 +376,10 @@ class _SectorPageState extends State<SectorPage> {
     TaskStatus status = task.getTaskProgress();
 
     // For code redundancy as this is called for all status cases
-    Widget statusWidget(IconData icon, Color color, String text) {
+    Widget statusWidget(AssetImage image, Color color, String text) {
       return Row(
         children: [
-          Icon(icon, color: color, size: 14),
+          ImageIcon(image, color: color, size: 14),
           Text(
             " " + text,
             textAlign: TextAlign.right,
@@ -396,30 +397,59 @@ class _SectorPageState extends State<SectorPage> {
       case TaskStatus.NOT_STARTED:
         if (_cloudPhotos != null && _cloudPhotos[index] != 0) {
           if (sector.getUnsyncedPhotos() == 0) {
-            return statusWidget(Icons.cloud, Colors.blue, "Cloud Available");
+            return statusWidget(
+              AssetImage("images/icons/icon_status_cloud.png"),
+              Colors.blue,
+              "Cloud Available",
+            );
           } else {
             return statusWidget(
-                Icons.cloud_off, Colors.yellow[700], "Not Synced");
+              AssetImage("images/icons/icon_status_not_synced.png"),
+              Colors.yellow[700],
+              "Not Synced",
+            );
           }
         }
-        return statusWidget(Icons.error, Colors.red[400], "Photos Needed");
+        return statusWidget(
+          AssetImage("images/icons/icon_status_alert.png"),
+          Colors.red[400],
+          "Photos Needed",
+        );
         break;
       case TaskStatus.NOT_REQUIRED:
         if (_cloudPhotos != null && _cloudPhotos[index] != 0) {
           if (sector.getUnsyncedPhotos() == 0) {
-            return statusWidget(Icons.cloud, Colors.blue, "Cloud Available");
+            return statusWidget(
+              AssetImage("images/icons/icon_status_cloud.png"),
+              Colors.blue,
+              "Cloud Available",
+            );
           }
         }
         return statusWidget(
-            Icons.indeterminate_check_box, Colors.grey, "Not Required");
+          AssetImage("images/icons/icon_status_not_required.png"),
+          Colors.grey,
+          "Not Required",
+        );
         break;
       case TaskStatus.DONE_NOT_SYNCED:
-        return statusWidget(Icons.cloud_off, Colors.yellow[700], "Not Synced");
+        return statusWidget(
+          AssetImage("images/icons/icon_status_not_synced.png"),
+          Colors.yellow[700],
+          "Not Synced",
+        );
       case TaskStatus.DONE_SYNCED:
         return statusWidget(
-            Icons.cloud_done, Colors.greenAccent[700], "Synced");
+          AssetImage("images/icons/icon_status_synced.png"),
+          Colors.greenAccent[700],
+          "Synced",
+        );
       case TaskStatus.INVALID:
-        return statusWidget(Icons.error, Colors.red[300], "Error");
+        return statusWidget(
+          AssetImage("images/icons/icon_status_alert.png"),
+          Colors.red[300],
+          "Error",
+        );
     }
     return null;
   }
@@ -432,32 +462,26 @@ class _SectorPageState extends State<SectorPage> {
 
     if (_cloudThumbs == null || _cloudThumbs[index] == null) {
       if (sector.tasks[index].thumbnail != null) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(5.0),
-          child: new FadeInImage(
-            fit: BoxFit.cover,
-            fadeInDuration: Duration(milliseconds: 100),
-            fadeOutDuration: Duration(milliseconds: 100),
-            placeholder: AssetImage("images/placeholder.png"),
-            image: sector.tasks[index].thumbnail,
-            height: 96.0,
-            width: 96.0,
-          ),
+        return FadeInImage(
+          fit: BoxFit.cover,
+          fadeInDuration: Duration(milliseconds: 100),
+          fadeOutDuration: Duration(milliseconds: 100),
+          placeholder: AssetImage("images/no_image.png"),
+          image: sector.tasks[index].thumbnail,
+          height: 96.0,
+          width: 96.0,
         );
       } else if (thumbnail == null) {
-        return Icon(Icons.photo_library, size: 96.0, color: Colors.grey);
+        return Container(color: Colors.grey, height: 96, width: 96);
       } else {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(5.0),
-          child: new FadeInImage(
-            fit: BoxFit.cover,
-            fadeInDuration: Duration(milliseconds: 100),
-            fadeOutDuration: Duration(milliseconds: 100),
-            placeholder: AssetImage("images/placeholder.png"),
-            image: thumbnail.image,
-            height: 96.0,
-            width: 96.0,
-          ),
+        return FadeInImage(
+          fit: BoxFit.cover,
+          fadeInDuration: Duration(milliseconds: 100),
+          fadeOutDuration: Duration(milliseconds: 100),
+          placeholder: AssetImage("images/no_image.png"),
+          image: thumbnail.image,
+          height: 96.0,
+          width: 96.0,
         );
       }
     } else {
@@ -465,46 +489,37 @@ class _SectorPageState extends State<SectorPage> {
         future: _cloudThumbs[index],
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (sector.tasks[index].thumbnail != null) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(5.0),
-              child: new FadeInImage(
-                fit: BoxFit.cover,
-                fadeInDuration: Duration(milliseconds: 100),
-                fadeOutDuration: Duration(milliseconds: 100),
-                placeholder: AssetImage("images/placeholder.png"),
-                image: sector.tasks[index].thumbnail,
-                height: 96.0,
-                width: 96.0,
-              ),
+            return FadeInImage(
+              fit: BoxFit.cover,
+              fadeInDuration: Duration(milliseconds: 100),
+              fadeOutDuration: Duration(milliseconds: 100),
+              placeholder: AssetImage("images/no_image.png"),
+              image: sector.tasks[index].thumbnail,
+              height: 96.0,
+              width: 96.0,
             );
           } else if (thumbnail != null) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(5.0),
-              child: new FadeInImage(
-                fit: BoxFit.cover,
-                fadeInDuration: Duration(milliseconds: 100),
-                fadeOutDuration: Duration(milliseconds: 100),
-                placeholder: AssetImage("images/placeholder.png"),
-                image: thumbnail.image,
-                height: 96.0,
-                width: 96.0,
-              ),
+            return FadeInImage(
+              fit: BoxFit.cover,
+              fadeInDuration: Duration(milliseconds: 100),
+              fadeOutDuration: Duration(milliseconds: 100),
+              placeholder: AssetImage("images/no_image.png"),
+              image: thumbnail.image,
+              height: 96.0,
+              width: 96.0,
             );
           } else if (!snapshot.hasData) {
-            return Icon(Icons.photo_library, size: 96.0, color: Colors.grey);
+            return Container(color: Colors.grey, height: 96, width: 96);
           } else {
             sector.tasks[index].thumbnail = snapshot.data.image;
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(5.0),
-              child: new FadeInImage(
-                fit: BoxFit.cover,
-                fadeInDuration: Duration(milliseconds: 100),
-                fadeOutDuration: Duration(milliseconds: 100),
-                placeholder: AssetImage("images/placeholder.png"),
-                image: snapshot.data.image,
-                height: 96.0,
-                width: 96.0,
-              ),
+            return FadeInImage(
+              fit: BoxFit.cover,
+              fadeInDuration: Duration(milliseconds: 100),
+              fadeOutDuration: Duration(milliseconds: 100),
+              placeholder: AssetImage("images/no_image.png"),
+              image: snapshot.data.image,
+              height: 96.0,
+              width: 96.0,
             );
           }
         },

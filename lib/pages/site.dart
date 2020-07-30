@@ -900,6 +900,7 @@ class _SitePageState extends State<SitePage> {
                               color: Colors.white.withOpacity(0.8),
                               fontWeight: FontWeight.w500,
                               fontSize: ScreenUtil().setSp(60),
+                              fontFamily: "Quicksand",
                             ),
                           ),
                           SizedBox(height: 96),

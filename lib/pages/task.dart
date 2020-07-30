@@ -299,6 +299,7 @@ class _TaskPageState extends State<TaskPage> {
                   fontSize: ScreenUtil().setSp(42),
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
+                  fontFamily: "Quicksand",
                 ),
               ),
             ],
@@ -401,6 +402,7 @@ class _TaskPageState extends State<TaskPage> {
                     color: Colors.white70,
                     fontWeight: FontWeight.w500,
                     fontSize: ScreenUtil().setSp(60),
+                    fontFamily: "Quicksand",
                   ),
                 ),
                 SizedBox(height: 96),
@@ -498,14 +500,14 @@ class _TaskPageState extends State<TaskPage> {
     List<FileTaskImage> allPhotos = task.getLocalPhotos();
 
     TaskStatus status = task.getTaskProgress();
-    IconData emptyIcon;
+    AssetImage emptyIcon;
     String emptyText;
 
     if (status == TaskStatus.NOT_REQUIRED) {
-      emptyIcon = Icons.indeterminate_check_box;
+      emptyIcon = AssetImage("images/icons/icon_need_picture.png");
       emptyText = "Task is marked as not required";
     } else {
-      emptyIcon = Icons.photo_library;
+      emptyIcon = AssetImage("images/icons/icon_need_picture.png");
       emptyText = "Task gallery is empty";
     }
 
@@ -521,10 +523,10 @@ class _TaskPageState extends State<TaskPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
+                    ImageIcon(
                       emptyIcon,
                       color: Colors.white70,
-                      size: ScreenUtil().setSp(96),
+                      size: ScreenUtil().setSp(144),
                     ),
                     SizedBox(height: 10),
                     Text(
@@ -534,6 +536,7 @@ class _TaskPageState extends State<TaskPage> {
                         color: Colors.white70,
                         fontWeight: FontWeight.w500,
                         fontSize: ScreenUtil().setSp(60),
+                        fontFamily: "Quicksand",
                       ),
                     ),
                     SizedBox(height: 96),
@@ -590,20 +593,20 @@ class _TaskPageState extends State<TaskPage> {
     if (!isCloud) {
       return Container(
         alignment: Alignment.bottomRight,
-        padding: EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(16.0),
         child: Stack(
           children: <Widget>[
             Positioned(
               left: 1.0,
-              top: 2.0,
-              child: Icon(
-                Icons.cloud_off,
+              top: 1.0,
+              child: ImageIcon(
+                AssetImage("images/icons/icon_status_not_synced.png"),
                 color: Colors.black54,
                 size: 24,
               ),
             ),
-            Icon(
-              Icons.cloud_off,
+            ImageIcon(
+              AssetImage("images/icons/icon_status_not_synced.png"),
               color: Colors.yellow[700],
               size: 24,
             ),
@@ -613,20 +616,20 @@ class _TaskPageState extends State<TaskPage> {
     } else {
       return Container(
         alignment: Alignment.bottomRight,
-        padding: EdgeInsets.all(15.0),
+        padding: EdgeInsets.all(16.0),
         child: Stack(
           children: <Widget>[
             Positioned(
               left: 1.0,
-              top: 2.0,
-              child: Icon(
-                Icons.cloud_off,
+              top: 1.0,
+              child: ImageIcon(
+                AssetImage("images/icons/icon_status_synced.png"),
                 color: Colors.black54,
                 size: 24,
               ),
             ),
-            Icon(
-              Icons.cloud_done,
+            ImageIcon(
+              AssetImage("images/icons/icon_status_synced.png"),
               color: Colors.green,
               size: 24,
             ),
@@ -640,22 +643,22 @@ class _TaskPageState extends State<TaskPage> {
     if (netTask.approved) {
       return Container(
         alignment: Alignment.bottomRight,
-        padding: EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(12.0),
         child: Stack(
           children: <Widget>[
             Positioned(
               left: 1.0,
-              top: 2.0,
-              child: Icon(
-                Icons.check_box,
+              top: 1.0,
+              child: ImageIcon(
+                AssetImage("images/icons/icon_check.png"),
                 color: Colors.black54,
-                size: 14,
+                size: 16,
               ),
             ),
-            Icon(
-              Icons.check_box,
+            ImageIcon(
+              AssetImage("images/icons/icon_check.png"),
               color: Colors.green,
-              size: 14,
+              size: 16,
             ),
           ],
         ),
@@ -663,22 +666,22 @@ class _TaskPageState extends State<TaskPage> {
     } else if (netTask.rejected) {
       return Container(
         alignment: Alignment.bottomRight,
-        padding: EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(12.0),
         child: Stack(
           children: <Widget>[
             Positioned(
               left: 1.0,
-              top: 2.0,
-              child: Icon(
-                Icons.error,
+              top: 1.0,
+              child: ImageIcon(
+                AssetImage("images/icons/icon_status_alert.png"),
                 color: Colors.black54,
-                size: 14,
+                size: 16,
               ),
             ),
-            Icon(
-              Icons.error,
+            ImageIcon(
+              AssetImage("images/icons/icon_status_alert.png"),
               color: Colors.red,
-              size: 14,
+              size: 16,
             ),
           ],
         ),
@@ -686,22 +689,22 @@ class _TaskPageState extends State<TaskPage> {
     } else {
       return Container(
         alignment: Alignment.bottomRight,
-        padding: EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(12.0),
         child: Stack(
           children: <Widget>[
             Positioned(
               left: 1.0,
-              top: 2.0,
-              child: Icon(
-                Icons.check_box_outline_blank,
+              top: 1.0,
+              child: ImageIcon(
+                AssetImage("images/icons/icon_pending.png"),
                 color: Colors.black54,
-                size: 14,
+                size: 16,
               ),
             ),
-            Icon(
-              Icons.check_box_outline_blank,
+            ImageIcon(
+              AssetImage("images/icons/icon_pending.png"),
               color: Colors.grey,
-              size: 14,
+              size: 16,
             ),
           ],
         ),
@@ -717,7 +720,7 @@ class _TaskPageState extends State<TaskPage> {
 
     if (allPhotos.isEmpty && status != TaskStatus.NOT_REQUIRED) {
       return Container(
-        color: Colors.red[400],
+        color: Color.fromRGBO(209, 25, 62, 1),
         padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
         child: InkWell(
           child: Row(
@@ -729,7 +732,7 @@ class _TaskPageState extends State<TaskPage> {
                 " MARK TASK AS NOT REQUIRED",
                 style: TextStyle(
                   fontSize: ScreenUtil().setSp(42),
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
               ),
@@ -742,7 +745,7 @@ class _TaskPageState extends State<TaskPage> {
       );
     } else if (status == TaskStatus.NOT_REQUIRED) {
       return Container(
-        color: Colors.grey,
+        color: Colors.grey[700],
         padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
         child: InkWell(
           child: Row(
@@ -754,7 +757,7 @@ class _TaskPageState extends State<TaskPage> {
                 " MARK TASK AS REQUIRED",
                 style: TextStyle(
                   fontSize: ScreenUtil().setSp(42),
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),
               ),
@@ -909,7 +912,7 @@ class _TaskPageState extends State<TaskPage> {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.red,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () async {
@@ -925,7 +928,7 @@ class _TaskPageState extends State<TaskPage> {
         'CANCEL',
         style: TextStyle(
           color: Colors.black,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -941,7 +944,7 @@ class _TaskPageState extends State<TaskPage> {
             'Are you sure?',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(42),
             ),
           ),
           content: SingleChildScrollView(
@@ -951,7 +954,10 @@ class _TaskPageState extends State<TaskPage> {
                   '\n\nYour progression may not reflect what others see on ' +
                   'the cloud.',
               textAlign: TextAlign.justify,
-              style: TextStyle(fontWeight: FontWeight.w400),
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: ScreenUtil().setSp(40),
+              ),
             ),
           ),
           actions: [logout, cancel],

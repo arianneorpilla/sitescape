@@ -347,9 +347,12 @@ class LoginPageState extends State<LoginPage> {
         obscureText: false,
         decoration: InputDecoration(
           fillColor: Colors.indigo[400].withOpacity(0.8),
-          prefixIcon: Icon(
-            Icons.mail,
-            color: Colors.white,
+          prefixIcon: IconButton(
+            icon: ImageIcon(
+              AssetImage("images/icons/icon_email.png"),
+              size: ScreenUtil().setSp(36),
+              color: Colors.white,
+            ),
           ),
           hintText: 'E-mail',
           hintStyle: TextStyle(
@@ -407,9 +410,12 @@ class LoginPageState extends State<LoginPage> {
           obscureText: true,
           decoration: InputDecoration(
             fillColor: Colors.indigo[400].withOpacity(0.8),
-            prefixIcon: Icon(
-              Icons.vpn_key,
-              color: Colors.white,
+            prefixIcon: IconButton(
+              icon: ImageIcon(
+                AssetImage("images/icons/icon_password.png"),
+                size: ScreenUtil().setSp(42),
+                color: Colors.white,
+              ),
             ),
             hintText: 'Password',
             hintStyle: TextStyle(
@@ -471,9 +477,12 @@ class LoginPageState extends State<LoginPage> {
                 cursorColor: Colors.white,
                 obscureText: true,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.check_box,
-                    color: Colors.white,
+                  prefixIcon: IconButton(
+                    icon: ImageIcon(
+                      AssetImage("images/icons/icon_confirm_password.png"),
+                      size: ScreenUtil().setSp(42),
+                      color: Colors.white,
+                    ),
                   ),
                   hintText: 'Confirm Password',
                   hintStyle: TextStyle(
