@@ -329,6 +329,7 @@ class _SectorPageState extends State<SectorPage> {
         Get.to(TaskPage(
           task: task,
           showNotReq: showNotReq,
+          viewCloud: false,
         )).then((value) {
           setState(() {
             refreshProgress();
@@ -468,11 +469,14 @@ class _SectorPageState extends State<SectorPage> {
           fadeOutDuration: Duration(milliseconds: 100),
           placeholder: AssetImage("images/no_image.png"),
           image: sector.tasks[index].thumbnail,
-          height: 96.0,
-          width: 96.0,
+          height: ScreenUtil().setHeight(228),
+          width: ScreenUtil().setHeight(228),
         );
       } else if (thumbnail == null) {
-        return Container(color: Colors.grey, height: 96, width: 96);
+        return Container(
+            color: Colors.grey,
+            height: ScreenUtil().setHeight(228),
+            width: ScreenUtil().setHeight(228));
       } else {
         return FadeInImage(
           fit: BoxFit.cover,
@@ -480,8 +484,8 @@ class _SectorPageState extends State<SectorPage> {
           fadeOutDuration: Duration(milliseconds: 100),
           placeholder: AssetImage("images/no_image.png"),
           image: thumbnail.image,
-          height: 96.0,
-          width: 96.0,
+          height: ScreenUtil().setHeight(228),
+          width: ScreenUtil().setHeight(228),
         );
       }
     } else {
@@ -495,8 +499,8 @@ class _SectorPageState extends State<SectorPage> {
               fadeOutDuration: Duration(milliseconds: 100),
               placeholder: AssetImage("images/no_image.png"),
               image: sector.tasks[index].thumbnail,
-              height: 96.0,
-              width: 96.0,
+              height: ScreenUtil().setHeight(228),
+              width: ScreenUtil().setHeight(228),
             );
           } else if (thumbnail != null) {
             return FadeInImage(
@@ -505,8 +509,8 @@ class _SectorPageState extends State<SectorPage> {
               fadeOutDuration: Duration(milliseconds: 100),
               placeholder: AssetImage("images/no_image.png"),
               image: thumbnail.image,
-              height: 96.0,
-              width: 96.0,
+              height: ScreenUtil().setHeight(228),
+              width: ScreenUtil().setHeight(228),
             );
           } else if (!snapshot.hasData) {
             return Container(color: Colors.grey, height: 96, width: 96);
@@ -518,8 +522,8 @@ class _SectorPageState extends State<SectorPage> {
               fadeOutDuration: Duration(milliseconds: 100),
               placeholder: AssetImage("images/no_image.png"),
               image: snapshot.data.image,
-              height: 96.0,
-              width: 96.0,
+              height: ScreenUtil().setHeight(228),
+              width: ScreenUtil().setHeight(228),
             );
           }
         },

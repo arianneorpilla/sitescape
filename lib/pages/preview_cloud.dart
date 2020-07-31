@@ -2,7 +2,6 @@ import 'package:expandable/expandable.dart';
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import "package:get/get.dart";
 import "package:photo_view/photo_view.dart";
 import "package:photo_view/photo_view_gallery.dart";
 
@@ -67,30 +66,28 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
   Widget build(BuildContext context) {
     // Reset all photos with each build as delete operations may have happened
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        extendBody: true,
-        backgroundColor: Colors.black,
-        body: Stack(
+      resizeToAvoidBottomInset: false,
+      extendBody: true,
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: <Widget>[
+          showPreviewGallery(),
+          showBackFloatButton(),
+        ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        notchMargin: 12.0,
+        elevation: 0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            showPreviewGallery(),
-            showBackFloatButton(),
+            Icon(Icons.camera_alt, color: Colors.transparent, size: 36),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          notchMargin: 12.0,
-          elevation: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Icon(Icons.camera_alt, color: Colors.transparent, size: 36),
-            ],
-          ),
-          color: Colors.transparent,
-          shape: CircularNotchedRectangle(),
-        ),
-        floatingActionButton: showFloatingActionButton(),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerDocked);
+        color: Colors.transparent,
+        shape: CircularNotchedRectangle(),
+      ),
+    );
   }
 
   /* Main content of the page, using PhotoViewGallery on allPhotos */
@@ -148,14 +145,6 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
     ]);
   }
 
-  /* Hidden floating action button */
-  Widget showFloatingActionButton() {
-    return FloatingActionButton(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-    );
-  }
-
   /* Below task header at top */
   Widget showDescription() {
     NetworkTaskImage netTask = _images[_currentPage];
@@ -188,8 +177,11 @@ class _PreviewCloudScreenState extends State<PreviewCloudPage> {
       child: ExpandablePanel(
         // ignore: deprecated_member_use
         headerAlignment: ExpandablePanelHeaderAlignment.center,
+        // ignore: deprecated_member_use
         iconColor: Colors.white,
+        // ignore: deprecated_member_use
         tapHeaderToExpand: true,
+        // ignore: deprecated_member_use
         tapBodyToCollapse: true,
         header: Row(
           crossAxisAlignment: CrossAxisAlignment.center,

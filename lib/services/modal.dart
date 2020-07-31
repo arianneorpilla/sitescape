@@ -1,13 +1,18 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import "package:flutter/material.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
+import 'package:ntp/ntp.dart';
 
 import "package:tfsitescape/main.dart";
+import 'package:tfsitescape/pages/home.dart';
 import "package:tfsitescape/pages/root.dart";
 import "package:tfsitescape/services/auth.dart";
+import 'package:tfsitescape/services/classes.dart';
+import 'package:tfsitescape/services/ui.dart';
 import 'package:tfsitescape/services/util.dart';
 
 /* App-wide pop-up menu used in most screens, shows the following options
@@ -40,6 +45,12 @@ Future showPopupMenu(BuildContext context, Offset offset) async {
         Colors.black,
         "Free up space",
       ),
+      popupOption(
+        AssetImage("images/icons/icon_add_issue.png"),
+        Theme.of(context).accentColor,
+        "Send feedback",
+        fontWeight: FontWeight.bold,
+      ),
       // popupOption(Icons.settings, Colors.black, "Settings"),
       popupOption(
         AssetImage("images/icons/icon_logout.png"),
@@ -54,6 +65,8 @@ Future showPopupMenu(BuildContext context, Offset offset) async {
     Get.to(CreditsScreen(), opaque: false);
   } else if (choice == "Free up space") {
     showFreeUpSpaceDialog(context);
+  } else if (choice == "Send feedback") {
+    showFeedbackDialog(context);
   } else if (choice == "Log out") {
     showSignoutDialog(context);
   }
@@ -197,7 +210,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
         // Pop the sign-out dialog.
         Get.back();
         freeUpSpace();
-        Get.offAll(RootPage(auth: gUserAuth));
+        Get.offAll(HomePage(auth: gUserAuth));
       } catch (e) {
         print(e);
       }
@@ -257,122 +270,132 @@ class CreditsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 24.0),
-        child: FloatingActionButton(
-          backgroundColor: Colors.white.withOpacity(0.4),
-          child: Icon(Icons.close, color: Colors.white),
-          onPressed: () {
-            Get.back(closeOverlays: true);
-          },
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       backgroundColor: Color.fromRGBO(51, 57, 104, 0.8),
-      body: new Container(
+      body: Container(
         height: MediaQuery.of(context).size.height,
-        padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+        width: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.all(16),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-          child: new FittedBox(
-            alignment: Alignment.center,
-            child: new Column(
-              children: [
-                new Text("sitescape",
-                    style: TextStyle(
-                        fontFamily: "Quicksand",
-                        color: Colors.white,
-                        fontWeight: FontWeight.w300,
-                        fontSize: 100)),
-                new Text(
-                  "H A N D O V E R  T O O L  P A C K",
-                  style: TextStyle(
-                    fontFamily: "Quicksand",
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w300,
-                  ),
-                  textAlign: TextAlign.justify,
-                ),
-                new Text(""),
-                new Text(
-                  gVersion,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  textAlign: TextAlign.justify,
-                ),
-                showCreditColumn(
-                  "Programming and Systems Design",
-                  "Leo Rafael Orpilla",
-                ),
-                showCreditColumn(
-                  "Technical and Planning",
-                  "Leodegario Orpilla Jr.",
-                ),
-                showCreditColumn(
-                  "Graphic Design",
-                  "Aaron Marbella",
-                ),
-                // showCreditColumn(
-                //   "Powered by",
-                //   "TOWERFORCE PTY LTD.",
-                // ),
-                showCreditColumn(
-                  "Data Sources",
-                  "Weather Forecast from OpenWeatherMap",
-                ),
-                new Text(
-                  "Maps and Navigation from Mapbox",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w200,
-                  ),
-                ),
-                new Text(""),
-                new Text(""),
-                new Text(
-                  "Sitescape is built with open source software.",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w400,
-                    fontFamily: "Quicksand",
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                new Text(""),
-                new RaisedButton(
-                  elevation: 20,
-                  shape: new RoundedRectangleBorder(
-                    borderRadius: new BorderRadius.circular(20.0),
-                  ),
-                  color: Colors.white.withOpacity(0.4),
-                  child: new Text(
-                    "Licenses",
-                    style: new TextStyle(
-                        fontSize: 24.0,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w200),
-                  ),
-                  onPressed: () {
-                    Get.to(
-                      LicensePage(
-                        applicationName: "Sitescape",
-                        applicationVersion: gVersion,
-                        applicationLegalese: "© Sitescape 2020",
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            fit: BoxFit.contain,
+          child: Stack(
+            children: [
+              showAllCredits(),
+              showBackButton(),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget showAllCredits() {
+    return Center(
+      child: FittedBox(
+        alignment: Alignment.center,
+        child: new Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  alignment: Alignment.topCenter,
+                  fit: BoxFit.contain,
+                  image: AssetImage('images/login/logo.png'),
+                ),
+              ),
+            ),
+            new Text("sitescape",
+                style: TextStyle(
+                    fontFamily: "Quicksand",
+                    color: Colors.white,
+                    fontWeight: FontWeight.w300,
+                    fontSize: ScreenUtil().setSp(288))),
+            new Text(
+              "H A N D O V E R  T O O L  P A C K",
+              style: TextStyle(
+                fontFamily: "Quicksand",
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(72),
+                fontWeight: FontWeight.w300,
+              ),
+              textAlign: TextAlign.justify,
+            ),
+            new Text(""),
+            new Text(
+              gVersion,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(48),
+                fontWeight: FontWeight.w400,
+              ),
+              textAlign: TextAlign.justify,
+            ),
+            showCreditColumn(
+              "Programming and Systems Design",
+              "Leo Rafael Orpilla",
+            ),
+            showCreditColumn(
+              "Technical and Planning",
+              "Leodegario Orpilla Jr.",
+            ),
+            showCreditColumn(
+              "Graphic Design",
+              "Aaron Marbella",
+            ),
+            // showCreditColumn(
+            //   "Powered by",
+            //   "TOWERFORCE PTY LTD.",
+            // ),
+            showCreditColumn(
+              "Data Sources",
+              "Weather Forecast from OpenWeatherMap",
+            ),
+            new Text(
+              "Maps and Navigation from Mapbox",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(60),
+                fontWeight: FontWeight.w200,
+              ),
+            ),
+            new Text(""),
+            new Text(""),
+            new Text(
+              "Sitescape is built with open source software.",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: ScreenUtil().setSp(60),
+                fontWeight: FontWeight.w400,
+                fontFamily: "Quicksand",
+              ),
+              textAlign: TextAlign.center,
+            ),
+            new Text(""),
+            new RaisedButton(
+              elevation: 20,
+              shape: new RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(20.0),
+              ),
+              color: Colors.white.withOpacity(0.4),
+              child: new Text(
+                "Licenses",
+                style: new TextStyle(
+                    fontSize: ScreenUtil().setSp(72),
+                    color: Colors.white,
+                    fontWeight: FontWeight.w200),
+              ),
+              onPressed: () {
+                Get.to(
+                  LicensePage(
+                    applicationName: "Sitescape",
+                    applicationVersion: gVersion,
+                    applicationLegalese: "© Sitescape 2020",
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        fit: BoxFit.contain,
       ),
     );
   }
@@ -391,7 +414,7 @@ class CreditsScreen extends StatelessWidget {
           header,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: ScreenUtil().setSp(60),
             fontWeight: FontWeight.w600,
             fontFamily: "Quicksand",
           ),
@@ -400,11 +423,115 @@ class CreditsScreen extends StatelessWidget {
           caption,
           style: TextStyle(
             color: Colors.white,
-            fontSize: 22,
+            fontSize: ScreenUtil().setSp(60),
             fontWeight: FontWeight.w300,
           ),
         ),
       ],
     );
   }
+}
+
+void showFeedbackDialog(BuildContext context) async {
+  TextEditingController _controller = new TextEditingController();
+
+  Widget logout = FlatButton(
+    child: Text(
+      "SUBMIT",
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).accentColor,
+        fontSize: 16,
+      ),
+    ),
+    onPressed: () async {
+      try {
+        if (_controller.text.isNotEmpty) {
+          DateTime now = await NTP.now();
+          FirebaseUser user = await gUserAuth.getCurrentUser();
+
+          SiteNote note = SiteNote.create(
+              _controller.text, user.uid, now.millisecondsSinceEpoch);
+
+          Site site = Site(
+            "Feedback Technical Test",
+            "Feedback Name",
+            "Feedback Address",
+            "Feedback Build",
+            "Feedback Network",
+            0,
+            0,
+            {},
+          );
+
+          site.addIssue(note);
+        }
+
+        Get.back();
+
+        // Prevent the user from returning to previous screens.
+      } catch (e) {
+        print(e);
+      }
+    },
+  );
+
+  Widget cancel = FlatButton(
+    child: Text(
+      "CANCEL",
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 16,
+      ),
+    ),
+    onPressed: () {
+      // Pop the sign-out dialog.
+      Get.back();
+    },
+  );
+
+  // Show the dialog when this function is called, with the above widgets.
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          "We appreciate your feedback",
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+        ),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: TextField(
+            autofocus: true,
+            controller: _controller,
+            maxLines: 4,
+            maxLengthEnforced: true,
+            maxLength: 300,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: Colors.black,
+            ),
+            decoration: new InputDecoration(
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.black, width: 1.0),
+                borderRadius: BorderRadius.zero,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                borderRadius: BorderRadius.zero,
+              ),
+              hintText: 'Enter any comments and suggestions',
+              hintStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+        ),
+        actions: [logout, cancel],
+      );
+    },
+  );
 }

@@ -30,10 +30,12 @@ class TaskPage extends StatefulWidget {
     Key key,
     this.task,
     this.showNotReq,
+    this.viewCloud,
   }) : super(key: key);
 
   final Task task;
   final bool showNotReq;
+  final bool viewCloud;
 
   @override
   State<StatefulWidget> createState() => new _TaskPageState(this.task);
@@ -108,7 +110,9 @@ class _TaskPageState extends State<TaskPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        shape: CircularNotchedRectangle(),
+        shape: TaskStatus.NOT_REQUIRED == task.getTaskProgress()
+            ? null
+            : CircularNotchedRectangle(),
         child: Container(
           padding: EdgeInsets.only(left: 36, right: 36),
           child: Row(
@@ -192,7 +196,7 @@ class _TaskPageState extends State<TaskPage> {
           key: _tabKey,
           alignment: Alignment.center,
           backgroundColor: Colors.white,
-          initPosition: 0,
+          initPosition: widget.viewCloud ? 1 : 0,
           itemCount: 2,
           tabBuilder: (context, index) => buildTabs(index),
           pageBuilder: (context, index) => buildPages(index),
@@ -351,6 +355,8 @@ class _TaskPageState extends State<TaskPage> {
           }
           if (_cloudPhotos.isEmpty) {
             return Container(
+              padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
+              alignment: Alignment.topCenter,
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -359,7 +365,7 @@ class _TaskPageState extends State<TaskPage> {
                     Icon(
                       Icons.cloud_queue,
                       color: Colors.white70,
-                      size: ScreenUtil().setSp(96),
+                      size: ScreenUtil().setSp(144),
                     ),
                     SizedBox(height: 10),
                     Text(
@@ -384,6 +390,8 @@ class _TaskPageState extends State<TaskPage> {
     } else {
       if (_cloudPhotos.isEmpty) {
         return Container(
+          padding: EdgeInsets.fromLTRB(12, 12, 12, 0),
+          alignment: Alignment.topCenter,
           child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -392,7 +400,7 @@ class _TaskPageState extends State<TaskPage> {
                 Icon(
                   Icons.cloud_queue,
                   color: Colors.white70,
-                  size: ScreenUtil().setSp(96),
+                  size: ScreenUtil().setSp(144),
                 ),
                 SizedBox(height: 10),
                 Text(
@@ -504,7 +512,7 @@ class _TaskPageState extends State<TaskPage> {
     String emptyText;
 
     if (status == TaskStatus.NOT_REQUIRED) {
-      emptyIcon = AssetImage("images/icons/icon_need_picture.png");
+      emptyIcon = AssetImage("images/icons/icon_status_not_required_big.png");
       emptyText = "Task is marked as not required";
     } else {
       emptyIcon = AssetImage("images/icons/icon_need_picture.png");

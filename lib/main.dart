@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:device_preview/device_preview.dart' as dp;
-import 'package:flutter/foundation.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:tfsitescape/pages/root.dart';
+import 'package:tfsitescape/pages/task.dart';
 import 'package:tfsitescape/services/auth.dart';
 import 'package:tfsitescape/services/util.dart';
 import 'package:tfsitescape/services/classes.dart';
@@ -36,6 +38,10 @@ List<Site> gSites;
 double gUserLatitude;
 double gUserLongitude;
 Auth gUserAuth = new Auth();
+
+FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 /* App execution starts here. */
 Future<void> main() async {
@@ -62,6 +68,9 @@ Future<void> main() async {
   await loadImage("images/login/logo.png");
   await loadLocalSites();
 
+  _initLocalNotifications();
+  _initFirebaseMessaging();
+
   // Run the application.
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.transparent));
@@ -74,7 +83,6 @@ Future<void> main() async {
     Permission.location,
     Permission.storage,
     Permission.camera,
-    Permission.microphone,
   ].request();
 }
 
@@ -109,4 +117,139 @@ class NoScroll extends ScrollBehavior {
       BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
   }
+}
+
+_initLocalNotifications() {
+  var initializationSettingsAndroid =
+      new AndroidInitializationSettings('@mipmap/ic_launcher');
+  var initializationSettingsIOS = new IOSInitializationSettings();
+  var initializationSettings = new InitializationSettings(
+      initializationSettingsAndroid, initializationSettingsIOS);
+  _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onSelectNotification: onSelectNotification);
+}
+
+_initFirebaseMessaging() {
+  _firebaseMessaging.configure(
+    onMessage: (Map<String, dynamic> message) {
+      print('AppPushs onMessage : $message');
+      _showNotification(message);
+      return;
+    },
+    onBackgroundMessage: myBackgroundMessageHandler,
+    onResume: (Map<String, dynamic> message) {
+      print('AppPushs onResume : $message');
+
+      String siteName = message["data"]["sitename"];
+      String subName = message["data"]["subname"];
+      String secName = message["data"]["secname"];
+      String taskName = message["data"]["taskname"];
+
+      Site site = gSites.singleWhere((a) => a.name == siteName);
+      Subsite sub = site.subsites.singleWhere((a) => a.name == subName);
+      Sector sec = sub.sectors.singleWhere((a) => a.name == secName);
+      Task task = sec.tasks.singleWhere((a) => a.name == taskName);
+
+      Get.to(TaskPage(task: task, showNotReq: false, viewCloud: true));
+
+      return;
+    },
+    onLaunch: (Map<String, dynamic> message) {
+      print('AppPushs onLaunch : $message');
+
+      String siteName = message["data"]["sitename"];
+      String subName = message["data"]["subname"];
+      String secName = message["data"]["secname"];
+      String taskName = message["data"]["taskname"];
+
+      Site site = gSites.singleWhere((a) => a.name == siteName);
+      Subsite sub = site.subsites.singleWhere((a) => a.name == subName);
+      Sector sec = sub.sectors.singleWhere((a) => a.name == secName);
+      Task task = sec.tasks.singleWhere((a) => a.name == taskName);
+
+      Get.to(TaskPage(task: task, showNotReq: false, viewCloud: true));
+
+      return;
+    },
+  );
+  _firebaseMessaging.requestNotificationPermissions(
+      const IosNotificationSettings(sound: true, badge: true, alert: true));
+}
+
+// TOP-LEVEL or STATIC function to handle background messages
+Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+  print('AppPushs myBackgroundMessageHandler : $message');
+  _showNotification(message);
+  return Future<void>.value();
+}
+
+Future _showNotification(Map<String, dynamic> message) async {
+  var nodeData = message['notification'];
+  var pushTitle = nodeData['title'];
+  var pushText = nodeData['body'];
+
+  var destinationData = message['data'];
+
+  if (pushTitle == "End of Sitescape Technical Test") {
+    try {
+      // Sign out the user and wipe their AuthStatus.
+      await gUserAuth.signOut();
+      gUserAuth = new Auth();
+
+      gSites = [];
+
+      String siteCacheDir = gExtDir.path + "/.sites";
+      File siteCache = File(siteCacheDir);
+      siteCache.deleteSync();
+    } catch (e) {
+      print(e);
+    } finally {
+      // Prevent the user from returning to previous screens.
+      Get.off(
+        RootPage(auth: gUserAuth),
+      );
+    }
+  }
+
+  // @formatter:off
+  var platformChannelSpecificsAndroid = new AndroidNotificationDetails(
+    'Channel ID',
+    'Channel ID',
+    'your channel description',
+    enableVibration: true,
+    importance: Importance.Max,
+    priority: Priority.High,
+    styleInformation: BigTextStyleInformation(''),
+  );
+  // @formatter:on
+  var platformChannelSpecificsIos =
+      new IOSNotificationDetails(presentSound: false);
+  var platformChannelSpecifics = new NotificationDetails(
+      platformChannelSpecificsAndroid, platformChannelSpecificsIos);
+
+  new Future.delayed(Duration.zero, () {
+    _flutterLocalNotificationsPlugin.show(
+      (DateTime.now().millisecondsSinceEpoch ~/ 1000),
+      pushTitle,
+      pushText,
+      platformChannelSpecifics,
+      payload: json.encode(destinationData),
+    );
+  });
+}
+
+Future onSelectNotification(String payload) async {
+  Map<String, dynamic> destinationData = json.decode(payload);
+
+  String siteName = destinationData["sitename"];
+  String subName = destinationData["subname"];
+  String secName = destinationData["secname"];
+  String taskName = destinationData["taskname"];
+
+  Site site = gSites.singleWhere((a) => a.name == siteName);
+  Subsite sub = site.subsites.singleWhere((a) => a.name == subName);
+  Sector sec = sub.sectors.singleWhere((a) => a.name == secName);
+  Task task = sec.tasks.singleWhere((a) => a.name == taskName);
+
+  Get.to(TaskPage(task: task, showNotReq: false, viewCloud: true));
 }

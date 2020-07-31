@@ -3,7 +3,6 @@ import "dart:ui";
 import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import "package:get/get.dart";
 
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/ui.dart';
@@ -460,29 +459,53 @@ class CalculatorPageState extends State<CalculatorPage> {
             inputFormatters: [
               DecimalTextInputFormatter(),
             ],
+
             autofocus: false,
             keyboardType:
                 TextInputType.numberWithOptions(decimal: true, signed: false),
             cursorColor: Colors.grey,
             obscureText: false,
             showCursor: true,
+
             decoration: InputDecoration(
               focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
               errorBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
-              contentPadding: EdgeInsets.all(12.0),
-              prefixIcon: Icon(
-                icon,
-                size: ScreenUtil().setSp(48),
-                color: Colors.grey,
+              isDense: true,
+              prefixIconConstraints: BoxConstraints(
+                minWidth: ScreenUtil().setSp(42),
+                minHeight: ScreenUtil().setSp(42),
               ),
-              suffixText: suffix,
-              suffixStyle: TextStyle(
-                  color: Colors.grey[800],
-                  fontSize: ScreenUtil().setSp(42),
-                  fontWeight: FontWeight.w500,
-                  fontStyle: FontStyle.italic),
+              prefixIcon: Padding(
+                padding: EdgeInsets.only(
+                  left: ScreenUtil().setWidth(42),
+                  right: ScreenUtil().setWidth(21),
+                ),
+                child: Icon(
+                  icon,
+                  size: ScreenUtil().setSp(42),
+                  color: Colors.grey,
+                ),
+              ),
+              suffix: Padding(
+                padding: EdgeInsets.only(
+                  left: ScreenUtil().setWidth(26),
+                ),
+                child: Text(
+                  suffix,
+                  style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: ScreenUtil().setSp(42),
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.italic),
+                ),
+              ),
+              contentPadding: EdgeInsets.only(
+                top: ScreenUtil().setWidth(26),
+                bottom: ScreenUtil().setWidth(26),
+                right: ScreenUtil().setWidth(42),
+              ),
               hintText: caption,
               hintStyle: TextStyle(
                 color: Colors.grey,

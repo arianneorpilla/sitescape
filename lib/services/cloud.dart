@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as ph;
 
@@ -23,7 +24,7 @@ Future<List<String>> getPhotosInCloudFolder(String path) async {
   return fileNames;
 }
 
-Future syncPhoto(FileTaskImage taskImage) async {
+Future syncPhoto(FileTaskImage taskImage, VoidCallback callback) async {
   File file = taskImage.imageFile;
   // print(file.path);
 
@@ -62,20 +63,24 @@ Future syncPhoto(FileTaskImage taskImage) async {
         storageReference.putFile(workingFile, metadata);
     print("Uploaded: " + ph.basename(workingFile.path));
     await uploadTask.onComplete;
+
+    if (uploadTask.isSuccessful) {
+      workingFile.deleteSync();
+
+      String newPath = ph.join(
+        gExtDir.path,
+        taskImage.siteName,
+        taskImage.subName,
+        taskImage.secName,
+        taskImage.getBasename(true),
+      );
+
+      print("name" + taskImage.siteName);
+
+      file.renameSync(newPath);
+      print("Rename: " + newPath);
+    } else {
+      callback();
+    }
   }
-
-  workingFile.deleteSync();
-
-  String newPath = ph.join(
-    gExtDir.path,
-    taskImage.siteName,
-    taskImage.subName,
-    taskImage.secName,
-    taskImage.getBasename(true),
-  );
-
-  print("name" + taskImage.siteName);
-
-  file.renameSync(newPath);
-  print("Rename: " + newPath);
 }

@@ -155,14 +155,17 @@ class LoginPageState extends State<LoginPage> {
             _isLoading = false;
             // This is so ugly
             if (firebaseError.contains("ERROR_EMAIL_ALREADY_IN_USE")) {
-              _errorMessage = "   This e-mail address is  already registered.";
+              _errorMessage = "This e-mail address is already registered.";
             } else if (firebaseError.contains("TOO_MANY_REQUESTS") ||
                 firebaseError.contains("ERROR_NETWORK_REQUEST_FAILED")) {
-              _errorMessage = "   Error communicating with service.";
+              _errorMessage = "Error communicating with service.";
             } else if (firebaseError.contains("ERROR_INVALID_EMAIL")) {
-              _errorMessage = "   Invalid e-mail format.";
+              _errorMessage = "Invalid e-mail address.";
+            } else if (firebaseError.contains("ERROR_USER_DISABLED")) {
+              _errorMessage =
+                  "This user account has been disabled by an administrator.";
             } else
-              _errorMessage = "   Invalid e-mail or password.";
+              _errorMessage = "Invalid e-mail or password.";
           },
         );
         _formKey.currentState.reset();
@@ -189,6 +192,7 @@ class LoginPageState extends State<LoginPage> {
   void resetForm() {
     _formKey.currentState.reset();
     _errorMessage = "";
+    emailController.clear();
     passwordController.clear();
     confirmController.clear();
   }
@@ -223,25 +227,13 @@ class LoginPageState extends State<LoginPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
           ),
+          showCloudTop(),
           showBottomArt(),
-          _showLogo(),
+          showLogo(),
           _showTitle(),
           _showFooter(),
           // _showCircularProgress(),
         ],
-      ),
-    );
-  }
-
-  Widget _showLogo() {
-    return Container(
-      margin: EdgeInsets.only(top: ScreenUtil().setHeight(220)),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          alignment: Alignment.topCenter,
-          fit: BoxFit.contain,
-          image: AssetImage('images/login/logo.png'),
-        ),
       ),
     );
   }
@@ -347,6 +339,16 @@ class LoginPageState extends State<LoginPage> {
         obscureText: false,
         decoration: InputDecoration(
           fillColor: Colors.indigo[400].withOpacity(0.8),
+          isDense: true,
+          contentPadding: EdgeInsets.only(
+            top: ScreenUtil().setWidth(26),
+            bottom: ScreenUtil().setWidth(26),
+            right: ScreenUtil().setWidth(42),
+          ),
+          prefixIconConstraints: BoxConstraints(
+            minWidth: ScreenUtil().setSp(36),
+            minHeight: ScreenUtil().setSp(36),
+          ),
           prefixIcon: IconButton(
             icon: ImageIcon(
               AssetImage("images/icons/icon_email.png"),
@@ -410,6 +412,16 @@ class LoginPageState extends State<LoginPage> {
           obscureText: true,
           decoration: InputDecoration(
             fillColor: Colors.indigo[400].withOpacity(0.8),
+            isDense: true,
+            contentPadding: EdgeInsets.only(
+              top: ScreenUtil().setWidth(26),
+              bottom: ScreenUtil().setWidth(26),
+              right: ScreenUtil().setWidth(42),
+            ),
+            prefixIconConstraints: BoxConstraints(
+              minWidth: ScreenUtil().setSp(42),
+              minHeight: ScreenUtil().setSp(42),
+            ),
             prefixIcon: IconButton(
               icon: ImageIcon(
                 AssetImage("images/icons/icon_password.png"),
@@ -477,6 +489,16 @@ class LoginPageState extends State<LoginPage> {
                 cursorColor: Colors.white,
                 obscureText: true,
                 decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.only(
+                    top: ScreenUtil().setWidth(26),
+                    bottom: ScreenUtil().setWidth(26),
+                    right: ScreenUtil().setWidth(42),
+                  ),
+                  prefixIconConstraints: BoxConstraints(
+                    minWidth: ScreenUtil().setSp(42),
+                    minHeight: ScreenUtil().setSp(42),
+                  ),
                   prefixIcon: IconButton(
                     icon: ImageIcon(
                       AssetImage("images/icons/icon_confirm_password.png"),
@@ -575,8 +597,8 @@ class LoginPageState extends State<LoginPage> {
         alignment: Alignment.center,
         padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
         child: InkWell(
-          onTap: () {
-            widget.auth.sendPasswordResetEmail(
+          onTap: () async {
+            await widget.auth.sendPasswordResetEmail(
               emailController.text.trim(),
             );
             showInformative("   Password reset e-mail requested.");

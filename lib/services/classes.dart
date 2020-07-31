@@ -113,59 +113,6 @@ class Site {
     return snapshotToNotes(issues.value);
   }
 
-  // Future updateTaskInfo() async {
-  //   DatabaseReference siteRef = FirebaseDatabase.instance.reference().child(
-  //         ph.join("photos", name),
-  //       );
-
-  //   DataSnapshot siteInfo = await siteRef.once();
-  //   Map<dynamic, dynamic> siteMap = siteInfo.value;
-
-  //   if (siteMap == null) return;
-
-  //   for (Subsite sub in this.subsites) {
-  //     Map<dynamic, dynamic> subMap = siteMap[sub.name];
-  //     if (subMap == null) continue;
-
-  //     for (Sector sec in sub.sectors) {
-  //       Map<dynamic, dynamic> secMap = subMap[sec.name];
-  //       if (secMap == null) continue;
-
-  //       print(secMap);
-  //       secMap.forEach((key, values) {
-  //         TaskInfo info = TaskInfo.fromMap(key, values);
-
-  //         Task task = sec.tasks.firstWhere((task) => info.taskname == task.name,
-  //             orElse: () => null);
-
-  //         if (task != null) {
-  //           task.info = info;
-
-  //           if (task.info.notRequired) {
-  //             print("fuck");
-  //             try {
-  //               String notRequiredCloudPath = ph.join(
-  //                     gExtDir.path,
-  //                     task.sector.subsite.site.name,
-  //                     task.sector.subsite.name,
-  //                     task.sector.name,
-  //                   ) +
-  //                   "/." +
-  //                   task.name +
-  //                   ".notrequired";
-  //               print(notRequiredCloudPath);
-
-  //               File(notRequiredCloudPath).createSync(recursive: true);
-  //             } catch (e) {
-  //               print(e);
-  //             }
-  //           }
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
-
   Future addIssue(SiteNote note) async {
     DatabaseReference issueRef =
         FirebaseDatabase.instance.reference().child("issues/" + this.code);
@@ -264,16 +211,16 @@ List<Site> jsonToSites(String text) {
    snapshot -> Map<dynamic, dynamic>: JSON map pulled from database 
 */
 List<Site> snapshotToSites(Map<dynamic, dynamic> snapshot) {
-  List<Site> Sites = [];
+  List<Site> sites = [];
 
   snapshot.forEach((key, values) {
     Site site = Site.fromMap(key, values);
-    Sites.add(site);
+    sites.add(site);
   });
 
-  Sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.compareTo(b.name));
 
-  return Sites;
+  return sites;
 }
 
 /* Represents a Subsite within a Site with a unique name.
@@ -1223,6 +1170,7 @@ class NetworkTaskImage implements TaskImage {
 class SiteNote {
   final String hash;
   final String contents;
+  final String userId;
   final int reportTime;
   bool resolved;
   int resolveTime;
@@ -1230,6 +1178,7 @@ class SiteNote {
   SiteNote(
     this.hash,
     this.contents,
+    this.userId,
     this.reportTime,
     this.resolved,
     this.resolveTime,
@@ -1240,6 +1189,7 @@ class SiteNote {
       this.hash: {
         "contents": this.contents,
         "reportTime": this.reportTime,
+        "userId": this.userId,
         "resolved": this.resolved,
         "resolveTime": this.resolveTime,
       }
@@ -1253,10 +1203,11 @@ class SiteNote {
     return timeString;
   }
 
-  factory SiteNote.create(String contents, int ms) {
+  factory SiteNote.create(String contents, String userId, int ms) {
     return SiteNote(
       generateStringHash(contents) + "_" + ms.toString(),
       contents,
+      userId,
       ms,
       false,
       ms,
@@ -1267,6 +1218,7 @@ class SiteNote {
     return SiteNote(
       key,
       value['contents'] as String,
+      value['userId'] as String,
       value['reportTime'] as int,
       value['resolved'] as bool,
       value['resolveTime'] as int,

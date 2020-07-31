@@ -116,6 +116,29 @@ Widget showBackFloatButton() {
   );
 }
 
+Widget showLogo() {
+  return Container(
+    margin: EdgeInsets.only(top: ScreenUtil().setHeight(220)),
+    decoration: BoxDecoration(
+      image: DecorationImage(
+        alignment: Alignment.topCenter,
+        fit: BoxFit.contain,
+        image: AssetImage('images/login/logo.png'),
+      ),
+    ),
+  );
+}
+
+Widget buildCustomPrefixIcon(IconData iconData) {
+  return Container(
+    width: 0,
+    alignment: Alignment(-0.99, 0.0),
+    child: Icon(
+      iconData,
+    ),
+  );
+}
+
 Widget showTopNavBox() {
   return Container(
     height: 96,

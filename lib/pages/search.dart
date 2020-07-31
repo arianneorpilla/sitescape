@@ -37,6 +37,8 @@ class SearchPageState extends State<SearchPage> {
   // Initially 10, as per page size
   int _currentIndex;
 
+  TextEditingController _searchController;
+
   /* Called when scrolling past the bottommost site on the ListView */
   void loadMore() {
     if (_paged.isNotEmpty) {
@@ -67,6 +69,14 @@ class SearchPageState extends State<SearchPage> {
     _currentIndex = PAGE_SIZE;
     _paged = filterSitesByNameOrCode(_search, PAGE_SIZE);
     _isLoading = false;
+
+    _searchController = new TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -176,6 +186,7 @@ class SearchPageState extends State<SearchPage> {
               _isLoading = false;
             });
           }),
+          controller: _searchController,
           textCapitalization: TextCapitalization.none,
           autofocus: true,
           keyboardType: TextInputType.emailAddress,
@@ -187,11 +198,26 @@ class SearchPageState extends State<SearchPage> {
             enabledBorder: InputBorder.none,
             errorBorder: InputBorder.none,
             disabledBorder: InputBorder.none,
-            contentPadding: EdgeInsets.all(12.0),
-            prefixIcon: Icon(
-              Icons.search,
-              size: ScreenUtil().setSp(48),
-              color: Colors.grey,
+            isDense: true,
+            prefixIconConstraints: BoxConstraints(
+              minWidth: ScreenUtil().setSp(42),
+              minHeight: ScreenUtil().setSp(42),
+            ),
+            prefixIcon: Padding(
+              padding: EdgeInsets.only(
+                left: ScreenUtil().setWidth(42),
+                right: ScreenUtil().setWidth(21),
+              ),
+              child: Icon(
+                Icons.search,
+                size: ScreenUtil().setSp(42),
+                color: Colors.grey,
+              ),
+            ),
+            contentPadding: EdgeInsets.only(
+              top: ScreenUtil().setWidth(26),
+              bottom: ScreenUtil().setWidth(26),
+              right: ScreenUtil().setWidth(42),
             ),
             hintText: 'Search for site',
             hintStyle: TextStyle(
@@ -203,6 +229,7 @@ class SearchPageState extends State<SearchPage> {
           style: TextStyle(
             color: Colors.black,
             fontSize: ScreenUtil().setSp(42),
+            // Must be valid entry
           ),
           // Must be valid entry
         ),

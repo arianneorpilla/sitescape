@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,7 @@ import 'package:fuzzy/fuzzy.dart';
 import 'package:intl/intl.dart';
 import 'package:image_editor/image_editor.dart';
 import 'package:path/path.dart' as ph;
+import 'package:aes_crypt/aes_crypt.dart';
 
 import 'package:weather/weather_library.dart';
 
@@ -143,7 +143,10 @@ Future refreshSites({offlineCallback}) async {
 
   String cacheContents = json.encode(sitesChild);
   print(cacheContents);
-  siteCache.writeAsString(cacheContents);
+
+  var crypt = AesCrypt('KinomotoSakura');
+  crypt.setOverwriteMode(AesCryptOwMode.on);
+  crypt.encryptTextToFileSync(cacheContents, siteCacheDir);
 
   return;
 }
@@ -195,9 +198,19 @@ Future loadLocalSites() async {
   String siteCacheDir = gExtDir.path + "/.sites";
   bool siteCacheExists = await File(siteCacheDir).exists();
 
-  if (siteCacheExists) {
+  bool isValid = false;
+  String contents;
+
+  try {
+    var crypt = AesCrypt('KinomotoSakura');
+    contents = crypt.decryptTextFromFileSync(siteCacheDir);
+
+    isValid = true;
+  } catch (e) {}
+
+  if (contents != null) {
     print("Site cache exists: " + siteCacheDir);
-    String contents = await File(siteCacheDir).readAsString();
+
     gSites = jsonToSites(contents);
     gSites.sort((a, b) => a.name.compareTo(b.name));
   } else {
@@ -476,18 +489,4 @@ Future<File> bakeTimestamp(File file, {bool bearings = false}) async {
     file: file,
     imageEditorOption: editorOption,
   );
-}
-
-Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
-  if (message.containsKey('data')) {
-    // Handle data message
-    final dynamic data = message['data'];
-  }
-
-  if (message.containsKey('notification')) {
-    // Handle notification message
-    final dynamic notification = message['notification'];
-  }
-
-  // Or do other work.
 }

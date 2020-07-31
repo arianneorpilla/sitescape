@@ -415,26 +415,53 @@ class ScannerPageState extends State<ScannerPage> {
           enabledBorder: InputBorder.none,
           errorBorder: InputBorder.none,
           disabledBorder: InputBorder.none,
-          contentPadding: EdgeInsets.all(12.0),
-          prefixIcon: new IconButton(
-            icon: ImageIcon(
+          isDense: true,
+          prefixIconConstraints: BoxConstraints(
+            minWidth: ScreenUtil().setSp(42),
+            minHeight: ScreenUtil().setSp(42),
+          ),
+          suffixIconConstraints: BoxConstraints(
+            minWidth: ScreenUtil().setSp(42),
+            minHeight: ScreenUtil().setSp(42),
+          ),
+          prefixIcon: Padding(
+            padding: EdgeInsets.only(
+              left: ScreenUtil().setWidth(42),
+              right: ScreenUtil().setWidth(21),
+            ),
+            child: ImageIcon(
               AssetImage(
                 "images/icons/icon_entry.png",
               ),
               color: Colors.grey,
-              size: ScreenUtil().setSp(48),
+              size: ScreenUtil().setSp(42),
             ),
           ),
-          suffixIcon: new IconButton(
-            icon: ImageIcon(
-              AssetImage(
-                "images/icons/icon_caret_right.png",
+          suffixIcon: Padding(
+            padding: EdgeInsets.only(
+              right: ScreenUtil().setWidth(21),
+            ),
+            child: new IconButton(
+              onPressed: () {
+                if (_controller.text.isNotEmpty) {
+                  _scannerHistory.add(new ScannerPair(_controller.text, ""));
+                  setScanner(_scannerHistory);
+                  setState(() {});
+                  _controller.clear();
+                }
+              },
+              icon: ImageIcon(
+                AssetImage(
+                  "images/icons/icon_caret_right.png",
+                ),
+                color: Colors.grey,
+                size: ScreenUtil().setSp(42),
               ),
-              color: Colors.grey,
-              size: ScreenUtil().setSp(48),
             ),
           ),
-          hintText: "Add an entry name",
+          contentPadding:
+              EdgeInsets.symmetric(vertical: ScreenUtil().setWidth(26)),
+          hintText: 'Add an entry name',
           hintStyle: TextStyle(
             color: Colors.grey,
             fontSize: ScreenUtil().setSp(42),

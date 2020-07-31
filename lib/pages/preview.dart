@@ -60,32 +60,30 @@ class _PreviewScreenState extends State<PreviewPage> {
     allPhotos = task.getLocalPhotos();
 
     return Scaffold(
-        resizeToAvoidBottomInset: false,
-        extendBody: true,
-        backgroundColor: Colors.black,
-        body: Stack(
+      resizeToAvoidBottomInset: false,
+      extendBody: true,
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: <Widget>[
+          showPreviewGallery(),
+          showBackFloatButton(),
+          showShareButton(),
+          showDeleteButton(),
+        ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        notchMargin: 12.0,
+        elevation: 0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            showPreviewGallery(),
-            showBackFloatButton(),
-            showShareButton(),
-            showDeleteButton(),
+            Icon(Icons.camera_alt, color: Colors.transparent, size: 36),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          notchMargin: 12.0,
-          elevation: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Icon(Icons.camera_alt, color: Colors.transparent, size: 36),
-            ],
-          ),
-          color: Colors.transparent,
-          shape: CircularNotchedRectangle(),
-        ),
-        floatingActionButton: showFloatingActionButton(),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.centerDocked);
+        color: Colors.transparent,
+        shape: CircularNotchedRectangle(),
+      ),
+    );
   }
 
   /* Main content of the page, using PhotoViewGallery on allPhotos */
@@ -112,14 +110,6 @@ class _PreviewScreenState extends State<PreviewPage> {
           itemCount: allPhotos.length,
         ),
       ),
-    );
-  }
-
-  /* Hidden floating action button */
-  Widget showFloatingActionButton() {
-    return FloatingActionButton(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
     );
   }
 

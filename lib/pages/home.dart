@@ -13,6 +13,7 @@ import 'package:tfsitescape/services/auth.dart';
 import 'package:tfsitescape/services/modal.dart';
 import 'package:tfsitescape/services/classes.dart';
 import 'package:tfsitescape/services/util.dart';
+import 'package:tfsitescape/main.dart';
 
 /* The HomePage is the main screen upon login, and has the Auth passed
    from login. Or if the login was skipped, it could be invalid, but
@@ -42,8 +43,44 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    // Future.delayed(Duration(seconds: 1))
-    //     .then((onValue) => {showWhatsNewModal()});
+    Future.delayed(Duration(seconds: 1))
+        .then((onValue) => {showWhatsNewModal()});
+
+    Future.delayed(Duration(seconds: 5)).then((onValue) {
+      if (gUserLatitude == null || gUserLongitude == null) {
+        _scaffoldKey.currentState.showSnackBar(
+          SnackBar(
+            backgroundColor: Color.fromRGBO(209, 25, 62, 1),
+            content: Text(
+              "There was an issue getting your location. Some of the application's features may be unavailable.",
+              style: TextStyle(
+                fontSize: ScreenUtil().setSp(36),
+              ),
+            ),
+            duration: Duration(seconds: 30),
+          ),
+        );
+      }
+    });
+
+    Future.delayed(Duration(seconds: 5)).then((onValue) {
+      isConnectionAvailable().then((onValue) {
+        if (!onValue) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              backgroundColor: Color.fromRGBO(209, 25, 62, 1),
+              content: Text(
+                "There was an issue connecting to the internet. Some of the application's features may be unavailable.",
+                style: TextStyle(
+                  fontSize: ScreenUtil().setSp(36),
+                ),
+              ),
+              duration: Duration(seconds: 30),
+            ),
+          );
+        }
+      });
+    });
 
     getWeather().then((weather) {
       setState(() {
@@ -165,7 +202,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       padding: EdgeInsets.only(
         left: ScreenUtil().setWidth(36),
-        top: ScreenUtil().setHeight(244),
+        top: ScreenUtil().setHeight(216),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -374,7 +411,7 @@ class _HomePageState extends State<HomePage> {
         Container(
           padding: EdgeInsets.only(
             left: 12,
-            top: ScreenUtil().setHeight(48),
+            top: ScreenUtil().setHeight(72),
           ),
           alignment: Alignment.centerLeft,
           width: ScreenUtil().setWidth(750),
@@ -475,21 +512,36 @@ class _HomePageState extends State<HomePage> {
           child: TextField(
             textCapitalization: TextCapitalization.none,
             autofocus: false,
+            enabled: false,
             keyboardType: TextInputType.emailAddress,
             cursorColor: Colors.grey,
             obscureText: false,
             showCursor: true,
-            enabled: false,
             decoration: InputDecoration(
               focusedBorder: InputBorder.none,
               enabledBorder: InputBorder.none,
               errorBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
-              contentPadding: EdgeInsets.all(12.0),
-              prefixIcon: Icon(
-                Icons.search,
-                size: ScreenUtil().setSp(48),
-                color: Colors.grey,
+              isDense: true,
+              prefixIconConstraints: BoxConstraints(
+                minWidth: ScreenUtil().setSp(42),
+                minHeight: ScreenUtil().setSp(42),
+              ),
+              prefixIcon: Padding(
+                padding: EdgeInsets.only(
+                  left: ScreenUtil().setWidth(42),
+                  right: ScreenUtil().setWidth(21),
+                ),
+                child: Icon(
+                  Icons.search,
+                  size: ScreenUtil().setSp(42),
+                  color: Colors.grey,
+                ),
+              ),
+              contentPadding: EdgeInsets.only(
+                top: ScreenUtil().setWidth(26),
+                bottom: ScreenUtil().setWidth(26),
+                right: ScreenUtil().setWidth(42),
               ),
               hintText: 'Search for site',
               hintStyle: TextStyle(
@@ -501,8 +553,8 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(
               color: Colors.black,
               fontSize: ScreenUtil().setSp(42),
+              // Must be valid entry
             ),
-            // Must be valid entry
           ),
         ),
       ),
@@ -655,7 +707,9 @@ class _HomePageState extends State<HomePage> {
                       (lastSite.getSiteThumbnail() != null)
                           ? lastSite.getSiteThumbnail()
                           : Container(
-                              height: 96, width: 96, color: Colors.grey[400]),
+                              height: ScreenUtil().setHeight(228),
+                              width: ScreenUtil().setHeight(228),
+                              color: Colors.grey[400]),
                       Expanded(
                         child: Container(
                           margin: EdgeInsets.only(left: 16, right: 16),
@@ -842,8 +896,9 @@ class _HomePageState extends State<HomePage> {
       child: Text(
         "DISMISS",
         style: TextStyle(
-          color: Colors.blue,
-          fontSize: ScreenUtil().setSp(42),
+          color: Theme.of(context).accentColor,
+          fontWeight: FontWeight.w600,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -857,31 +912,22 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            "Welcome to the Technical Test",
+            "Welcome, Tester",
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: ScreenUtil().setSp(48),
+              fontSize: ScreenUtil().setSp(42),
             ),
           ),
           content: SingleChildScrollView(
             child: Text(
-              "Thank you for participating in the Sitescape Technical Test. This message will appear with each startup." +
-                  " Your objective as a pre-production tester is as follows:\n\n"
-                      "- As a basic tutorial, attempt to access the Technical Test 00 site, where every tester is instructed to dump any number of photos.\n" +
-                  "- Make sure to sync your items to the cloud.\n" +
-                  "- Find a Technical Test site that is empty (not 00) and perform the tasks in it as your individual folder.\n" +
-                  "- Complete every sector until progression is complete.\n" +
-                  "- No additional instructions are available to you as a tester as the tests are intended to gauge the effectiveness of the application and user interface design.\n\n" +
-                  "The following are what we expect to gain from this Technical Test:\n\n" +
-                  "- Knowledge of bugs present in the application.\n" +
-                  "- User's tendencies and any aversions towards the user interface.\n" +
-                  "- Stability of the client software in different devices.\n" +
-                  "- Reliability of cloud upload and presence of any undesired or undefined behaviour.\n" +
-                  "- Server load, cost and bandwidth from each cloud task performed with increased traffic.\n",
+              "This is a development build distributed for testing purposes. This message will appear with each startup.\n\n" +
+                  "As a pre-production tester, feel free to test any of the example sites and upload appropriate content to the cloud, as well as any other features included in the app.\n\n" +
+                  "We highly appreciate receiving user feedback at this stage and will be actively monitoring for any comments and suggestions. You can reach out to us via the \"Send feedback\" option in the lower-right menu. Thank you for participating in the Sitescape Technical Test.\n\n" +
+                  "- The Sitescape team",
               textAlign: TextAlign.justify,
               style: TextStyle(
                 fontWeight: FontWeight.w400,
-                fontSize: ScreenUtil().setSp(42),
+                fontSize: ScreenUtil().setSp(40),
               ),
             ),
           ),

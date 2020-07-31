@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mapbox_navigation/flutter_mapbox_navigation.dart'
@@ -13,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:ntp/ntp.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:tfsitescape/main.dart';
 import 'package:tfsitescape/pages/sector.dart';
 import 'package:tfsitescape/services/cloud.dart';
 import 'package:path/path.dart' as ph;
@@ -46,7 +48,6 @@ class _SitePageState extends State<SitePage> {
 
   final _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _tabKey = new GlobalKey<CustomTabsState>();
-  bool _recentlyDone;
 
   bool _downloading = false;
   bool _uploading = false;
@@ -55,7 +56,6 @@ class _SitePageState extends State<SitePage> {
   @override
   void initState() {
     super.initState();
-    _recentlyDone = false;
 
     setLastSiteAccessed(widget.site);
   }
@@ -358,8 +358,7 @@ class _SitePageState extends State<SitePage> {
                 padding: EdgeInsets.all(12),
                 child: Center(
                   child: CircularProgressIndicator(
-                      valueColor:
-                          AlwaysStoppedAnimation(Colors.greenAccent[700]),
+                      valueColor: AlwaysStoppedAnimation(Colors.greenAccent),
                       strokeWidth: 2),
                 ),
                 decoration: BoxDecoration(
@@ -819,33 +818,11 @@ class _SitePageState extends State<SitePage> {
 
         for (TaskImage k in sectorPhotos) {
           if (!k.isCloud) {
-            await syncPhoto(k);
+            await syncPhoto(k, showTransactionError);
           }
 
           setState(() {});
         }
-
-        // // Handle not required files.
-        // for (Task task in sec.tasks) {
-        //   try {
-        //     String notRequiredPath = ph.join(
-        //         task.getDirectory().path, "." + task.name + ".notrequired-L");
-        //     String notRequiredCloudPath = ph.join(
-        //         task.getDirectory().path, "." + task.name + ".notrequired");
-
-        //     if (File(notRequiredPath).existsSync()) {
-        //       DatabaseReference notRequiredRef =
-        //           FirebaseDatabase.instance.reference().child(
-        //                 ph.join("photos", site.name, sub.name, sec.name,
-        //                     task.name, "notRequired"),
-        //               );
-
-        //       await notRequiredRef.set(true);
-
-        //       File(notRequiredPath).renameSync(notRequiredCloudPath);
-        //     }
-        //   } catch (e) {}
-        // }
 
         sec.uploading = false;
         sec.key.currentState.refreshProgress();
@@ -858,6 +835,21 @@ class _SitePageState extends State<SitePage> {
     setState(() {
       _uploading = false;
     });
+  }
+
+  void showTransactionError() {
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        backgroundColor: Color.fromRGBO(209, 25, 62, 1),
+        content: Text(
+          "There was an issue performing a cloud operation.",
+          style: TextStyle(
+            fontSize: ScreenUtil().setSp(36),
+          ),
+        ),
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   Widget showNoteList(Site site) {
@@ -943,12 +935,9 @@ class _SitePageState extends State<SitePage> {
                 itemCount: notes.length,
                 itemBuilder: (BuildContext context, int index) {
                   // Return a card only if the search term is found in name/code.
-                  return InkWell(
-                    onTap: () {},
-                    child: NoteCard(
-                      site: site,
-                      note: notes[index],
-                    ),
+                  return NoteCard(
+                    site: site,
+                    note: notes[index],
                   );
                 },
               );
@@ -973,16 +962,21 @@ class _SitePageState extends State<SitePage> {
       ),
       onPressed: () async {
         try {
-          // Pop the sign-out dialog.
-          DateTime now = await NTP.now();
-
-          SiteNote note =
-              SiteNote.create(_controller.text, now.millisecondsSinceEpoch);
-          await widget.site.addIssue(note);
-          setState(() {});
-          Get.back();
-
           _tabKey.currentState.animateTo(site.subsites.length);
+          // Pop the sign-out dialog.
+
+          if (_controller.text.isNotEmpty) {
+            DateTime now = await NTP.now();
+            FirebaseUser user = await gUserAuth.getCurrentUser();
+
+            SiteNote note = SiteNote.create(
+                _controller.text, user.uid, now.millisecondsSinceEpoch);
+
+            await widget.site.addIssue(note);
+            setState(() {});
+          }
+
+          Get.back();
 
           // Prevent the user from returning to previous screens.
         } catch (e) {
@@ -1015,12 +1009,13 @@ class _SitePageState extends State<SitePage> {
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
           ),
           content: Container(
-            height: MediaQuery.of(context).size.height * 0.1,
             width: MediaQuery.of(context).size.width * 0.8,
             child: TextField(
               autofocus: true,
               controller: _controller,
-              maxLines: 5,
+              maxLines: 4,
+              maxLengthEnforced: true,
+              maxLength: 300,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -1028,10 +1023,18 @@ class _SitePageState extends State<SitePage> {
               ),
               decoration: new InputDecoration(
                 focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.black, width: 1.0),
+                  borderSide: BorderSide(
+                    color: Colors.black,
+                    width: 1.0,
+                  ),
+                  borderRadius: BorderRadius.zero,
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                  borderSide: BorderSide(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                  borderRadius: BorderRadius.zero,
                 ),
                 hintText: 'Enter details',
                 hintStyle: TextStyle(
@@ -1288,7 +1291,7 @@ class SectorCardState extends State<SectorCard> {
             strokeWidth: 2,
             valueColor: downloading
                 ? AlwaysStoppedAnimation(Colors.blue)
-                : AlwaysStoppedAnimation(Colors.greenAccent[700]),
+                : AlwaysStoppedAnimation(Colors.greenAccent),
           ),
         ),
       ),
@@ -1332,6 +1335,7 @@ class NoteCardState extends State<NoteCard> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
+            onTap: () {},
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -1389,6 +1393,9 @@ class NoteCardState extends State<NoteCard> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
+            onTap: () {
+              showResolveDialog();
+            },
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
