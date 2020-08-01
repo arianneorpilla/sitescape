@@ -81,6 +81,54 @@ class Site {
     );
   }
 
+  Map<String, dynamic> getSiteJson() {
+    Map<dynamic, dynamic> subsitesMap;
+    Map<dynamic, dynamic> sectorsMap;
+    Map<dynamic, dynamic> tasksMap;
+
+    subsitesMap = {};
+    for (Subsite sub in this.subsites) {
+      sectorsMap = {};
+      for (Sector sec in sub.sectors) {
+        tasksMap = {};
+        for (Task task in sec.tasks) {
+          tasksMap.addAll({
+            task.name: {
+              "note": task.note,
+              "required": 0,
+            }
+          });
+        }
+        sectorsMap.addAll({
+          sec.name: {
+            "tasks": tasksMap,
+            "name": sec.name,
+          }
+        });
+      }
+      subsitesMap.addAll({
+        sub.name: {
+          "sectors": sectorsMap,
+          "name": sub.name,
+        }
+      });
+    }
+
+    Map<String, dynamic> siteJson = {
+      this.code: {
+        "sitename": this.name,
+        "address": this.address,
+        "build": this.build,
+        "network": this.network,
+        "latitude": this.latitude,
+        "longitude": this.longitude,
+        "subsites": subsitesMap
+      }
+    };
+
+    return siteJson;
+  }
+
   /*
     Used after factory constructor to populate subsites. Necessary to set
     up a reference to site. 
@@ -111,7 +159,7 @@ class Site {
     );
   }
 
-  void updateCloudEntry() {
+  Future<void> updateCloudEntry() async {
     Map<dynamic, dynamic> subsitesMap;
     Map<dynamic, dynamic> sectorsMap;
     Map<dynamic, dynamic> tasksMap;
@@ -126,7 +174,6 @@ class Site {
             task.name: {
               "note": task.note,
               "required": 0,
-              "lastUpdated": DateTime.now().millisecondsSinceEpoch
             }
           });
         }
@@ -145,7 +192,7 @@ class Site {
       });
     }
 
-    userAuth
+    await userAuth
         .getDatabase()
         .refFromURL("gs://tfsitescape.firebaseio.com")
         .child("sites")
@@ -165,6 +212,27 @@ class Site {
         "subsites": subsitesMap
       },
     );
+
+    Map<String, dynamic> sitesMap = {};
+    sites.forEach((a) => sitesMap.addAll(a.getSiteJson()));
+
+    String toWrite = json.encode(sitesMap);
+
+    fb.StorageReference sitesRef = userAuth
+        .getStorage()
+        .refFromURL("gs://tfsitescape.appspot.com")
+        .child("tfcloud/sites.json");
+
+    await sitesRef
+        .putString(
+          toWrite,
+        )
+        .future
+        .then((snapshot) {
+      print("Done");
+      sitesRef.getDownloadURL();
+    });
+    return;
   }
 
   /* From the site's network String value, get the appropriate AssetImage.
@@ -461,9 +529,9 @@ class Task {
         )
         .update(
       {
-        "rejected": true,
+        "rejected": false,
         "message": message,
-        "approved": false,
+        "approved": true,
       },
     );
   }
@@ -478,13 +546,13 @@ class Task {
         .getDatabase()
         .refFromURL("gs://tfsitescape.firebaseio.com")
         .child("users")
-        .child(netTask.uid);
+        .child(netTask.uid)
+        .child("tokens");
 
     fb.QueryEvent allTokens = await tokensRef.once('value');
 
     allTokens.snapshot.forEach((result) {
-      String token = result.key;
-      sendNote(netTask, token);
+      sendNote(netTask, result.key);
     });
 
     return userAuth
@@ -531,8 +599,10 @@ class Task {
           'priority': 'high',
           'data': <String, dynamic>{
             'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-            'id': '1',
-            'status': 'done'
+            'sitename': netTask.siteName,
+            'subname': netTask.subName,
+            'secname': netTask.secName,
+            'taskname': netTask.taskName,
           },
           'to': token,
         },

@@ -93,7 +93,7 @@ Future<List<Site>> fetchSites() async {
 
   allSites.snapshot.forEach((result) {
     Map<dynamic, dynamic> value = result.val();
-    print(value);
+    // print(value);
     Site site = Site.fromMap(result.key, value);
     site.populate();
     sites.add(site);

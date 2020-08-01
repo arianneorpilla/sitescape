@@ -143,7 +143,7 @@ class LoginPageState extends State<LoginPage> {
             _isLoading = false;
             // This is so ugly
             if (firebaseError.contains("ERROR_EMAIL_ALREADY_IN_USE")) {
-              _errorMessage = "   This e-mail address is  already registered.";
+              _errorMessage = "   This e-mail address is already registered.";
             } else if (firebaseError.contains("TOO_MANY_REQUESTS") ||
                 firebaseError.contains("ERROR_NETWORK_REQUEST_FAILED")) {
               _errorMessage = "   Error communicating with server.";
