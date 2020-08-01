@@ -13,11 +13,11 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:tfsitescape/pages/root.dart';
-import 'package:tfsitescape/pages/task.dart';
-import 'package:tfsitescape/services/auth.dart';
-import 'package:tfsitescape/services/util.dart';
-import 'package:tfsitescape/services/classes.dart';
+import 'package:sitescape/pages/root.dart';
+import 'package:sitescape/pages/task.dart';
+import 'package:sitescape/services/auth.dart';
+import 'package:sitescape/services/util.dart';
+import 'package:sitescape/services/classes.dart';
 
 // Background image persistent in the app.
 
@@ -38,6 +38,7 @@ List<Site> gSites;
 double gUserLatitude;
 double gUserLongitude;
 Auth gUserAuth = new Auth();
+bool gTransaction = false;
 
 FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -74,6 +75,7 @@ Future<void> main() async {
   // Run the application.
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
       .then((_) {
     runApp(App());

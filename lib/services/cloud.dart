@@ -5,9 +5,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as ph;
+import 'package:http/http.dart' as http;
 
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/services/classes.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/services/classes.dart';
 
 Future<List<String>> getPhotosInCloudFolder(String path) async {
   // print(gCloudPath + path);
@@ -24,7 +25,12 @@ Future<List<String>> getPhotosInCloudFolder(String path) async {
   return fileNames;
 }
 
-Future syncPhoto(FileTaskImage taskImage, VoidCallback callback) async {
+Future syncPhoto(
+    Sector sec, FileTaskImage taskImage, VoidCallback callback) async {
+  if (!gTransaction) {
+    return;
+  }
+
   File file = taskImage.imageFile;
   // print(file.path);
 
@@ -83,4 +89,38 @@ Future syncPhoto(FileTaskImage taskImage, VoidCallback callback) async {
       callback();
     }
   }
+
+  sec.key.currentState.refresh();
+
+  return;
+}
+
+Future downloadPhoto(Sector sec, String imageBasename) async {
+  if (!gTransaction) {
+    return;
+  }
+
+  String localPath = ph.join(sec.getDirectory().path, imageBasename);
+  String cloudPath = ph.join(sec.getCloudPath(), imageBasename);
+
+  bool fileExists = await File(localPath).exists();
+
+  final StorageReference storageRef =
+      FirebaseStorage.instance.ref().child(cloudPath);
+
+  String url = "";
+  url = await storageRef.getDownloadURL();
+
+  if (!fileExists) {
+    var imageBytes = await http.get(url);
+    File file = new File(localPath);
+    file.createSync(recursive: true);
+    file.writeAsBytesSync(imageBytes.bodyBytes);
+  }
+
+  sec.key.currentState
+      .setDownloadCount(sec.key.currentState.getDownloadCount() - 1);
+  sec.key.currentState.refresh();
+
+  return;
 }

@@ -6,7 +6,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:crypto/crypto.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:geolocator/geolocator.dart';
@@ -15,11 +15,12 @@ import 'package:intl/intl.dart';
 import 'package:image_editor/image_editor.dart';
 import 'package:path/path.dart' as ph;
 import 'package:aes_crypt/aes_crypt.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:weather/weather_library.dart';
 
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/services/classes.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/services/classes.dart';
 
 /* Used to await an image and pre-cache it so it loads without blinking in.
    Used for the splash screen, where image takes time to load and thus
@@ -115,7 +116,6 @@ Future refreshSites({offlineCallback}) async {
 
   String siteCacheDir = gExtDir.path + "/.sites";
   File(siteCacheDir).createSync();
-  File siteCache = File(siteCacheDir);
 
   bool isOnline = await isConnectionAvailable();
   if (!isOnline) {
@@ -124,24 +124,19 @@ Future refreshSites({offlineCallback}) async {
     return;
   }
 
-  final DatabaseReference dbRef =
-      FirebaseDatabase.instance.reference().child("sites");
+  final StorageReference sitesRef =
+      FirebaseStorage.instance.ref().child("tfcloud").child("sites.json");
 
-  DataSnapshot dbSnapshot = await dbRef.once();
-  Map<dynamic, dynamic> sitesChild = {};
+  String url = await sitesRef.getDownloadURL();
 
-  gSites = [];
-  Map<dynamic, dynamic> data = dbSnapshot.value;
-  data.forEach((key, value) {
-    Site site = Site.fromMap(key, value);
-    site.populate();
-    gSites.add(site);
-    sitesChild.addAll({key: value});
-  });
+  var siteBytes = await http.get(url);
+  String sitesJson = siteBytes.body;
+  print(sitesJson);
 
+  gSites = jsonToSites(sitesJson);
   gSites.sort((a, b) => a.name.compareTo(b.name));
 
-  String cacheContents = json.encode(sitesChild);
+  String cacheContents = json.encode(sitesJson);
   print(cacheContents);
 
   var crypt = AesCrypt('KinomotoSakura');
@@ -196,16 +191,11 @@ Future loadLocalSites() async {
   gSites = [];
 
   String siteCacheDir = gExtDir.path + "/.sites";
-  bool siteCacheExists = await File(siteCacheDir).exists();
-
-  bool isValid = false;
   String contents;
 
   try {
     var crypt = AesCrypt('KinomotoSakura');
-    contents = crypt.decryptTextFromFileSync(siteCacheDir);
-
-    isValid = true;
+    contents = json.decode(crypt.decryptTextFromFileSync(siteCacheDir));
   } catch (e) {}
 
   if (contents != null) {

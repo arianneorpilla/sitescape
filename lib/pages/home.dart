@@ -5,15 +5,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:weather/weather_library.dart';
 
-import 'package:tfsitescape/pages/calculator.dart';
-import 'package:tfsitescape/pages/scanner.dart';
-import 'package:tfsitescape/pages/search.dart';
-import 'package:tfsitescape/pages/site.dart';
-import 'package:tfsitescape/services/auth.dart';
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/util.dart';
-import 'package:tfsitescape/main.dart';
+import 'package:sitescape/pages/calculator.dart';
+import 'package:sitescape/pages/scanner.dart';
+import 'package:sitescape/pages/search.dart';
+import 'package:sitescape/pages/site.dart';
+import 'package:sitescape/services/auth.dart';
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/util.dart';
+import 'package:sitescape/main.dart';
 
 /* The HomePage is the main screen upon login, and has the Auth passed
    from login. Or if the login was skipped, it could be invalid, but
@@ -52,7 +52,8 @@ class _HomePageState extends State<HomePage> {
           SnackBar(
             backgroundColor: Color.fromRGBO(209, 25, 62, 1),
             content: Text(
-              "There was an issue getting your location. Some of the application's features may be unavailable.",
+              "There was an issue getting your location. Some of the " +
+                  "application's features may be unavailable.",
               style: TextStyle(
                 fontSize: ScreenUtil().setSp(36),
               ),
@@ -70,7 +71,8 @@ class _HomePageState extends State<HomePage> {
             SnackBar(
               backgroundColor: Color.fromRGBO(209, 25, 62, 1),
               content: Text(
-                "There was an issue connecting to the internet. Some of the application's features may be unavailable.",
+                "There was an issue connecting to the internet. Some of the " +
+                    "application's features may be unavailable.",
                 style: TextStyle(
                   fontSize: ScreenUtil().setSp(36),
                 ),
@@ -517,9 +519,8 @@ class _HomePageState extends State<HomePage> {
             cursorColor: Colors.grey,
             obscureText: false,
             showCursor: true,
+            textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
               errorBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
               isDense: true,
@@ -920,9 +921,16 @@ class _HomePageState extends State<HomePage> {
           ),
           content: SingleChildScrollView(
             child: Text(
-              "This is a development build distributed for testing purposes. This message will appear with each startup.\n\n" +
-                  "As a pre-production tester, feel free to test any of the example sites and upload appropriate content to the cloud, as well as any other features included in the app.\n\n" +
-                  "We highly appreciate receiving user feedback at this stage and will be actively monitoring for any comments and suggestions. You can reach out to us via the \"Send feedback\" option in the lower-right menu. Thank you for participating in the Sitescape Technical Test.\n\n" +
+              "This is a development build distributed for testing purposes. " +
+                  "This message will appear with each startup.\n\n" +
+                  "As a pre-production tester, feel free to test any of the " +
+                  "example sites and upload appropriate content to the cloud, " +
+                  " as well as any other features included in the app.\n\n" +
+                  "We highly appreciate receiving user feedback at this stage " +
+                  "and will be actively monitoring for any comments and " +
+                  "suggestions. You can reach out to us via the \"Send " +
+                  "feedback\" option in the lower-right menu. Thank you " +
+                  "for participating in the Sitescape Technical Test.\n\n" +
                   "- The Sitescape team",
               textAlign: TextAlign.justify,
               style: TextStyle(

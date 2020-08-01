@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mapbox_navigation/flutter_mapbox_navigation.dart'
     as fmn;
@@ -14,17 +12,16 @@ import 'package:get/get.dart';
 import 'package:mapbox_gl/mapbox_gl.dart';
 import 'package:ntp/ntp.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/pages/sector.dart';
-import 'package:tfsitescape/services/cloud.dart';
-import 'package:path/path.dart' as ph;
-import 'package:http/http.dart' as http;
+import 'package:quiver/iterables.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/pages/sector.dart';
+import 'package:sitescape/services/cloud.dart';
 
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/tabs.dart';
-import 'package:tfsitescape/services/ui.dart';
-import 'package:tfsitescape/services/util.dart';
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/tabs.dart';
+import 'package:sitescape/services/ui.dart';
+import 'package:sitescape/services/util.dart';
 
 /* Page upon Site selection, where user can pick a sector and scroll through
    subsites. Also has a map of the site pulled from GPS coordinates, with
@@ -57,6 +54,13 @@ class _SitePageState extends State<SitePage> {
   void initState() {
     super.initState();
 
+    for (Subsite sub in site.subsites) {
+      for (Sector sec in sub.sectors) {
+        sec.downloading = false;
+        sec.uploading = false;
+      }
+    }
+
     setLastSiteAccessed(widget.site);
   }
 
@@ -86,7 +90,7 @@ class _SitePageState extends State<SitePage> {
               showSiteInfo(),
               showTabs(),
             ]),
-            showBackFloatButton(),
+            showBackFloatButton(callback: _onWillPop),
             showStatusBarBox(),
           ],
         ),
@@ -120,11 +124,15 @@ class _SitePageState extends State<SitePage> {
                     }),
                 GestureDetector(
                   onTapDown: (TapDownDetails details) {
-                    showPopupMenu(context, details.globalPosition);
+                    if (!_downloading && !_uploading && !_navigating) {
+                      showPopupMenu(context, details.globalPosition);
+                    }
                   },
                   child: ImageIcon(
                     AssetImage("images/home/icon_menu.png"),
-                    color: Colors.white,
+                    color: _downloading || _uploading || _navigating
+                        ? Colors.white.withOpacity(0.5)
+                        : Colors.white,
                     size: 28,
                   ),
                 ),
@@ -158,6 +166,7 @@ class _SitePageState extends State<SitePage> {
               sec.uploading = false;
             }
           }
+          gTransaction = false;
           Get.back();
           Get.back();
         },
@@ -728,6 +737,7 @@ class _SitePageState extends State<SitePage> {
 
     setState(() {
       _downloading = true;
+      gTransaction = true;
     });
 
     for (Subsite sub in site.subsites) {
@@ -751,29 +761,28 @@ class _SitePageState extends State<SitePage> {
         sec.key.currentState.setDownloadCount(images.length);
         sec.key.currentState.refresh();
 
+        List<Future<dynamic>> futures = [];
         for (String imageBasename in images) {
-          String localPath = ph.join(sec.getDirectory().path, imageBasename);
-          String cloudPath = ph.join(sec.getCloudPath(), imageBasename);
+          futures.add(downloadPhoto(sec, imageBasename));
+        }
 
-          bool fileExists = await File(localPath).exists();
+        List<List<Future<dynamic>>> splitFutures =
+            partition(futures, (futures.length / 3).ceil()).toList();
 
-          final StorageReference storageRef =
-              FirebaseStorage.instance.ref().child(cloudPath);
+        if (futures.isNotEmpty) {
+          List<Future<dynamic>> queues = [];
+          try {
+            queues.add(performQueuedFutures(splitFutures[0]));
+          } catch (e) {}
+          try {
+            queues.add(performQueuedFutures(splitFutures[1]));
+          } catch (e) {}
+          try {
+            queues.add(performQueuedFutures(splitFutures[2]));
+          } catch (e) {}
 
-          String url = "";
-          url = await storageRef.getDownloadURL();
-
-          if (!fileExists) {
-            var imageBytes = await http.get(url);
-            File file = new File(localPath);
-            file.createSync(recursive: true);
-            file.writeAsBytesSync(imageBytes.bodyBytes);
-          }
-          sec.key.currentState
-              .setDownloadCount(sec.key.currentState.getDownloadCount() - 1);
-
-          sec.key.currentState.refresh();
-          await Future.delayed(Duration(milliseconds: 200));
+          await Future.wait(queues);
+          await Future.delayed(Duration(milliseconds: 500));
         }
 
         sec.downloading = false;
@@ -786,7 +795,16 @@ class _SitePageState extends State<SitePage> {
 
     setState(() {
       _downloading = false;
+      gTransaction = false;
     });
+  }
+
+  Future performQueuedFutures(List<Future<dynamic>> queue) async {
+    for (int i = 0; i < queue.length; i++) {
+      await queue[i];
+    }
+
+    return;
   }
 
   Future syncSite(Site site, bool partial) async {
@@ -796,6 +814,7 @@ class _SitePageState extends State<SitePage> {
 
     setState(() {
       _uploading = true;
+      gTransaction = true;
     });
 
     for (Subsite sub in site.subsites) {
@@ -816,12 +835,30 @@ class _SitePageState extends State<SitePage> {
 
         List<TaskImage> sectorPhotos = sec.getLocalPhotos();
 
+        List<Future<dynamic>> futures = [];
         for (TaskImage k in sectorPhotos) {
           if (!k.isCloud) {
-            await syncPhoto(k, showTransactionError);
+            futures.add(syncPhoto(sec, k, showTransactionError));
           }
+        }
 
-          setState(() {});
+        List<List<Future<dynamic>>> splitFutures =
+            partition(futures, (futures.length / 3).ceil()).toList();
+
+        if (futures.isNotEmpty) {
+          List<Future<dynamic>> queues = [];
+          try {
+            queues.add(performQueuedFutures(splitFutures[0]));
+          } catch (e) {}
+          try {
+            queues.add(performQueuedFutures(splitFutures[1]));
+          } catch (e) {}
+          try {
+            queues.add(performQueuedFutures(splitFutures[2]));
+          } catch (e) {}
+
+          await Future.wait(queues);
+          await Future.delayed(Duration(milliseconds: 500));
         }
 
         sec.uploading = false;
@@ -834,6 +871,7 @@ class _SitePageState extends State<SitePage> {
 
     setState(() {
       _uploading = false;
+      gTransaction = false;
     });
   }
 

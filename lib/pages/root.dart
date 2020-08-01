@@ -1,19 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:get/get.dart';
-import 'package:tfsitescape/main.dart';
 
-import 'package:tfsitescape/pages/home.dart';
-import 'package:tfsitescape/pages/login.dart';
-import 'package:tfsitescape/pages/task.dart';
-import 'package:tfsitescape/services/auth.dart';
-import 'package:tfsitescape/services/classes.dart';
+import 'package:sitescape/pages/home.dart';
+import 'package:sitescape/pages/login.dart';
+import 'package:sitescape/services/auth.dart';
 
 /* The root page is called on app startup, and changes based on Auth.
    auth -> Auth: The authentication status or whether user logged in, etc. */
@@ -28,7 +22,7 @@ class RootPage extends StatefulWidget {
 
 /* State for Root Page */
 class _RootPageState extends State<RootPage> {
-  AuthStatus authStatus = AuthStatus.NOT_DETERMINED;
+  AuthStatus _authStatus = AuthStatus.NOT_DETERMINED;
   String _userId = "";
 
   // If the user ID is not valid, set AuthStatus appropriately.
@@ -41,7 +35,7 @@ class _RootPageState extends State<RootPage> {
         if (user != null) {
           _userId = user?.uid;
         }
-        authStatus =
+        _authStatus =
             user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
       });
     });
@@ -65,17 +59,14 @@ class _RootPageState extends State<RootPage> {
 
     setState(() {
       _userId = user.uid;
-    });
-
-    setState(() {
-      authStatus = AuthStatus.LOGGED_IN;
+      _authStatus = AuthStatus.LOGGED_IN;
     });
   }
 
   // On logout, set auth status to reflect this.
   void logoutCallback() {
     setState(() {
-      authStatus = AuthStatus.NOT_LOGGED_IN;
+      _authStatus = AuthStatus.NOT_LOGGED_IN;
       _userId = "";
     });
   }
@@ -93,7 +84,7 @@ class _RootPageState extends State<RootPage> {
   // Based on Auth, build into different pages, login or main activity.
   @override
   Widget build(BuildContext context) {
-    switch (authStatus) {
+    switch (_authStatus) {
       case AuthStatus.NOT_DETERMINED:
         return buildWaitingScreen();
         break;

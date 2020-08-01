@@ -1,4 +1,4 @@
-package com.tf.sitescape
+package com.sitescape.tinola
 
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.PluginRegistry

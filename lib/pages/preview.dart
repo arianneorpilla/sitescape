@@ -9,8 +9,8 @@ import "package:photo_view/photo_view.dart";
 import "package:photo_view/photo_view_gallery.dart";
 import "package:path/path.dart" as ph;
 
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/ui.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/ui.dart';
 
 /* The Preview Page is for photo inspection and interaction; the user can
    zoom, pinch and scroll through a task"s gallery

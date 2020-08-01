@@ -6,11 +6,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:get/get.dart';
 import 'package:adv_camera/adv_camera.dart';
-import 'package:tfsitescape/main.dart';
+import 'package:sitescape/main.dart';
 
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/ui.dart';
-import 'package:tfsitescape/services/util.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/ui.dart';
+import 'package:sitescape/services/util.dart';
 
 /* Screen for taking photo, has entire preview as background and take
    picture button

@@ -5,10 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/services/auth.dart';
-import 'package:tfsitescape/services/util.dart';
-import 'package:tfsitescape/services/ui.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/services/auth.dart';
+import 'package:sitescape/services/util.dart';
+import 'package:sitescape/services/ui.dart';
 
 /* Login page taking a previously initialised Auth and a void function
    which executes after authentication attempt.
@@ -35,13 +35,13 @@ class LoginPageState extends State<LoginPage> {
   String _password = "";
 
   // Used to pass the e-mail from form to password reset
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
 
   // Used to pass focus from username to password text field
-  FocusNode passwordFocus = new FocusNode();
-  FocusNode confirmFocus = new FocusNode();
+  FocusNode _passwordFocus = new FocusNode();
+  FocusNode _confirmFocus = new FocusNode();
 
   // Used to check if its sign up or login happening
   bool _isLoginForm;
@@ -60,28 +60,6 @@ class LoginPageState extends State<LoginPage> {
     _isLoginForm = true;
 
     super.initState();
-  }
-
-  Future cacheHomeImages() async {
-    await precacheImage(AssetImage("images/home/hill.png"), context);
-    await precacheImage(AssetImage("images/home/tower.png"), context);
-    await precacheImage(AssetImage("images/home/koalas.png"), context);
-    await precacheImage(AssetImage("images/home/day.png"), context);
-    await precacheImage(AssetImage("images/home/weather_clear.png"), context);
-    await precacheImage(AssetImage("images/home/weather_foggy.png"), context);
-    await precacheImage(AssetImage("images/home/weather_rainy.png"), context);
-    await precacheImage(AssetImage("images/home/weather_stormy.png"), context);
-    await precacheImage(AssetImage("images/home/weather_cloudy.png"), context);
-    await precacheImage(AssetImage("images/home/weather_snowy.png"), context);
-    await precacheImage(AssetImage("images/home/icon_menu.png"), context);
-    await precacheImage(AssetImage("images/home/icon_help.png"), context);
-    await precacheImage(AssetImage("images/home/divider.png"), context);
-    await precacheImage(AssetImage("images/home/icon_scanner.png"), context);
-    await precacheImage(
-        AssetImage("images/home/icon_calculations.png"), context);
-    await precacheImage(AssetImage("images/home/icon_reports.png"), context);
-
-    return;
   }
 
   /* Check if form is valid before perform login or signup */
@@ -142,7 +120,6 @@ class LoginPageState extends State<LoginPage> {
             userId != null &&
             _isLoginForm &&
             user.isEmailVerified) {
-          await cacheHomeImages();
           widget.loginCallback();
         }
       } on PlatformException catch (e) {
@@ -192,9 +169,9 @@ class LoginPageState extends State<LoginPage> {
   void resetForm() {
     _formKey.currentState.reset();
     _errorMessage = "";
-    emailController.clear();
-    passwordController.clear();
-    confirmController.clear();
+    _emailController.clear();
+    _passwordController.clear();
+    _confirmController.clear();
   }
 
   /* Shows blue text below entry fields if text is not empty or null 
@@ -331,9 +308,10 @@ class LoginPageState extends State<LoginPage> {
   Widget showEmailInput() {
     return new Container(
       child: TextFormField(
-        controller: emailController,
+        controller: _emailController,
         textCapitalization: TextCapitalization.none,
         autofocus: false,
+        textAlignVertical: TextAlignVertical.center,
         keyboardType: TextInputType.emailAddress,
         cursorColor: Colors.white,
         obscureText: false,
@@ -349,6 +327,7 @@ class LoginPageState extends State<LoginPage> {
             minWidth: ScreenUtil().setSp(36),
             minHeight: ScreenUtil().setSp(36),
           ),
+          // ignore: missing_required_param
           prefixIcon: IconButton(
             icon: ImageIcon(
               AssetImage("images/icons/icon_email.png"),
@@ -386,7 +365,7 @@ class LoginPageState extends State<LoginPage> {
         validator: (value) => value.isEmpty ? 'E-mail required.' : null,
         // Used to pass focus from user -> pass
         onFieldSubmitted: (String value) {
-          FocusScope.of(context).requestFocus(passwordFocus);
+          FocusScope.of(context).requestFocus(_passwordFocus);
         },
         onTap: () {
           // Reset error message
@@ -404,9 +383,10 @@ class LoginPageState extends State<LoginPage> {
         padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
         // This is near identical to user function.
         child: TextFormField(
-          focusNode: passwordFocus,
-          controller: passwordController,
+          focusNode: _passwordFocus,
+          controller: _passwordController,
           textCapitalization: TextCapitalization.none,
+          textAlignVertical: TextAlignVertical.center,
           autofocus: false,
           cursorColor: Colors.white,
           obscureText: true,
@@ -422,6 +402,7 @@ class LoginPageState extends State<LoginPage> {
               minWidth: ScreenUtil().setSp(42),
               minHeight: ScreenUtil().setSp(42),
             ),
+            // ignore: missing_required_param
             prefixIcon: IconButton(
               icon: ImageIcon(
                 AssetImage("images/icons/icon_password.png"),
@@ -467,7 +448,7 @@ class LoginPageState extends State<LoginPage> {
           onFieldSubmitted: (String _password) => {
             _isLoginForm
                 ? validateAndSubmit()
-                : FocusScope.of(context).requestFocus(confirmFocus)
+                : FocusScope.of(context).requestFocus(_confirmFocus)
           },
         ),
       ),
@@ -482,9 +463,10 @@ class LoginPageState extends State<LoginPage> {
               padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
               // This is near identical to user function.
               child: TextFormField(
-                focusNode: confirmFocus,
-                controller: confirmController,
+                focusNode: _confirmFocus,
+                controller: _confirmController,
                 textCapitalization: TextCapitalization.none,
+                textAlignVertical: TextAlignVertical.center,
                 autofocus: false,
                 cursorColor: Colors.white,
                 obscureText: true,
@@ -499,6 +481,7 @@ class LoginPageState extends State<LoginPage> {
                     minWidth: ScreenUtil().setSp(42),
                     minHeight: ScreenUtil().setSp(42),
                   ),
+                  // ignore: missing_required_param
                   prefixIcon: IconButton(
                     icon: ImageIcon(
                       AssetImage("images/icons/icon_confirm_password.png"),
@@ -534,7 +517,7 @@ class LoginPageState extends State<LoginPage> {
                 ),
                 // Must be valid entry
                 validator: (value) => (value.isEmpty || (value.length < 5)) ||
-                        (value != passwordController.text)
+                        (value != _passwordController.text)
                     ? 'Password must be valid and same as above.'
                     : null,
                 onTap: () {
@@ -599,7 +582,7 @@ class LoginPageState extends State<LoginPage> {
         child: InkWell(
           onTap: () async {
             await widget.auth.sendPasswordResetEmail(
-              emailController.text.trim(),
+              _emailController.text.trim(),
             );
             showInformative("   Password reset e-mail requested.");
           },

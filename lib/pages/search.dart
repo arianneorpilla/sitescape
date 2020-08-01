@@ -6,12 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 import "package:lazy_load_scrollview/lazy_load_scrollview.dart";
 
-import "package:tfsitescape/main.dart";
-import "package:tfsitescape/pages/site.dart";
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/ui.dart';
-import "package:tfsitescape/services/util.dart";
+import "package:sitescape/main.dart";
+import "package:sitescape/pages/site.dart";
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/ui.dart';
+import "package:sitescape/services/util.dart";
 
 class SearchPage extends StatefulWidget {
   SearchPage({Key key}) : super(key: key);
@@ -98,6 +98,7 @@ class SearchPageState extends State<SearchPage> {
               children: [
                 // Search Bar
                 showSearchBar(),
+                SizedBox(height: ScreenUtil().setHeight(32)),
                 showSites(),
                 _isLoading ? showLoading() : Container()
                 // siteDisplay(context, _search)
@@ -187,6 +188,7 @@ class SearchPageState extends State<SearchPage> {
             });
           }),
           controller: _searchController,
+          textAlignVertical: TextAlignVertical.center,
           textCapitalization: TextCapitalization.none,
           autofocus: true,
           keyboardType: TextInputType.emailAddress,
@@ -310,96 +312,6 @@ class SearchPageState extends State<SearchPage> {
       ),
     );
   }
-
-  // return Container(
-  //         decoration: BoxDecoration(
-  //           color: Colors.white.withOpacity(0.9),
-  //           boxShadow: [
-  //             BoxShadow(
-  //               color: Colors.black.withOpacity(0.2),
-  //               spreadRadius: 1,
-  //               blurRadius: 10,
-  //               offset: Offset(0, 3), // changes position of shadow
-  //             ),
-  //           ],
-  //         ),
-  //         margin: EdgeInsets.fromLTRB(
-  //           24,
-  //           ScreenUtil().setHeight(16),
-  //           24,
-  //           ScreenUtil().setHeight(16),
-  //         ),
-  //         child: Material(
-  //           color: Colors.transparent,
-  //           child: InkWell(
-  //             onTap: () {
-  //               Get.to(SitePage(site: lastSite))
-  //                   .then((onValue) => setState(() {}));
-  //             },
-  //             child: Stack(
-  //               children: [
-  //                 Row(
-  //                   mainAxisAlignment: MainAxisAlignment.start,
-  //                   children: [
-  //                     (lastSite.getSiteThumbnail() != null)
-  //                         ? lastSite.getSiteThumbnail()
-  //                         : Container(
-  //                             height: 96, width: 96, color: Colors.grey[400]),
-  //                     Expanded(
-  //                       child: Container(
-  //                         margin: EdgeInsets.only(left: 16, right: 16),
-  //                         child: Column(
-  //                           mainAxisAlignment: MainAxisAlignment.start,
-  //                           crossAxisAlignment: CrossAxisAlignment.start,
-  //                           children: [
-  //                             Text(
-  //                               lastSite.name.toUpperCase(),
-  //                               textAlign: TextAlign.start,
-  //                               overflow: TextOverflow.ellipsis,
-  //                               maxLines: 1,
-  //                               style: TextStyle(
-  //                                   fontSize: ScreenUtil().setSp(42),
-  //                                   fontWeight: FontWeight.w600,
-  //                                   color: Colors.black54),
-  //                             ),
-  //                             Text(
-  //                               lastSite.code.toUpperCase(),
-  //                               overflow: TextOverflow.ellipsis,
-  //                               maxLines: 1,
-  //                               textAlign: TextAlign.start,
-  //                               style: TextStyle(
-  //                                   fontSize: ScreenUtil().setSp(36),
-  //                                   fontWeight: FontWeight.w400,
-  //                                   color: Colors.black54),
-  //                             )
-  //                           ],
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Positioned.fill(
-  //                   child: Align(
-  //                     alignment: Alignment.topRight,
-  //                     child: Container(
-  //                       child: Text(
-  //                         " Last accessed site ",
-  //                         textAlign: TextAlign.start,
-  //                         style: TextStyle(
-  //                           color: Colors.white,
-  //                           fontSize: ScreenUtil().setSp(32),
-  //                         ),
-  //                       ),
-  //                       padding: const EdgeInsets.fromLTRB(4, 2, 4, 2),
-  //                       color: Color.fromRGBO(84, 176, 159, 1.0),
-  //                     ),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       );
 
   /* Site card which shows site name, code and network icon
      site -> Site: The site pertaining to the card */

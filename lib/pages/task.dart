@@ -9,15 +9,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as ph;
 
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/pages/camera.dart';
-import 'package:tfsitescape/pages/preview.dart';
-import 'package:tfsitescape/pages/preview_cloud.dart';
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/tabs.dart';
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/ui.dart';
-import 'package:tfsitescape/services/util.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/pages/camera.dart';
+import 'package:sitescape/pages/preview.dart';
+import 'package:sitescape/pages/preview_cloud.dart';
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/tabs.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/ui.dart';
+import 'package:sitescape/services/util.dart';
 
 /* Page for Task Selection, shows tasks in list order with option to take
    a picture or upload.

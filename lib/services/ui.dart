@@ -93,25 +93,22 @@ Widget showBackButton({Color color = Colors.transparent}) {
   );
 }
 
-Widget showBackFloatButton() {
+Widget showBackFloatButton({VoidCallback callback}) {
   return Container(
     padding: EdgeInsets.fromLTRB(12, 36, 12, 0),
     height: 96,
     width: 96,
     child: FittedBox(
       child: FlatButton(
-        color: Colors.grey.withOpacity(0.7),
-        child: ImageIcon(
-          AssetImage("images/icons/icon_back_float.png"),
-          size: 34,
-          color: Colors.white,
-        ),
-        padding: EdgeInsets.all(0.1),
-        shape: CircleBorder(),
-        onPressed: () {
-          Get.back();
-        },
-      ),
+          color: Colors.grey.withOpacity(0.7),
+          child: ImageIcon(
+            AssetImage("images/icons/icon_back_float.png"),
+            size: 34,
+            color: Colors.white,
+          ),
+          padding: EdgeInsets.all(0.1),
+          shape: CircleBorder(),
+          onPressed: callback ?? () => Get.back()),
     ),
   );
 }

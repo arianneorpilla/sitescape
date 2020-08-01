@@ -8,6 +8,43 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:760937399414:android:a9795b28805fb9ce988b57",
+        "android_client_info": {
+          "package_name": "com.sitescape.tinola"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "760937399414-5v0m4piidp1ghcqec4tqbr0e30u3e8kf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.sitescape.tinola",
+            "certificate_hash": "5bcf9b6eeb0315b202951919350f27886cb9a9b4"
+          }
+        },
+        {
+          "client_id": "760937399414-6r47lpm3pqph47l1gm422m1961c52als.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvSbquWeGOiWx7LLBdcEMfkMqjtVXAmIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "760937399414-6r47lpm3pqph47l1gm422m1961c52als.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:760937399414:android:ac7402cec5e37998988b57",
         "android_client_info": {
           "package_name": "com.tf.sitescape"

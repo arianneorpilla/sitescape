@@ -4,8 +4,8 @@ import "package:flutter/material.dart";
 import "package:flutter/services.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/ui.dart';
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/ui.dart';
 
 class CalculatorPage extends StatefulWidget {
   CalculatorPage({Key key}) : super(key: key);
@@ -26,89 +26,104 @@ class CalculatorPageState extends State<CalculatorPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   // For search term, used for filtering
-  String chrAGCValue;
-  String chrRSLValueLER;
+  String _chrAGCValue;
+  String _chrRSLValueLER;
 
-  String eAGCValue;
-  String eRSLValueLER;
+  String _eAGCValue;
+  String _eRSLValueLER;
 
-  TextEditingController chrIV;
-  TextEditingController chrSPV;
-  TextEditingController chrBPV;
-  TextEditingController chrRSLV;
+  TextEditingController _chrIV;
+  TextEditingController _chrSPV;
+  TextEditingController _chrBPV;
+  TextEditingController _chrRSLV;
 
-  TextEditingController eIV;
-  TextEditingController eSPV;
-  TextEditingController eBPV;
-  TextEditingController eRSLV;
+  TextEditingController _eIV;
+  TextEditingController _eSPV;
+  TextEditingController _eBPV;
+  TextEditingController _eRSLV;
 
   @override
   void initState() {
     // Show first 10 Sites alphabetically
-    chrAGCValue = "";
-    chrRSLValueLER = "";
+    _chrAGCValue = "";
+    _chrRSLValueLER = "";
 
-    chrIV = new TextEditingController();
-    chrSPV = new TextEditingController();
-    chrBPV = new TextEditingController();
-    chrRSLV = new TextEditingController();
+    _chrIV = new TextEditingController();
+    _chrSPV = new TextEditingController();
+    _chrBPV = new TextEditingController();
+    _chrRSLV = new TextEditingController();
 
-    eAGCValue = "";
-    eRSLValueLER = "";
+    _eAGCValue = "";
+    _eRSLValueLER = "";
 
-    eIV = new TextEditingController();
-    eSPV = new TextEditingController();
-    eBPV = new TextEditingController();
-    eRSLV = new TextEditingController();
+    _eIV = new TextEditingController();
+    _eSPV = new TextEditingController();
+    _eBPV = new TextEditingController();
+    _eRSLV = new TextEditingController();
 
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _chrIV.dispose();
+    _chrSPV.dispose();
+    _chrBPV.dispose();
+    _chrRSLV.dispose();
+
+    _eIV.dispose();
+    _eSPV.dispose();
+    _eBPV.dispose();
+    _eRSLV.dispose();
+
+    super.dispose();
+  }
+
   void updateValues() {
-    print(chrAGCValue);
+    print(_chrAGCValue);
 
     try {
-      double numCHRRSLValueLER = double.parse(chrRSLValueLER);
+      double numCHRRSLValueLER = double.parse(_chrRSLValueLER);
 
-      chrIV.text = ((numCHRRSLValueLER) / 100 + 1).toStringAsFixed(3);
-      chrSPV.text = (((numCHRRSLValueLER) + 1) / 100 + 1).toStringAsFixed(3);
-      chrBPV.text = (((numCHRRSLValueLER) + 2) / 100 + 1).toStringAsFixed(3);
+      _chrIV.text = ((numCHRRSLValueLER) / 100 + 1).toStringAsFixed(3);
+      _chrSPV.text = (((numCHRRSLValueLER) + 1) / 100 + 1).toStringAsFixed(3);
+      _chrBPV.text = (((numCHRRSLValueLER) + 2) / 100 + 1).toStringAsFixed(3);
     } catch (e) {
       print(e);
-      chrIV.clear();
-      chrSPV.clear();
-      chrBPV.clear();
+      _chrIV.clear();
+      _chrSPV.clear();
+      _chrBPV.clear();
     }
 
     try {
-      double numCHRAGCVal = double.parse(chrAGCValue);
+      double numCHRAGCVal = double.parse(_chrAGCValue);
 
-      chrRSLV.text = ((numCHRAGCVal - 1) * 100).toStringAsFixed(3);
+      _chrRSLV.text = ((numCHRAGCVal - 1) * 100).toStringAsFixed(3);
     } catch (e) {
       print(e);
-      chrRSLV.clear();
+      _chrRSLV.clear();
     }
 
     try {
-      double numERSLValueLER = double.parse(eRSLValueLER);
+      double numERSLValueLER = double.parse(_eRSLValueLER);
 
-      eIV.text = ((120 - numERSLValueLER) / 40).toStringAsFixed(3);
-      eSPV.text = ((120 - (numERSLValueLER + 1)) / 40).toStringAsFixed(3);
-      eBPV.text = ((120 - (numERSLValueLER + 2)) / 40).toStringAsFixed(3);
+      _eIV.text = ((120 - numERSLValueLER) / 40).toStringAsFixed(3);
+      _eSPV.text = ((120 - (numERSLValueLER + 1)) / 40).toStringAsFixed(3);
+      _eBPV.text = ((120 - (numERSLValueLER + 2)) / 40).toStringAsFixed(3);
     } catch (e) {
       print(e);
-      eIV.clear();
-      eSPV.clear();
-      eBPV.clear();
+      _eIV.clear();
+      _eSPV.clear();
+      _eBPV.clear();
     }
 
     try {
-      double numEAGCVal = double.parse(eAGCValue);
+      double numEAGCVal = double.parse(_eAGCValue);
 
-      eRSLV.text = (120 - (numEAGCVal * 40)).toStringAsFixed(3);
+      _eRSLV.text = (120 - (numEAGCVal * 40)).toStringAsFixed(3);
     } catch (e) {
       print(e);
-      eRSLV.clear();
+      _eRSLV.clear();
     }
   }
 
@@ -221,19 +236,19 @@ class CalculatorPageState extends State<CalculatorPage> {
                   Icons.exposure_zero,
                   "Ideal Value",
                   "AGC Volts",
-                  chrIV,
+                  _chrIV,
                 ),
                 showOutput(
                   Icons.exposure_plus_1,
                   "Safe Passing Value",
                   "AGC Volts",
-                  chrSPV,
+                  _chrSPV,
                 ),
                 showOutput(
                   Icons.exposure_plus_2,
                   "Borderline Passing Value",
                   "AGC Volts",
-                  chrBPV,
+                  _chrBPV,
                 ),
               ],
             ),
@@ -265,13 +280,13 @@ class CalculatorPageState extends State<CalculatorPage> {
                   Icons.show_chart,
                   "RSL Value",
                   "-dBm",
-                  chrRSLV,
+                  _chrRSLV,
                 ),
               ],
             ),
             padding: const EdgeInsets.fromLTRB(30, 15, 30, 15),
           ),
-          SizedBox(height: MediaQuery.of(context).size.height / 8),
+          SizedBox(height: MediaQuery.of(context).size.height / 16),
           Container(
             child: Text(
               "Ericsson",
@@ -309,19 +324,19 @@ class CalculatorPageState extends State<CalculatorPage> {
                   Icons.exposure_zero,
                   "Ideal Value",
                   "AGC Volts",
-                  eIV,
+                  _eIV,
                 ),
                 showOutput(
                   Icons.exposure_plus_1,
                   "Safe Passing Value",
                   "AGC Volts",
-                  eSPV,
+                  _eSPV,
                 ),
                 showOutput(
                   Icons.exposure_plus_2,
                   "Borderline Passing Value",
                   "AGC Volts",
-                  eBPV,
+                  _eBPV,
                 ),
               ],
             ),
@@ -351,7 +366,7 @@ class CalculatorPageState extends State<CalculatorPage> {
                   Icons.show_chart,
                   "RSL Value",
                   "-dBm",
-                  eRSLV,
+                  _eRSLV,
                 ),
               ],
             ),
@@ -437,20 +452,21 @@ class CalculatorPageState extends State<CalculatorPage> {
         child: InkWell(
           onTap: () {},
           child: TextField(
+            textAlignVertical: TextAlignVertical.center,
             onChanged: ((val) async {
               setState(() {
                 switch (valueToChange) {
                   case CalculatorValues.CHR_RSL_VALUE_LER:
-                    chrRSLValueLER = val;
+                    _chrRSLValueLER = val;
                     break;
                   case CalculatorValues.CHR_AGC_VALUE:
-                    chrAGCValue = val;
+                    _chrAGCValue = val;
                     break;
                   case CalculatorValues.ERIC_RSL_VALUE_LER:
-                    eRSLValueLER = val;
+                    _eRSLValueLER = val;
                     break;
                   case CalculatorValues.ERIC_AGC_VALUE:
-                    eAGCValue = val;
+                    _eAGCValue = val;
                     break;
                 }
               });

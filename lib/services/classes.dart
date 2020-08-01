@@ -10,10 +10,10 @@ import 'package:path/path.dart' as ph;
 import 'package:intl/intl.dart';
 
 import 'package:flutter/material.dart';
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/pages/site.dart';
-import 'package:tfsitescape/services/cloud.dart';
-import 'package:tfsitescape/services/util.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/pages/site.dart';
+import 'package:sitescape/services/cloud.dart';
+import 'package:sitescape/services/util.dart';
 
 /* Represents a cell-site with a unique code. Top-level nested 
    structure loaded from the cloud or as a JSON file. 

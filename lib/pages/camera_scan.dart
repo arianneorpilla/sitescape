@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:tfsitescape/services/ui.dart';
+import 'package:sitescape/services/ui.dart';
 
 /* Screen for taking photo, has entire preview as background and take
    picture button
@@ -53,6 +53,7 @@ class CameraScanScreenState extends State<CameraScanScreen>
   void dispose() {
     // Dispose of the controller when the widget is disposed.
     _controller.dispose();
+    _qrController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

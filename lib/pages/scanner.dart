@@ -8,10 +8,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 
-import 'package:tfsitescape/main.dart';
-import 'package:tfsitescape/pages/camera_scan.dart';
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/ui.dart';
+import 'package:sitescape/main.dart';
+import 'package:sitescape/pages/camera_scan.dart';
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/ui.dart';
 
 class ScannerPage extends StatefulWidget {
   ScannerPage({Key key}) : super(key: key);
@@ -56,6 +56,7 @@ class ScannerPageState extends State<ScannerPage> {
             children: [
               // Search Bar
               showAddEntry(),
+              SizedBox(height: ScreenUtil().setHeight(32)),
               showEntries(),
               // siteDisplay(context, _search)
             ],
@@ -410,6 +411,7 @@ class ScannerPageState extends State<ScannerPage> {
         cursorColor: Colors.grey,
         obscureText: false,
         showCursor: true,
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,

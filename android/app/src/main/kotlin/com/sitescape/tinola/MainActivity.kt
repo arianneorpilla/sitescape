@@ -1,4 +1,4 @@
-package com.tf.tfsitescape
+package com.sitescape.tinola
 
 import io.flutter.embedding.android.FlutterActivity
 

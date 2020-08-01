@@ -7,13 +7,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import "package:get/get.dart";
 import 'package:ntp/ntp.dart';
 
-import "package:tfsitescape/main.dart";
-import 'package:tfsitescape/pages/home.dart';
-import "package:tfsitescape/pages/root.dart";
-import "package:tfsitescape/services/auth.dart";
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/ui.dart';
-import 'package:tfsitescape/services/util.dart';
+import "package:sitescape/main.dart";
+import 'package:sitescape/pages/home.dart';
+import "package:sitescape/pages/root.dart";
+import "package:sitescape/services/auth.dart";
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/ui.dart';
+import 'package:sitescape/services/util.dart';
 
 /* App-wide pop-up menu used in most screens, shows the following options
    in the following order:
@@ -319,7 +319,7 @@ class CreditsScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.justify,
             ),
-            new Text(""),
+            Text("", style: TextStyle(fontSize: ScreenUtil().setSp(36))),
             new Text(
               gVersion,
               style: TextStyle(
@@ -332,10 +332,6 @@ class CreditsScreen extends StatelessWidget {
             showCreditColumn(
               "Programming and Systems Design",
               "Leo Rafael Orpilla",
-            ),
-            showCreditColumn(
-              "Technical and Planning",
-              "Leodegario Orpilla Jr.",
             ),
             showCreditColumn(
               "Graphic Design",
@@ -357,8 +353,7 @@ class CreditsScreen extends StatelessWidget {
                 fontWeight: FontWeight.w200,
               ),
             ),
-            new Text(""),
-            new Text(""),
+            Text("", style: TextStyle(fontSize: ScreenUtil().setSp(36))),
             new Text(
               "Sitescape is built with open source software.",
               style: TextStyle(
@@ -408,8 +403,8 @@ class CreditsScreen extends StatelessWidget {
   Widget showCreditColumn(String header, String caption) {
     return Column(
       children: [
-        new Text(""),
-        new Text(""),
+        Text("", style: TextStyle(fontSize: ScreenUtil().setSp(36))),
+        Text("", style: TextStyle(fontSize: ScreenUtil().setSp(36))),
         new Text(
           header,
           style: TextStyle(

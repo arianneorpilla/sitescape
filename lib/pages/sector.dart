@@ -5,10 +5,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-import 'package:tfsitescape/pages/task.dart';
-import 'package:tfsitescape/services/modal.dart';
-import 'package:tfsitescape/services/classes.dart';
-import 'package:tfsitescape/services/ui.dart';
+import 'package:sitescape/pages/task.dart';
+import 'package:sitescape/services/modal.dart';
+import 'package:sitescape/services/classes.dart';
+import 'package:sitescape/services/ui.dart';
 
 /* Sector Page with option to pick a Task, also showing progress 
 
