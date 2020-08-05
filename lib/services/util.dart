@@ -99,7 +99,7 @@ Future<List<Site>> fetchSites() async {
     sites.add(site);
   });
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   return sites;
 }

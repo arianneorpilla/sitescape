@@ -201,7 +201,8 @@ class SubPageState extends State<SubPage> {
               sub.populate();
 
               site.subsites.add(sub);
-              site.subsites.sort((a, b) => a.name.compareTo(b.name));
+              site.subsites.sort((a, b) =>
+                  a.name.toLowerCase().compareTo(b.name.toLowerCase()));
             });
           }
 
@@ -368,7 +369,7 @@ class SubPageState extends State<SubPage> {
         controller: subController,
         textCapitalization: TextCapitalization.none,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z-a-z ]"))
         ],
         autofocus: false,
         cursorColor: Colors.white,

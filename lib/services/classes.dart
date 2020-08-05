@@ -143,7 +143,8 @@ class Site {
       sub.populate();
     });
     // Sort the subsites by alphabetical order
-    subsites.sort((a, b) => a.name.compareTo(b.name));
+    subsites
+        .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 
   factory Site.add() {
@@ -171,21 +172,21 @@ class Site {
         tasksMap = {};
         for (Task task in sec.tasks) {
           tasksMap.addAll({
-            task.name: {
+            task.name.trim(): {
               "note": task.note,
               "required": 0,
             }
           });
         }
         sectorsMap.addAll({
-          sec.name: {
+          sec.name.trim(): {
             "tasks": tasksMap,
             "name": sec.name,
           }
         });
       }
       subsitesMap.addAll({
-        sub.name: {
+        sub.name.trim(): {
           "sectors": sectorsMap,
           "name": sub.name,
         }
@@ -270,7 +271,7 @@ List<Site> jsonToSites(String text) {
 
   sitesJson.forEach((key, value) => sites.add(Site.fromMap(key, value)));
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   return sites;
 }
@@ -288,7 +289,7 @@ List<Site> snapshotToSites(Map<dynamic, dynamic> snapshot) {
     sites.add(site);
   });
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   return sites;
 }
@@ -340,7 +341,8 @@ class Subsite {
       sec.populate();
     });
 
-    sectors.sort((a, b) => a.name.compareTo(b.name));
+    sectors
+        .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 }
 
@@ -403,7 +405,7 @@ class Sector {
     tasks.forEach((task) => task.sector = this);
 
     // Sort the subsites by alphabetical order
-    tasks.sort((a, b) => a.name.compareTo(b.name));
+    tasks.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 
   String getCloudPath() {
@@ -455,7 +457,7 @@ class Task {
     List<Future<NetworkTaskImage>> futures = [];
 
     for (String basename in filenames) {
-      List<String> parts = ph.basenameWithoutExtension(basename).split("-");
+      List<String> parts = ph.basenameWithoutExtension(basename).split("_");
       if (task == null || task.name == parts[1]) {
         futures.add(getCloudPhoto(basename));
       }
@@ -701,7 +703,7 @@ class NetworkTaskImage implements TaskImage {
     String finalURL,
     String thumbURL,
   ) {
-    List<String> parts = basename.split("-");
+    List<String> parts = basename.split("_");
 
     if (parts.length != 4) {
       return null;
@@ -738,11 +740,11 @@ class NetworkTaskImage implements TaskImage {
 
   String getBasename(bool isCloud) {
     return this.siteCode +
-        "-" +
+        "_" +
         this.taskName +
-        "-" +
+        "_" +
         this.count.toString().padLeft(3, "0") +
-        "-" +
+        "_" +
         this.hash;
   }
 

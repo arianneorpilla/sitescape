@@ -240,7 +240,7 @@ class SitePageState extends State<SitePage> {
         cursorColor: Colors.white,
         obscureText: false,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z-a-z ]"))
         ],
         decoration: InputDecoration(
           fillColor: widget.create

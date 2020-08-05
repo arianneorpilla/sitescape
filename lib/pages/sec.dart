@@ -199,7 +199,8 @@ class SecPageState extends State<SecPage> {
               sec.populate();
 
               sub.sectors.add(sec);
-              sub.sectors.sort((a, b) => a.name.compareTo(b.name));
+              sub.sectors.sort((a, b) =>
+                  a.name.toLowerCase().compareTo(b.name.toLowerCase()));
             });
           }
 
@@ -329,7 +330,7 @@ class SecPageState extends State<SecPage> {
       child: TextField(
         controller: secController,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z-a-z ]"))
         ],
         textCapitalization: TextCapitalization.none,
         autofocus: false,

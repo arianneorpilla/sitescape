@@ -309,7 +309,8 @@ class TaskPageState extends State<TaskPage> {
             Task task =
                 Task(nameController.text, descriptionController.text, 0);
             sec.tasks.add(task);
-            sec.tasks.sort((a, b) => a.name.compareTo(b.name));
+            sec.tasks.sort(
+                (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
             nameController.clear();
             descriptionController.clear();
@@ -357,7 +358,7 @@ class TaskPageState extends State<TaskPage> {
       child: TextField(
         controller: nameController,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z_a-z ]"))
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z-a-z ]"))
         ],
         textCapitalization: TextCapitalization.none,
         autofocus: false,
