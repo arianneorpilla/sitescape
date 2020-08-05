@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:get/get.dart';
@@ -32,6 +33,8 @@ String gVersion;
 String gBuildNumber;
 String gVersionAndBuild;
 
+Map<Permission, PermissionStatus> gPermissions;
+
 CameraDescription gCam;
 List<Site> gSites;
 
@@ -46,6 +49,9 @@ final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
 /* App execution starts here. */
 Future<void> main() async {
+  SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+
   // Wait for camera and other things to get ready.
 
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,6 +68,20 @@ Future<void> main() async {
   gExtDir = await getExternalStorageDirectory();
   gTempDir = await getTemporaryDirectory();
 
+  _initLocalNotifications();
+  _initFirebaseMessaging();
+
+  AppUpdateInfo updateInfo = await InAppUpdate.checkForUpdate();
+  if (updateInfo.updateAvailable) {
+    await InAppUpdate.performImmediateUpdate();
+  }
+
+  gPermissions = await [
+    Permission.location,
+    Permission.storage,
+    Permission.camera,
+  ].request();
+
   await loadImage("images/login/hill.png");
   await loadImage("images/login/tower.png");
   await loadImage("images/login/cloud_top.png");
@@ -69,26 +89,13 @@ Future<void> main() async {
   await loadImage("images/login/logo.png");
   await loadLocalSites();
 
-  _initLocalNotifications();
-  _initFirebaseMessaging();
-
-  // Run the application.
-  SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(statusBarColor: Colors.transparent));
-
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      // Run the application.
       .then((_) {
     runApp(App());
   });
-
-  await [
-    Permission.location,
-    Permission.storage,
-    Permission.camera,
-  ].request();
 }
 
-/* App class defining title and visual information. */
 class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

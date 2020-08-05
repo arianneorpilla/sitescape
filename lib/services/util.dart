@@ -16,6 +16,7 @@ import 'package:image_editor/image_editor.dart';
 import 'package:path/path.dart' as ph;
 import 'package:aes_crypt/aes_crypt.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:weather/weather_library.dart';
 
@@ -67,7 +68,7 @@ String generateFileHash(File file) {
 
   // Encoding the raw bytes from SHA256 in base64 should give us more entropy
   // when truncating the filename to 8 characters.
-  var base64Str = base64UrlEncode(hash.bytes).replaceAll("-", ",");
+  var base64Str = base64UrlEncode(hash.bytes).replaceAll("_", ",");
 
   return base64Str;
 }
@@ -134,7 +135,7 @@ Future refreshSites({offlineCallback}) async {
   print(sitesJson);
 
   gSites = jsonToSites(sitesJson);
-  gSites.sort((a, b) => a.name.compareTo(b.name));
+  gSites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   String cacheContents = json.encode(sitesJson);
   print(cacheContents);
@@ -173,7 +174,7 @@ void freeUpSpace() {
 
   for (FileSystemEntity i in files) {
     if (ph.extension(i.path) == ".jpg" &&
-        (!ph.basenameWithoutExtension(i.path).endsWith("-L"))) {
+        (!ph.basenameWithoutExtension(i.path).endsWith("_L"))) {
       print("FILE DELETE: " + i.path);
       i.deleteSync();
     }
@@ -202,7 +203,7 @@ Future loadLocalSites() async {
     print("Site cache exists: " + siteCacheDir);
 
     gSites = jsonToSites(contents);
-    gSites.sort((a, b) => a.name.compareTo(b.name));
+    gSites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   } else {
     print("Site cache not found.");
     gSites = [];
@@ -479,4 +480,14 @@ Future<File> bakeTimestamp(File file, {bool bearings = false}) async {
     file: file,
     imageEditorOption: editorOption,
   );
+}
+
+Future launchURL() async {
+  const url =
+      'https://drive.google.com/file/d/1KMVp7aJN_fHHkdnKMZ94yiSEjWcvzp3v/view';
+  if (await canLaunch(url)) {
+    await launch(url);
+  } else {
+    throw 'Could not launch $url';
+  }
 }

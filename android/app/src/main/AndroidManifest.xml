@@ -21,7 +21,8 @@
     <application
         android:name=".Application"
         android:label="Sitescape"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:requestLegacyExternalStorage="true">
         <meta-data 
             android:name="com.mapbox.token" 
             android:value="pk.eyJ1IjoibHJvcnBpbGxhIiwiYSI6ImNrYnJ0Y3VpbDE5eWsycGxtOHQwaDU4d2UifQ.BTvEomWYhP1oCRuqejdmLA" />

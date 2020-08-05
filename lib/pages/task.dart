@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:animated_overflow/animated_overflow.dart';
 import 'package:expandable/expandable.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -56,12 +57,20 @@ class _TaskPageState extends State<TaskPage> {
 
   bool _isUploading;
 
+  bool _textVisible = false;
+
   @override
   void initState() {
     super.initState();
     _isUploading = false;
     _scrollController = new ScrollController();
     _expandableController = new ExpandableController();
+
+    Future.delayed(Duration(milliseconds: 16)).then((onValue) {
+      setState(() {
+        _textVisible = true;
+      });
+    });
   }
 
   @override
@@ -123,18 +132,7 @@ class _TaskPageState extends State<TaskPage> {
                   color: Colors.white,
                   iconSize: 28,
                   onPressed: () async {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
-                        content: Text(
-                          "This feature is under construction.",
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(36),
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 200),
-                      ),
-                    );
+                    await launchURL();
                   }),
               GestureDetector(
                 onTapDown: (TapDownDetails details) {
@@ -259,14 +257,25 @@ class _TaskPageState extends State<TaskPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  task.name,
-                  textAlign: TextAlign.right,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: ScreenUtil().setSp(48),
-                    fontWeight: FontWeight.w600,
+                AnimatedOpacity(
+                  opacity: _textVisible ? 1.0 : 0.0,
+                  duration: Duration(milliseconds: 0),
+                  curve: Curves.easeInOut,
+                  child: AnimatedOverflow(
+                    animatedOverflowDirection:
+                        AnimatedOverflowDirection.HORIZONTAL,
+                    maxWidth: ScreenUtil().setWidth(1080) * 0.65,
+                    speed: 100,
+                    child: Text(
+                      task.name,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenUtil().setSp(48),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -123,18 +123,7 @@ class SearchPageState extends State<SearchPage> {
                   color: Colors.white,
                   iconSize: 28,
                   onPressed: () async {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
-                        content: Text(
-                          "This feature is under construction.",
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(36),
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 200),
-                      ),
-                    );
+                    await launchURL();
                   }),
               GestureDetector(
                 onTapDown: (TapDownDetails details) {
@@ -342,29 +331,32 @@ class SearchPageState extends State<SearchPage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    // Stretch the cards in horizontal axis
-                    children: <Widget>[
-                      Text(
-                        site.name.toUpperCase(),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(42),
-                          fontWeight: FontWeight.w600,
+                  child: Container(
+                    margin: EdgeInsets.only(right: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      // Stretch the cards in horizontal axis
+                      children: <Widget>[
+                        Text(
+                          site.name.toUpperCase(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(42),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      Text(
-                        site.code.toUpperCase(),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(
-                          fontSize: ScreenUtil().setSp(36),
-                          color: Colors.black54,
+                        Text(
+                          site.code.toUpperCase(),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(
+                            fontSize: ScreenUtil().setSp(36),
+                            color: Colors.black54,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 Row(

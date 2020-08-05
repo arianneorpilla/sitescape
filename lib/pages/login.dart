@@ -75,6 +75,10 @@ class LoginPageState extends State<LoginPage> {
 
   /* Perform login or signup */
   void validateAndSubmit() async {
+    if (_isLoading) {
+      return;
+    }
+
     // Remove any informatives as "Password is required" could show below.
     showInformative("");
     // Show the loading circle while Auth in progress.

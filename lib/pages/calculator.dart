@@ -149,7 +149,7 @@ class CalculatorPageState extends State<CalculatorPage> {
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         notchMargin: 12.0,
-        shape: CircularNotchedRectangle(),
+        // shape: CircularNotchedRectangle(),
         child: Container(
           padding: EdgeInsets.only(left: 36, right: 36),
           child: Row(

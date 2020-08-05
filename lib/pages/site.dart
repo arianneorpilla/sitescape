@@ -50,9 +50,16 @@ class _SitePageState extends State<SitePage> {
   bool _uploading = false;
   bool _navigating = false;
 
+  bool _mapVisible = false;
+
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration(milliseconds: 200)).then((onValue) {
+      setState(() {
+        _mapVisible = true;
+      });
+    });
 
     for (Subsite sub in site.subsites) {
       for (Sector sec in sub.sectors) {
@@ -109,18 +116,7 @@ class _SitePageState extends State<SitePage> {
                     color: Colors.white,
                     iconSize: 28,
                     onPressed: () async {
-                      _scaffoldKey.currentState.showSnackBar(
-                        SnackBar(
-                          backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
-                          content: Text(
-                            "This feature is under construction.",
-                            style: TextStyle(
-                              fontSize: ScreenUtil().setSp(36),
-                            ),
-                          ),
-                          duration: Duration(milliseconds: 200),
-                        ),
-                      );
+                      await launchURL();
                     }),
                 GestureDetector(
                   onTapDown: (TapDownDetails details) {
@@ -610,24 +606,29 @@ class _SitePageState extends State<SitePage> {
   Widget showMapCard() {
     return Container(
       height: ScreenUtil().setHeight(2280) * 0.25,
+      color: Color.fromRGBO(230, 224, 224, 1),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          MapboxMap(
-            logoViewMargins: Point(5, 5),
-            scrollGesturesEnabled: false,
-            zoomGesturesEnabled: false,
-            rotateGesturesEnabled: false,
-            tiltGesturesEnabled: false,
-            myLocationEnabled: false,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(widget.site.latitude, widget.site.longitude),
-              zoom: 14,
+          AnimatedOpacity(
+            opacity: _mapVisible ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: MapboxMap(
+              logoViewMargins: Point(5, 5),
+              scrollGesturesEnabled: false,
+              zoomGesturesEnabled: false,
+              rotateGesturesEnabled: false,
+              tiltGesturesEnabled: false,
+              myLocationEnabled: false,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(widget.site.latitude, widget.site.longitude),
+                zoom: 14,
+              ),
             ),
           ),
         ],
       ),
-      color: Colors.white,
     );
   }
 
@@ -791,6 +792,8 @@ class _SitePageState extends State<SitePage> {
     }
 
     _tabKey.currentState.animateTo(leftOff);
+
+    await Future.delayed(Duration(milliseconds: 500));
     _tabKey.currentState.toggleScrollable();
 
     setState(() {
@@ -867,6 +870,7 @@ class _SitePageState extends State<SitePage> {
     }
 
     _tabKey.currentState.animateTo(leftOff);
+    await Future.delayed(Duration(milliseconds: 500));
     _tabKey.currentState.toggleScrollable();
 
     setState(() {
@@ -995,7 +999,7 @@ class _SitePageState extends State<SitePage> {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.red,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () async {
@@ -1028,7 +1032,7 @@ class _SitePageState extends State<SitePage> {
         "CANCEL",
         style: TextStyle(
           color: Colors.black,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -1044,7 +1048,10 @@ class _SitePageState extends State<SitePage> {
         return AlertDialog(
           title: Text(
             "Report a site issue",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: ScreenUtil().setSp(42),
+            ),
           ),
           content: Container(
             width: MediaQuery.of(context).size.width * 0.8,
@@ -1076,7 +1083,7 @@ class _SitePageState extends State<SitePage> {
                 ),
                 hintText: 'Enter details',
                 hintStyle: TextStyle(
-                  fontSize: 16,
+                  fontSize: ScreenUtil().setSp(40),
                   fontWeight: FontWeight.w500,
                   color: Colors.grey,
                 ),

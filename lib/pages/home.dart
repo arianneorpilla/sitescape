@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:weather/weather_library.dart';
 
 import 'package:sitescape/pages/calculator.dart';
@@ -47,6 +48,26 @@ class _HomePageState extends State<HomePage> {
         .then((onValue) => {showWhatsNewModal()});
 
     Future.delayed(Duration(seconds: 5)).then((onValue) {
+      gPermissions.forEach((key, value) {
+        if (value != PermissionStatus.granted) {
+          _scaffoldKey.currentState.showSnackBar(
+            SnackBar(
+              backgroundColor: Color.fromRGBO(209, 25, 62, 1),
+              content: Text(
+                "One or more necessary permissions are not granted. Some of " +
+                    "the application's features may be unavailable.",
+                style: TextStyle(
+                  fontSize: ScreenUtil().setSp(36),
+                ),
+              ),
+              duration: Duration(seconds: 15),
+            ),
+          );
+        }
+      });
+    });
+
+    Future.delayed(Duration(seconds: 10)).then((onValue) {
       if (gUserLatitude == null || gUserLongitude == null) {
         _scaffoldKey.currentState.showSnackBar(
           SnackBar(
@@ -58,13 +79,13 @@ class _HomePageState extends State<HomePage> {
                 fontSize: ScreenUtil().setSp(36),
               ),
             ),
-            duration: Duration(seconds: 30),
+            duration: Duration(seconds: 15),
           ),
         );
       }
     });
 
-    Future.delayed(Duration(seconds: 5)).then((onValue) {
+    Future.delayed(Duration(seconds: 10)).then((onValue) {
       isConnectionAvailable().then((onValue) {
         if (!onValue) {
           _scaffoldKey.currentState.showSnackBar(
@@ -77,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                   fontSize: ScreenUtil().setSp(36),
                 ),
               ),
-              duration: Duration(seconds: 30),
+              duration: Duration(seconds: 15),
             ),
           );
         }
@@ -132,18 +153,7 @@ class _HomePageState extends State<HomePage> {
                   color: Colors.white,
                   iconSize: 28,
                   onPressed: () async {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
-                        content: Text(
-                          "This feature is under construction.",
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(36),
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 200),
-                      ),
-                    );
+                    await launchURL();
                   }),
               GestureDetector(
                 onTapDown: (TapDownDetails details) {
@@ -449,7 +459,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   /* Helper widget for above showWeather function
-
      parameter -> String: Topical header for data
      data -> String: Actual data with units to shwow
   */
@@ -771,7 +780,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   /* One of three nearest Sites, polled with getThreeClosestSites()
-
      site -> Site: Site with info to show
      distance -> String: Distance in km or m with getDistanceText()
   */

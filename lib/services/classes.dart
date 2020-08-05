@@ -6,6 +6,7 @@ import 'dart:ui';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:path/path.dart' as ph;
 import 'package:intl/intl.dart';
 
@@ -97,7 +98,8 @@ class Site {
       sub.populate();
     });
     // Sort the subsites by alphabetical order
-    subsites.sort((a, b) => a.name.compareTo(b.name));
+    subsites
+        .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 
   Future<List<SiteNote>> getIssues() async {
@@ -128,8 +130,8 @@ class Site {
           if (thumb != null) {
             return Image(
               image: thumb.image,
-              height: 96,
-              width: 96,
+              height: ScreenUtil().setHeight(228),
+              width: ScreenUtil().setHeight(228),
               fit: BoxFit.fill,
             );
           }
@@ -200,7 +202,7 @@ List<Site> jsonToSites(String text) {
     sites.add(site);
   });
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   return sites;
 }
@@ -218,7 +220,7 @@ List<Site> snapshotToSites(Map<dynamic, dynamic> snapshot) {
     sites.add(site);
   });
 
-  sites.sort((a, b) => a.name.compareTo(b.name));
+  sites.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
   return sites;
 }
@@ -273,7 +275,8 @@ class Subsite {
       sec.populate();
     });
 
-    sectors.sort((a, b) => a.name.compareTo(b.name));
+    sectors
+        .sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 
   /* Get the directory relevant to a user selection, as the app stores images
@@ -353,7 +356,7 @@ class Sector {
     tasks.forEach((task) => task.sector = this);
 
     // Sort the subsites by alphabetical order
-    tasks.sort((a, b) => a.name.compareTo(b.name));
+    tasks.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 
   /* Get the directory relevant to a user selection, as the app stores images
@@ -448,7 +451,7 @@ class Sector {
         }
 
         // Parse the file's name and split up by delimiter (-)
-        List<String> parts = ph.basenameWithoutExtension(filePath).split("-");
+        List<String> parts = ph.basenameWithoutExtension(filePath).split("_");
 
         // Disregard file if site code mismatch
         if (parts[0] != subsite.site.code) {
@@ -479,7 +482,7 @@ class Sector {
   }
 
   /* Check if a task has been synced by checking if it ends with the local
-     indicator "-L" meaning it has not yet been uploaded. */
+     indicator "_L" meaning it has not yet been uploaded. */
   int getUnsyncedPhotos({Task task}) {
     List<TaskImage> allPhotos = getLocalPhotos(task: task);
 
@@ -489,7 +492,7 @@ class Sector {
       if (allPhotos[i] is FileTaskImage) {
         FileTaskImage fileTask = allPhotos[i];
         String imageFilePath = fileTask.imageFile.path;
-        if (ph.basename(imageFilePath).endsWith("-L.png")) {
+        if (ph.basename(imageFilePath).endsWith("_L.png")) {
           unsyncCount += 1;
         }
       }
@@ -528,7 +531,7 @@ class Sector {
       bool found = false;
 
       for (String basename in fileNames) {
-        List<String> parts = ph.basenameWithoutExtension(basename).split("-");
+        List<String> parts = ph.basenameWithoutExtension(basename).split("_");
         if (task.name == parts[1]) {
           thumbs.add(task.getCloudPhoto(basename));
           found = true;
@@ -552,7 +555,7 @@ class Sector {
       int taskImageCount = 0;
 
       for (String basename in fileNames) {
-        List<String> parts = ph.basenameWithoutExtension(basename).split("-");
+        List<String> parts = ph.basenameWithoutExtension(basename).split("_");
 
         if (task.name == parts[1]) {
           taskImageCount += 1;
@@ -758,7 +761,7 @@ class Task {
     List<Future<NetworkTaskImage>> futures = [];
 
     for (String basename in filenames) {
-      List<String> parts = ph.basenameWithoutExtension(basename).split("-");
+      List<String> parts = ph.basenameWithoutExtension(basename).split("_");
       if (task == null || task.name == parts[1]) {
         // print(basename);
         futures.add(getCloudPhoto(basename));
@@ -823,7 +826,7 @@ class Task {
         }
 
         // Parse the file's name and split up by delimiter (-)
-        List<String> parts = ph.basenameWithoutExtension(filePath).split("-");
+        List<String> parts = ph.basenameWithoutExtension(filePath).split("_");
 
         // Disregard file if site code mismatch
         if (parts[0] != sector.subsite.site.code) {
@@ -874,7 +877,7 @@ enum TaskStatus {
    taskName -> String: Name of task from image name
    count -> int: Sequential count of the image for alphabetical sort in filesys
    hash -> String: Cryptographic hash to prevent filename collisions in cloud
-   isCloud -> bool: Whether or not photo ends with "-L" to check sync status
+   isCloud -> bool: Whether or not photo ends with "_L" to check sync status
 */
 
 abstract class TaskImage {
@@ -976,7 +979,7 @@ class FileTaskImage implements TaskImage {
     }
 
     String basename = ph.basenameWithoutExtension(pathText);
-    List<String> parts = basename.split("-");
+    List<String> parts = basename.split("_");
 
     bool isCloud;
 
@@ -1025,15 +1028,15 @@ class FileTaskImage implements TaskImage {
     if (isCloud) {
       cloudSuffix = ".jpg";
     } else {
-      cloudSuffix = "-L.png";
+      cloudSuffix = "_L.png";
     }
 
     return this.siteCode +
-        "-" +
+        "_" +
         this.taskName +
-        "-" +
+        "_" +
         this.count.toString().padLeft(3, "0") +
-        "-" +
+        "_" +
         this.hash +
         cloudSuffix;
   }
@@ -1105,7 +1108,7 @@ class NetworkTaskImage implements TaskImage {
     String finalURL,
     String thumbURL,
   ) {
-    List<String> parts = basename.split("-");
+    List<String> parts = basename.split("_");
 
     if (parts.length != 4) {
       return null;
@@ -1141,11 +1144,11 @@ class NetworkTaskImage implements TaskImage {
 
   String getBasename(bool isCloud) {
     return this.siteCode +
-        "-" +
+        "_" +
         this.taskName +
-        "-" +
+        "_" +
         this.count.toString().padLeft(3, "0") +
-        "-" +
+        "_" +
         this.hash;
   }
 

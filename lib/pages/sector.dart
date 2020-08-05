@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:animated_overflow/animated_overflow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:sitescape/pages/task.dart';
 import 'package:sitescape/services/modal.dart';
 import 'package:sitescape/services/classes.dart';
 import 'package:sitescape/services/ui.dart';
+import 'package:sitescape/services/util.dart';
 
 /* Sector Page with option to pick a Task, also showing progress 
 
@@ -44,9 +46,17 @@ class _SectorPageState extends State<SectorPage> {
 
   _SectorPageState(this.sector);
 
+  bool _textVisible = false;
+
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration(milliseconds: 16)).then((onValue) {
+      setState(() {
+        _textVisible = true;
+      });
+    });
+
     // Initialise progress parameters
     _sectorProgress = widget.progress;
     _sectorProgressColor = widget.color;
@@ -154,18 +164,7 @@ class _SectorPageState extends State<SectorPage> {
                   color: Colors.white,
                   iconSize: 28,
                   onPressed: () async {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
-                        content: Text(
-                          "This feature is under construction.",
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(36),
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 200),
-                      ),
-                    );
+                    await launchURL();
                   }),
               GestureDetector(
                 onTapDown: (TapDownDetails details) {
@@ -215,14 +214,24 @@ class _SectorPageState extends State<SectorPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  sector.name,
-                  textAlign: TextAlign.right,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: ScreenUtil().setSp(48),
-                    fontWeight: FontWeight.w600,
+                AnimatedOpacity(
+                  opacity: _textVisible ? 1.0 : 0.0,
+                  duration: Duration(milliseconds: 0),
+                  child: AnimatedOverflow(
+                    animatedOverflowDirection:
+                        AnimatedOverflowDirection.HORIZONTAL,
+                    maxWidth: ScreenUtil().setWidth(1080) * 0.65,
+                    speed: 100,
+                    child: Text(
+                      sector.name,
+                      textAlign: TextAlign.right,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: ScreenUtil().setSp(48),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -557,7 +566,7 @@ class _SectorPageState extends State<SectorPage> {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.red,
-          fontSize: ScreenUtil().setSp(42),
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () async {
@@ -579,7 +588,7 @@ class _SectorPageState extends State<SectorPage> {
         'CANCEL',
         style: TextStyle(
           color: Colors.black,
-          fontSize: ScreenUtil().setSp(42),
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -595,7 +604,7 @@ class _SectorPageState extends State<SectorPage> {
             'Are you sure?',
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: ScreenUtil().setSp(48),
+              fontSize: ScreenUtil().setSp(42),
             ),
           ),
           content: SingleChildScrollView(
@@ -607,7 +616,7 @@ class _SectorPageState extends State<SectorPage> {
               textAlign: TextAlign.justify,
               style: TextStyle(
                 fontWeight: FontWeight.w400,
-                fontSize: ScreenUtil().setSp(42),
+                fontSize: ScreenUtil().setSp(40),
               ),
             ),
           ),

@@ -240,7 +240,7 @@ void showFreeUpSpaceDialog(BuildContext context) async {
           "Free up space?",
           style: TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: ScreenUtil().setSp(48),
+            fontSize: ScreenUtil().setSp(42),
           ),
         ),
         content: SingleChildScrollView(
@@ -436,7 +436,7 @@ void showFeedbackDialog(BuildContext context) async {
       style: TextStyle(
         fontWeight: FontWeight.bold,
         color: Theme.of(context).accentColor,
-        fontSize: 16,
+        fontSize: ScreenUtil().setSp(40),
       ),
     ),
     onPressed: () async {
@@ -476,7 +476,7 @@ void showFeedbackDialog(BuildContext context) async {
       "CANCEL",
       style: TextStyle(
         color: Colors.black,
-        fontSize: 16,
+        fontSize: ScreenUtil().setSp(40),
       ),
     ),
     onPressed: () {
@@ -492,7 +492,10 @@ void showFeedbackDialog(BuildContext context) async {
       return AlertDialog(
         title: Text(
           "We appreciate your feedback",
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: ScreenUtil().setSp(42),
+          ),
         ),
         content: Container(
           width: MediaQuery.of(context).size.width * 0.8,
@@ -518,7 +521,7 @@ void showFeedbackDialog(BuildContext context) async {
               ),
               hintText: 'Enter any comments and suggestions',
               hintStyle: TextStyle(
-                fontSize: 16,
+                fontSize: ScreenUtil().setSp(40),
                 fontWeight: FontWeight.w500,
                 color: Colors.grey,
               ),

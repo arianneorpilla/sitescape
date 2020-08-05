@@ -113,21 +113,24 @@ class CameraScanScreenState extends State<CameraScanScreen>
       ),
       // floatingActionButton: showFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: BottomAppBar(
-        notchMargin: 12.0,
-        elevation: 0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.camera_alt),
-                color: Colors.transparent,
-                iconSize: 36,
-                onPressed: () {}),
-          ],
+      bottomNavigationBar: Container(
+        margin: EdgeInsets.only(bottom: 48),
+        child: BottomAppBar(
+          notchMargin: 12.0,
+          elevation: 0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.camera_alt),
+                  color: Colors.transparent,
+                  iconSize: 36,
+                  onPressed: () {}),
+            ],
+          ),
+          color: Colors.transparent,
+          shape: CircularNotchedRectangle(),
         ),
-        color: Colors.transparent,
-        shape: CircularNotchedRectangle(),
       ),
     );
   }

@@ -4,6 +4,7 @@ import "dart:typed_data";
 import "package:esys_flutter_share/esys_flutter_share.dart";
 import "package:flutter/material.dart";
 import "package:flutter/rendering.dart";
+import 'package:flutter_screenutil/screenutil.dart';
 import "package:get/get.dart";
 import "package:photo_view/photo_view.dart";
 import "package:photo_view/photo_view_gallery.dart";
@@ -195,7 +196,7 @@ class _PreviewScreenState extends State<PreviewPage> {
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: Colors.red,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -227,7 +228,7 @@ class _PreviewScreenState extends State<PreviewPage> {
         "CANCEL",
         style: TextStyle(
           color: Colors.black,
-          fontSize: 16,
+          fontSize: ScreenUtil().setSp(40),
         ),
       ),
       onPressed: () {
@@ -243,7 +244,7 @@ class _PreviewScreenState extends State<PreviewPage> {
             "Are you sure?",
             style: TextStyle(
               fontWeight: FontWeight.w600,
-              fontSize: 20,
+              fontSize: ScreenUtil().setSp(42),
             ),
           ),
           content: SingleChildScrollView(
@@ -251,7 +252,10 @@ class _PreviewScreenState extends State<PreviewPage> {
               "Deleting this photo will mean losing it permanently if it " +
                   "has not yet been synced with the cloud.",
               textAlign: TextAlign.justify,
-              style: TextStyle(fontWeight: FontWeight.w400),
+              style: TextStyle(
+                fontWeight: FontWeight.w400,
+                fontSize: ScreenUtil().setSp(40),
+              ),
             ),
           ),
           actions: [logout, cancel],
