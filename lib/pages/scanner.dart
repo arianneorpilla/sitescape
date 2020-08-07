@@ -12,6 +12,7 @@ import 'package:sitescape/main.dart';
 import 'package:sitescape/pages/camera_scan.dart';
 import 'package:sitescape/services/modal.dart';
 import 'package:sitescape/services/ui.dart';
+import 'package:sitescape/services/util.dart';
 
 class ScannerPage extends StatefulWidget {
   ScannerPage({Key key}) : super(key: key);
@@ -83,18 +84,7 @@ class ScannerPageState extends State<ScannerPage> {
                   color: Colors.white,
                   iconSize: 28,
                   onPressed: () async {
-                    _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(
-                        backgroundColor: Color.fromRGBO(84, 176, 159, 1.0),
-                        content: Text(
-                          "This feature is under construction.",
-                          style: TextStyle(
-                            fontSize: ScreenUtil().setSp(36),
-                          ),
-                        ),
-                        duration: Duration(milliseconds: 200),
-                      ),
-                    );
+                    launchURL();
                   }),
               GestureDetector(
                 onTapDown: (TapDownDetails details) {
