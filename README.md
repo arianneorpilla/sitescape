@@ -20,3 +20,4 @@ Collecting and organising documents and photos in the field has never been simpl
 * Get the important numbers right with extra features like MW alignment calculations
 * Be made aware of rejected photos and defects as soon as possible with push notifications
 * Track progress easily and get status updates on sites that need your attention
+
