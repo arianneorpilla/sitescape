@@ -313,6 +313,9 @@ class SitePageState extends State<SitePage> {
       child: TextFormField(
         controller: nameController,
         textCapitalization: TextCapitalization.none,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r"[0-9A-Z-a-z ]"))
+        ],
         autofocus: false,
         cursorColor: Colors.white,
         obscureText: false,
@@ -371,7 +374,9 @@ class SitePageState extends State<SitePage> {
         ),
         style: TextStyle(color: Colors.white, fontSize: 16),
         // Must be valid entry
-        validator: (value) => value.isEmpty ? 'Site name required.' : null,
+        validator: (value) => value.isEmpty || value.contains("/")
+            ? 'Valid site name required.'
+            : null,
         // Used to pass focus from user -> pass
       ),
     );
